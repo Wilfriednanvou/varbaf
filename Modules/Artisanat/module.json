@@ -1,0 +1,11 @@
+{
+    "name": "Artisanat",
+    "alias": "artisanat",
+    "description": "Artisans, corps de métier, entreprises artisanales, boutiques, espaces et attributions de boutiques.",
+    "keywords": ["artisanat", "artisans", "boutiques"],
+    "priority": 90,
+    "providers": [
+        "Modules\\Artisanat\\Providers\\ArtisanatServiceProvider"
+    ],
+    "files": []
+}

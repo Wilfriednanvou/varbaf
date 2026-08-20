@@ -29,7 +29,10 @@
             "Modules\\": "Modules/",
             "Modules\\Socle\\": "Modules/Socle/app/",
             "Modules\\Socle\\Database\\Factories\\": "Modules/Socle/database/factories/",
-            "Modules\\Socle\\Database\\Seeders\\": "Modules/Socle/database/seeders/"
+            "Modules\\Socle\\Database\\Seeders\\": "Modules/Socle/database/seeders/",
+            "Modules\\Artisanat\\": "Modules/Artisanat/app/",
+            "Modules\\Artisanat\\Database\\Factories\\": "Modules/Artisanat/database/factories/",
+            "Modules\\Artisanat\\Database\\Seeders\\": "Modules/Artisanat/database/seeders/"
         }
     },
     "autoload-dev": {
@@ -87,6 +90,7 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform-check": false,
         "allow-plugins": {
             "php-http/discovery": true,
             "wikimedia/composer-merge-plugin": true

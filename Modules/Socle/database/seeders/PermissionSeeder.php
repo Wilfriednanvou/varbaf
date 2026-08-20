@@ -96,6 +96,44 @@ class PermissionSeeder extends Seeder
 
             // === SÉCURITÉ : audit ===
             ['name' => 'lister_journaux_audit', 'module' => 'SOCLE', 'description' => 'Consulter le journal d\'audit'],
+
+            // === ARTISANAT : corps de métier ===
+            ['name' => 'lister_corps_metiers', 'module' => 'ARTISANAT', 'description' => 'Consulter les corps de métier'],
+            ['name' => 'ajouter_corps_metier', 'module' => 'ARTISANAT', 'description' => 'Créer un corps de métier'],
+            ['name' => 'modifier_corps_metier', 'module' => 'ARTISANAT', 'description' => 'Modifier un corps de métier'],
+            ['name' => 'supprimer_corps_metier', 'module' => 'ARTISANAT', 'description' => 'Supprimer un corps de métier'],
+
+            // === ARTISANAT : entreprises artisanales ===
+            ['name' => 'lister_entreprises', 'module' => 'ARTISANAT', 'description' => 'Consulter les entreprises artisanales'],
+            ['name' => 'ajouter_entreprise', 'module' => 'ARTISANAT', 'description' => 'Créer une entreprise artisanale'],
+            ['name' => 'modifier_entreprise', 'module' => 'ARTISANAT', 'description' => 'Modifier une entreprise artisanale'],
+            ['name' => 'supprimer_entreprise', 'module' => 'ARTISANAT', 'description' => 'Supprimer une entreprise artisanale'],
+
+            // === ARTISANAT : artisans ===
+            ['name' => 'lister_artisans', 'module' => 'ARTISANAT', 'description' => 'Consulter les artisans'],
+            ['name' => 'ajouter_artisan', 'module' => 'ARTISANAT', 'description' => 'Enregistrer un artisan'],
+            ['name' => 'modifier_artisan', 'module' => 'ARTISANAT', 'description' => 'Modifier un artisan'],
+            ['name' => 'supprimer_artisan', 'module' => 'ARTISANAT', 'description' => 'Supprimer un artisan'],
+
+            // === ARTISANAT : boutiques ===
+            ['name' => 'lister_boutiques', 'module' => 'ARTISANAT', 'description' => 'Consulter les boutiques'],
+            ['name' => 'ajouter_boutique', 'module' => 'ARTISANAT', 'description' => 'Créer une boutique'],
+            ['name' => 'modifier_boutique', 'module' => 'ARTISANAT', 'description' => 'Modifier une boutique'],
+            ['name' => 'supprimer_boutique', 'module' => 'ARTISANAT', 'description' => 'Supprimer une boutique'],
+
+            // === ARTISANAT : espaces ===
+            ['name' => 'lister_espaces', 'module' => 'ARTISANAT', 'description' => 'Consulter les espaces'],
+            ['name' => 'ajouter_espace', 'module' => 'ARTISANAT', 'description' => 'Créer un espace'],
+            ['name' => 'modifier_espace', 'module' => 'ARTISANAT', 'description' => 'Modifier un espace'],
+            ['name' => 'supprimer_espace', 'module' => 'ARTISANAT', 'description' => 'Supprimer un espace'],
+
+            // === ARTISANAT : attributions de boutiques ===
+            ['name' => 'lister_attributions', 'module' => 'ARTISANAT', 'description' => 'Consulter les attributions de boutiques'],
+            ['name' => 'ajouter_attribution', 'module' => 'ARTISANAT', 'description' => 'Attribuer une boutique à un artisan'],
+            ['name' => 'modifier_attribution', 'module' => 'ARTISANAT', 'description' => 'Modifier une attribution de boutique'],
+            ['name' => 'resilier_attribution', 'module' => 'ARTISANAT', 'description' => 'Résilier une attribution avant terme'],
+            ['name' => 'terminer_attribution', 'module' => 'ARTISANAT', 'description' => 'Clore une attribution arrivée à échéance'],
+            ['name' => 'supprimer_attribution', 'module' => 'ARTISANAT', 'description' => 'Supprimer une attribution de boutique'],
         ];
     }
 
@@ -127,6 +165,16 @@ class PermissionSeeder extends Seeder
                     'lister_utilisateurs',
                     'lister_roles',
                     'lister_journaux_audit',
+                    // Le coordonnateur tient le référentiel de
+                    // l'artisanat et signe les attributions : c'est son
+                    // domaine propre.
+                    'lister_corps_metiers', 'ajouter_corps_metier', 'modifier_corps_metier',
+                    'lister_entreprises', 'ajouter_entreprise', 'modifier_entreprise',
+                    'lister_artisans', 'ajouter_artisan', 'modifier_artisan',
+                    'lister_boutiques', 'ajouter_boutique', 'modifier_boutique',
+                    'lister_espaces', 'ajouter_espace', 'modifier_espace',
+                    'lister_attributions', 'ajouter_attribution', 'modifier_attribution',
+                    'resilier_attribution', 'terminer_attribution',
                 ],
             ],
             'agent_commercial' => [
@@ -135,6 +183,13 @@ class PermissionSeeder extends Seeder
                     'lister_villages',
                     'lister_exercices',
                     'lister_agents',
+                    // Lecture seule : l'agent commercial a besoin de
+                    // savoir quelle boutique appartient à quel artisan
+                    // pour saisir une vente, pas de modifier le parc.
+                    'lister_corps_metiers',
+                    'lister_artisans',
+                    'lister_boutiques',
+                    'lister_attributions',
                 ],
             ],
             'caissier' => [
@@ -143,6 +198,10 @@ class PermissionSeeder extends Seeder
                     'lister_villages',
                     'lister_exercices',
                     'lister_agents',
+                    'lister_artisans',
+                    'lister_boutiques',
+                    'lister_attributions',
+                    'lister_espaces',
                 ],
             ],
         ];

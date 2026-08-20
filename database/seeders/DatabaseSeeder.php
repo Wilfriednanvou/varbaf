@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Artisanat\Database\Seeders\ArtisanatDatabaseSeeder;
 use Modules\Socle\Database\Seeders\SocleDatabaseSeeder;
 
 /**
@@ -18,6 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SocleDatabaseSeeder::class,
+            ArtisanatDatabaseSeeder::class,
         ]);
     }
 }

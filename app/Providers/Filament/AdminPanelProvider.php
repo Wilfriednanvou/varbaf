@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Modules\Artisanat\Filament\ArtisanatPlugin;
 use Modules\Socle\Filament\SoclePlugin;
 
 /**
@@ -55,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
             // ressources et ses pages.
             ->plugins([
                 SoclePlugin::make(),
+                ArtisanatPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

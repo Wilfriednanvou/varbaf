@@ -1,0 +1,17 @@
+{
+    "name": "varbaf/artisanat",
+    "description": "Module Artisanat — artisans, boutiques et attributions de l'ERP VARBAF",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Artisanat\\": "app/",
+            "Modules\\Artisanat\\Database\\Factories\\": "database/factories/",
+            "Modules\\Artisanat\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
