@@ -13,7 +13,9 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Artisanat\Enums\EtatBoutique;
 use Modules\Artisanat\Enums\PeriodiciteRedevance;
 use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Filament\Resources\AttributionBoutiqueResource\Pages;
@@ -98,9 +100,27 @@ class AttributionBoutiqueResource extends Resource
                         ->searchable(['matricule', 'nom', 'prenom'])
                         ->preload()
                         ->required(),
+                    // Le filtre laisse toujours passer la valeur déjà
+                    // enregistrée. Filament réutilise ce même
+                    // modifyQueryUsing pour résoudre l'option
+                    // sélectionnée : sans cette échappatoire, ouvrir en
+                    // modification une attribution dont la boutique est
+                    // devenue indisponible viderait le champ, et
+                    // l'enregistrement écraserait la valeur.
                     Forms\Components\Select::make('boutique_id')
                         ->label('Boutique')
-                        ->relationship('boutique', 'numero')
+                        ->relationship(
+                            name: 'boutique',
+                            titleAttribute: 'numero',
+                            modifyQueryUsing: fn (Builder $query, ?Model $record) => $query->where(
+                                fn (Builder $sousRequete) => $sousRequete
+                                    ->where('etat', '!=', EtatBoutique::INDISPONIBLE->value)
+                                    ->when(
+                                        $record?->boutique_id,
+                                        fn (Builder $q, $identifiant) => $q->orWhere('boutiques.id', $identifiant),
+                                    ),
+                            ),
+                        )
                         ->searchable()
                         ->preload()
                         ->required()
@@ -146,9 +166,23 @@ class AttributionBoutiqueResource extends Resource
                         ->required(),
                 ]),
                 Grid::make(2)->schema([
+                    // Même échappatoire que pour la boutique : un
+                    // exercice clôturé après coup doit rester lisible
+                    // sur les attributions qui s'y rattachent déjà.
                     Forms\Components\Select::make('exercice_id')
                         ->label('Exercice')
-                        ->relationship('exercice', 'libelle')
+                        ->relationship(
+                            name: 'exercice',
+                            titleAttribute: 'libelle',
+                            modifyQueryUsing: fn (Builder $query, ?Model $record) => $query->where(
+                                fn (Builder $sousRequete) => $sousRequete
+                                    ->where('cloture', false)
+                                    ->when(
+                                        $record?->exercice_id,
+                                        fn (Builder $q, $identifiant) => $q->orWhere('exercices.id', $identifiant),
+                                    ),
+                            ),
+                        )
                         ->default(fn () => Exercice::courant()?->getKey())
                         ->searchable()
                         ->preload()
@@ -163,6 +197,25 @@ class AttributionBoutiqueResource extends Resource
                         ->disabled()
                         ->dehydrated(false),
                 ]),
+                Grid::make(2)->schema([
+                    // Le premier mois est offert : la date est calculée
+                    // par le modèle et seulement montrée ici, pour que
+                    // l'agent qui saisit le contrat voie tout de suite
+                    // à partir de quand la boutique sera facturée.
+                    Forms\Components\DatePicker::make('date_debut_facturation')
+                        ->label('Début de facturation')
+                        ->native(false)
+                        ->displayFormat('d/m/Y')
+                        ->disabled()
+                        ->dehydrated(false),
+                    Forms\Components\Placeholder::make('validee_par_affichage')
+                        ->label('Dossier validé par')
+                        ->content(fn (?Model $record) => $record?->valideePar?->name ?? 'Pas encore validé'),
+                ]),
+                Forms\Components\Toggle::make('dossier_complet')
+                    ->label('Dossier administratif complet')
+                    ->default(false)
+                    ->helperText('Demande timbrée, attestation communale, images des œuvres, plan de localisation de l\'atelier et copie de la CNI. Cocher cette case vous enregistre comme validateur du dossier'),
             ]);
     }
 
@@ -188,6 +241,12 @@ class AttributionBoutiqueResource extends Resource
                     ->label('Début')
                     ->date('d/m/Y')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('date_debut_facturation')
+                    ->label('Début de facturation')
+                    ->date('d/m/Y')
+                    ->description('Premier mois offert')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('date_fin')
                     ->label('Fin')
                     ->date('d/m/Y')
@@ -198,6 +257,14 @@ class AttributionBoutiqueResource extends Resource
                     ->money('XAF')
                     ->description(fn (AttributionBoutique $record) => $record->periodicite?->getLabel())
                     ->sortable(),
+                Tables\Columns\IconColumn::make('dossier_complet')
+                    ->label('Dossier')
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('valideePar.name')
+                    ->label('Validé par')
+                    ->placeholder('Pas encore validé')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('statut')
                     ->label('Statut')
                     ->badge()

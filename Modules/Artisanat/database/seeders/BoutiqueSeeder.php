@@ -11,12 +11,15 @@ use Modules\Socle\Models\VillageArtisanal;
  * Parc de 24 boutiques du Village Artisanal Régional de Bafoussam.
  *
  * Seules les données structurelles connues sont posées : numéro et
- * emplacement. La superficie et la redevance de référence restent
- * nulles — CLAUDE.md interdit les données fictives, et ces montants
- * doivent être repris de la liste réelle des redevances détenue par la
- * coordination. Une redevance inventée se retrouverait ensuite dans les
- * échéanciers et les statistiques, sans qu'on sache plus qu'elle était
- * fausse.
+ * emplacement. La superficie et le tarif au mètre carré restent nuls —
+ * CLAUDE.md interdit les données fictives, et ces valeurs doivent être
+ * reprises du barème réel détenu par la coordination. Un tarif inventé
+ * se retrouverait, multiplié par la surface, dans les échéanciers et
+ * les statistiques, sans qu'on sache plus qu'il était faux.
+ *
+ * La redevance mensuelle n'est pas semée : depuis la règle 12 de
+ * CLAUDE.md, elle découle de la surface et du tarif, et le modèle la
+ * calcule à chaque écriture.
  *
  * Le seeder n'est pas lié à un village en dur : il alimente le village
  * de code VARBAF, et ne fait rien si le Socle n'a pas encore été semé.
@@ -50,10 +53,10 @@ class BoutiqueSeeder extends Seeder
                     ['village_id' => $village->id, 'numero' => $numero],
                     [
                         'emplacement' => $emplacement,
-                        // Laissées nulles à dessein : à renseigner
-                        // depuis la liste réelle des redevances.
+                        // Laissés nuls à dessein : à renseigner depuis
+                        // le barème réel.
                         'superficie' => null,
-                        'redevance_mensuelle' => null,
+                        'tarif_metre_carre' => null,
                         'etat' => EtatBoutique::DISPONIBLE,
                     ],
                 );
@@ -63,6 +66,6 @@ class BoutiqueSeeder extends Seeder
         $total = Boutique::where('village_id', $village->id)->count();
 
         $this->command?->info("{$total} boutiques en place pour {$village->nom}.");
-        $this->command?->comment('Superficies et redevances à renseigner depuis la liste réelle de la coordination.');
+        $this->command?->comment('Superficies et tarifs au mètre carré à renseigner depuis le barème de la coordination : la redevance en découlera.');
     }
 }

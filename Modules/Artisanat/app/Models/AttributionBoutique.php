@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Modules\Artisanat\Enums\EtatBoutique;
 use Modules\Artisanat\Enums\PeriodiciteRedevance;
 use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Exceptions\AttributionChevauchanteException;
 use Modules\Artisanat\Exceptions\AttributionInvalideException;
 use Modules\Socle\Models\Exercice;
+use Modules\Socle\Models\Utilisateur;
 
 /**
  * Occupation d'une boutique par un artisan sur une période donnée.
@@ -58,11 +60,17 @@ class AttributionBoutique extends Model
 {
     protected $table = 'attributions_boutiques';
 
+    /**
+     * `date_debut_facturation` et `validee_par` sont absentes : la
+     * première est calculée, la seconde est constatée à la validation
+     * du dossier. Ni l'une ni l'autre ne se saisit.
+     */
     protected $fillable = [
         'date_debut',
         'date_fin',
         'redevance_convenue',
         'periodicite',
+        'dossier_complet',
         'statut',
         'motif_resiliation',
         'artisan_id',
@@ -84,15 +92,18 @@ class AttributionBoutique extends Model
     protected $attributes = [
         'statut' => 'ACTIVE',
         'periodicite' => 'MENSUELLE',
+        'dossier_complet' => false,
     ];
 
     protected function casts(): array
     {
         return [
             'date_debut' => 'date',
+            'date_debut_facturation' => 'date',
             'date_fin' => 'date',
             'redevance_convenue' => 'decimal:2',
             'periodicite' => PeriodiciteRedevance::class,
+            'dossier_complet' => 'boolean',
             'statut' => StatutAttribution::class,
         ];
     }
@@ -100,6 +111,8 @@ class AttributionBoutique extends Model
     protected static function booted(): void
     {
         static::saving(function (self $attribution): void {
+            $attribution->calculerDateDebutFacturation();
+            $attribution->constaterValidationDuDossier();
             $attribution->garantirConditionsDAttribution();
             $attribution->garantirAbsenceDeChevauchement();
         });
@@ -125,6 +138,11 @@ class AttributionBoutique extends Model
     public function exercice(): BelongsTo
     {
         return $this->belongsTo(Exercice::class, 'exercice_id');
+    }
+
+    public function valideePar(): BelongsTo
+    {
+        return $this->belongsTo(Utilisateur::class, 'validee_par');
     }
 
     public function scopeActive(Builder $requete): Builder
@@ -171,6 +189,49 @@ class AttributionBoutique extends Model
             ->where(fn (Builder $requete) => $requete
                 ->whereNull('date_fin')
                 ->orWhereDate('date_fin', '>=', $debut));
+    }
+
+    /**
+     * Le premier mois d'occupation est gratuit : la facturation ne
+     * commence qu'un mois après la date d'entrée (règle 12 de
+     * CLAUDE.md).
+     *
+     * La date est recalculée à chaque écriture plutôt que figée une
+     * fois : si la date d'entrée est corrigée après coup — cas courant
+     * quand le contrat est saisi en retard — la date de facturation
+     * doit suivre, sans quoi le village facturerait un mois qu'il
+     * s'était engagé à offrir.
+     */
+    public function calculerDateDebutFacturation(): void
+    {
+        $this->date_debut_facturation = $this->date_debut
+            ? Carbon::parse($this->date_debut)->copy()->addMonth()->toDateString()
+            : null;
+    }
+
+    /**
+     * Constate qui a validé la complétude du dossier.
+     *
+     * Le validateur n'est pas choisi dans une liste : il est constaté.
+     * C'est l'utilisateur qui coche la case qui engage sa
+     * responsabilité, et laisser désigner un tiers ôterait toute
+     * valeur à la trace. Décocher la case efface le validateur — le
+     * journal d'audit, lui, garde l'historique des deux mouvements.
+     *
+     * Hors contexte authentifié — seeder, commande artisan — le champ
+     * reste nul : personne n'a validé.
+     */
+    public function constaterValidationDuDossier(): void
+    {
+        if (! $this->dossier_complet) {
+            $this->validee_par = null;
+
+            return;
+        }
+
+        if (blank($this->validee_par)) {
+            $this->validee_par = Auth::id();
+        }
     }
 
     /**

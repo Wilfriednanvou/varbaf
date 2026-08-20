@@ -28,11 +28,15 @@ class Boutique extends Model
 {
     protected $table = 'boutiques';
 
+    /**
+     * `redevance_mensuelle` est volontairement absente : elle est
+     * calculée, jamais saisie.
+     */
     protected $fillable = [
         'numero',
         'superficie',
         'emplacement',
-        'redevance_mensuelle',
+        'tarif_metre_carre',
         'etat',
         'village_id',
     ];
@@ -50,9 +54,34 @@ class Boutique extends Model
     {
         return [
             'superficie' => 'decimal:2',
+            'tarif_metre_carre' => 'decimal:2',
             'redevance_mensuelle' => 'decimal:2',
             'etat' => EtatBoutique::class,
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Règle 12 de CLAUDE.md : la redevance découle de la surface et
+        // du tarif au mètre carré. Le calcul vit dans le modèle et non
+        // dans le formulaire, afin qu'une reprise de barème passée par
+        // un seeder ou une commande produise le même résultat.
+        static::saving(fn (self $boutique) => $boutique->recalculerRedevanceMensuelle());
+    }
+
+    /**
+     * Redevance de référence = superficie × tarif au mètre carré.
+     *
+     * Tant que l'une des deux valeurs manque, la redevance reste nulle
+     * plutôt que de valoir zéro : une boutique dont on ignore la
+     * surface n'est pas une boutique gratuite, et l'écran affiche
+     * « À renseigner » au lieu d'un montant faux.
+     */
+    public function recalculerRedevanceMensuelle(): void
+    {
+        $this->redevance_mensuelle = (blank($this->superficie) || blank($this->tarif_metre_carre))
+            ? null
+            : round((float) $this->superficie * (float) $this->tarif_metre_carre, 2);
     }
 
     public function village(): BelongsTo

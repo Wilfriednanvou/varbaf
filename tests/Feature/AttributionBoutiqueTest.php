@@ -157,6 +157,49 @@ class AttributionBoutiqueTest extends TestCase
         $this->assertTrue($anterieure->exists);
     }
 
+    public function test_la_facturation_commence_un_mois_apres_l_entree(): void
+    {
+        $attribution = $this->attribuer('2026-03-15', '2026-12-31');
+
+        $this->assertSame(
+            '2026-04-15',
+            $attribution->date_debut_facturation->toDateString(),
+            'Le premier mois d\'occupation est offert.'
+        );
+    }
+
+    public function test_la_date_de_facturation_suit_une_correction_de_la_date_d_entree(): void
+    {
+        $attribution = $this->attribuer('2026-03-15', '2026-12-31');
+
+        $attribution->date_debut = '2026-05-01';
+        $attribution->save();
+
+        $this->assertSame('2026-06-01', $attribution->fresh()->date_debut_facturation->toDateString());
+    }
+
+    public function test_le_dossier_est_incomplet_par_defaut_et_sans_validateur(): void
+    {
+        $attribution = $this->attribuer('2026-01-01', '2026-06-30');
+
+        $this->assertFalse($attribution->dossier_complet);
+        $this->assertNull($attribution->validee_par);
+    }
+
+    public function test_la_redevance_de_la_boutique_decoule_de_la_surface_et_du_tarif(): void
+    {
+        $this->boutique->update(['superficie' => 12.5, 'tarif_metre_carre' => 2000]);
+
+        $this->assertSame('25000.00', $this->boutique->fresh()->redevance_mensuelle);
+    }
+
+    public function test_la_redevance_reste_nulle_tant_qu_une_des_deux_valeurs_manque(): void
+    {
+        $this->boutique->update(['superficie' => 12.5]);
+
+        $this->assertNull($this->boutique->fresh()->redevance_mensuelle);
+    }
+
     public function test_une_attribution_resiliee_ne_bloque_plus_la_boutique(): void
     {
         $premiere = $this->attribuer('2026-01-01', '2026-06-30');

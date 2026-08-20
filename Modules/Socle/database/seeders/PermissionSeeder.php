@@ -53,6 +53,8 @@ class PermissionSeeder extends Seeder
             $role->syncPermissions($definition['permissions']);
         }
 
+        $this->retirerLesRolesObsoletes();
+
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
@@ -138,72 +140,163 @@ class PermissionSeeder extends Seeder
     }
 
     /**
-     * Profils livrés avec le Socle.
+     * Profils calqués sur l'organigramme réel de la structure :
+     * coordonnateur, coordonnateur adjoint et cinq chefs de section.
      *
-     * La séparation des rôles exigée par le cahier des charges se lit
-     * ici : le profil qui saisira les ventes n'est pas celui qui
-     * clôturera une section de caisse ni celui qui validera une
-     * campagne de reversement. Les profils métier seront complétés par
-     * les modules Commerce et Trésorerie, sans jamais élargir le
-     * périmètre du coordonnateur au-delà du pilotage.
+     * Chaque section ne reçoit que ce que ses attributions justifient.
+     * C'est la lecture directe de la règle de séparation des rôles de
+     * CLAUDE.md : la section qui vendra n'est pas celle qui tient le
+     * parc de boutiques, ni celle qui clôturera une section de caisse.
+     * Les modules Commerce et Trésorerie compléteront ces listes sans
+     * élargir aucun périmètre.
+     *
+     * `super_utilisateur` est conservé à part : c'est le compte
+     * technique d'administration, celui que le seeder crée pour la
+     * première connexion. CLAUDE.md décrit le coordonnateur comme
+     * super-utilisateur ; les fusionner reviendrait à donner à un rôle
+     * métier les droits d'administration du système, ce qui mérite
+     * d'être tranché explicitement plutôt qu'en passant.
      *
      * @return array<string, array{description: string, permissions: array<int, string>}>
      */
     protected function roles(): array
     {
+        // Lecture du référentiel : le socle commun à toutes les
+        // sections, sans lequel aucun écran métier n'est exploitable.
+        $lectureReferentiel = [
+            'lister_villages',
+            'lister_exercices',
+            'lister_corps_metiers',
+            'lister_artisans',
+            'lister_entreprises',
+            'lister_boutiques',
+            'lister_espaces',
+            'lister_attributions',
+        ];
+
         return [
             Utilisateur::ROLE_SUPER_UTILISATEUR => [
                 'description' => 'Administrateur technique : toutes les permissions, y compris celles des modules à venir',
                 'permissions' => [],
             ],
+
             'coordonnateur' => [
-                'description' => 'Coordonnateur du village : pilote le référentiel et consulte l\'audit',
+                'description' => 'Coordonnateur : dirige le village, arrête les exercices et signe les attributions',
                 'permissions' => [
-                    'lister_villages', 'modifier_village',
-                    'lister_exercices', 'ajouter_exercice', 'modifier_exercice', 'activer_exercice', 'cloturer_exercice',
+                    ...$lectureReferentiel,
+                    'modifier_village',
+                    'ajouter_exercice', 'modifier_exercice', 'activer_exercice', 'cloturer_exercice',
                     'lister_agents', 'ajouter_agent', 'modifier_agent',
-                    'lister_utilisateurs',
+                    'lister_utilisateurs', 'ajouter_utilisateur', 'modifier_utilisateur',
                     'lister_roles',
                     'lister_journaux_audit',
-                    // Le coordonnateur tient le référentiel de
-                    // l'artisanat et signe les attributions : c'est son
-                    // domaine propre.
-                    'lister_corps_metiers', 'ajouter_corps_metier', 'modifier_corps_metier',
-                    'lister_entreprises', 'ajouter_entreprise', 'modifier_entreprise',
-                    'lister_artisans', 'ajouter_artisan', 'modifier_artisan',
-                    'lister_boutiques', 'ajouter_boutique', 'modifier_boutique',
-                    'lister_espaces', 'ajouter_espace', 'modifier_espace',
-                    'lister_attributions', 'ajouter_attribution', 'modifier_attribution',
+                    'ajouter_corps_metier', 'modifier_corps_metier',
+                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_artisan', 'modifier_artisan',
+                    'ajouter_boutique', 'modifier_boutique',
+                    'ajouter_espace', 'modifier_espace',
+                    'ajouter_attribution', 'modifier_attribution',
                     'resilier_attribution', 'terminer_attribution',
                 ],
             ],
-            'agent_commercial' => [
-                'description' => 'Agent commercial : saisit les ventes, consulte le référentiel en lecture',
+
+            'coordonnateur_adjoint' => [
+                'description' => 'Coordonnateur adjoint : seconde le coordonnateur au quotidien, sans les actes irréversibles',
                 'permissions' => [
-                    'lister_villages',
-                    'lister_exercices',
-                    'lister_agents',
-                    // Lecture seule : l'agent commercial a besoin de
-                    // savoir quelle boutique appartient à quel artisan
-                    // pour saisir une vente, pas de modifier le parc.
-                    'lister_corps_metiers',
-                    'lister_artisans',
-                    'lister_boutiques',
-                    'lister_attributions',
+                    ...$lectureReferentiel,
+                    'lister_agents', 'ajouter_agent', 'modifier_agent',
+                    'lister_journaux_audit',
+                    'ajouter_corps_metier', 'modifier_corps_metier',
+                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_artisan', 'modifier_artisan',
+                    'ajouter_boutique', 'modifier_boutique',
+                    'ajouter_espace', 'modifier_espace',
+                    'ajouter_attribution', 'modifier_attribution',
+                    'terminer_attribution',
+                    // Volontairement absents : cloturer_exercice et
+                    // resilier_attribution. Clôturer un exercice est
+                    // irréversible, résilier rompt un contrat : ces deux
+                    // actes engagent le coordonnateur lui-même.
                 ],
             ],
-            'caissier' => [
-                'description' => 'Caissier : tient la caisse, consulte le référentiel en lecture',
+
+            'chef_section_production' => [
+                'description' => 'Chef de section Production : encadre les artisans et la production, valide les produits',
                 'permissions' => [
-                    'lister_villages',
-                    'lister_exercices',
-                    'lister_agents',
-                    'lister_artisans',
-                    'lister_boutiques',
-                    'lister_attributions',
-                    'lister_espaces',
+                    ...$lectureReferentiel,
+                    'ajouter_corps_metier', 'modifier_corps_metier',
+                    'ajouter_artisan', 'modifier_artisan',
+                    // La validation des produits (règle 13) viendra
+                    // avec le module Commerce.
+                ],
+            ],
+
+            'chef_section_formation' => [
+                'description' => 'Chef de section Formation : organise les sessions et gère les salles d\'apprentissage',
+                'permissions' => [
+                    ...$lectureReferentiel,
+                    'ajouter_espace', 'modifier_espace',
+                ],
+            ],
+
+            'chef_section_administrative_financiere' => [
+                'description' => 'Chef de section Administrative et Financière : tient le parc de boutiques, les attributions et les redevances',
+                'permissions' => [
+                    ...$lectureReferentiel,
+                    'lister_agents', 'ajouter_agent', 'modifier_agent',
+                    'lister_journaux_audit',
+                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_boutique', 'modifier_boutique',
+                    'ajouter_attribution', 'modifier_attribution',
+                    'resilier_attribution', 'terminer_attribution',
+                ],
+            ],
+
+            'chef_section_promotion_commercialisation' => [
+                'description' => 'Chef de section Promotion et Commercialisation : expose et vend les produits, anime le portail public',
+                'permissions' => [
+                    ...$lectureReferentiel,
+                    // Lecture seule sur le référentiel : la section a
+                    // besoin de savoir quelle boutique appartient à quel
+                    // artisan pour vendre, pas de modifier le parc. Ses
+                    // permissions de vente arriveront avec le module
+                    // Commerce — et la règle de séparation des rôles
+                    // interdit qu'elles se cumulent avec la tenue de
+                    // caisse.
+                ],
+            ],
+
+            'chef_section_orientation_information_documentation' => [
+                'description' => 'Chef de section Orientation, Information et Documentation : accueille les visiteurs et tient les dossiers des artisans',
+                'permissions' => [
+                    ...$lectureReferentiel,
+                    'ajouter_artisan', 'modifier_artisan',
+                    'ajouter_entreprise', 'modifier_entreprise',
                 ],
             ],
         ];
+    }
+
+    /**
+     * Retire les profils de la première version, remplacés par
+     * l'organigramme réel de la structure.
+     *
+     * La liste est nominative, jamais « tout ce qui n'est pas déclaré » :
+     * un rôle créé à la main depuis l'écran des rôles ne doit pas
+     * disparaître au prochain passage du seeder. `migrate:fresh` rend
+     * ce nettoyage inutile, mais un `db:seed` sur une base existante
+     * laisserait sinon traîner des rôles porteurs de permissions.
+     */
+    protected function retirerLesRolesObsoletes(): void
+    {
+        $obsoletes = ['agent_commercial', 'caissier'];
+
+        Role::query()
+            ->whereIn('name', $obsoletes)
+            ->get()
+            ->each(function (Role $role): void {
+                $role->syncPermissions([]);
+                $role->delete();
+            });
     }
 }

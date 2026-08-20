@@ -75,7 +75,8 @@ class BoutiqueResource extends Resource
                         ->label('Superficie (m²)')
                         ->placeholder('12')
                         ->numeric()
-                        ->minValue(0),
+                        ->minValue(0)
+                        ->live(onBlur: true),
                     Forms\Components\TextInput::make('emplacement')
                         ->label('Emplacement')
                         ->placeholder('Rez-de-chaussée')
@@ -83,22 +84,40 @@ class BoutiqueResource extends Resource
                         ->maxLength(60),
                 ]),
                 Grid::make(2)->schema([
-                    Forms\Components\TextInput::make('redevance_mensuelle')
-                        ->label('Redevance mensuelle de référence (FCFA)')
-                        ->placeholder('Montant du barème en vigueur')
+                    Forms\Components\TextInput::make('tarif_metre_carre')
+                        ->label('Tarif mensuel au mètre carré (FCFA)')
+                        ->placeholder('Tarif du barème en vigueur')
                         ->numeric()
-                        ->minValue(0),
-                    // L'état n'est modifiable que pour poser ou lever
-                    // INDISPONIBLE : DISPONIBLE et OCCUPEE sont
-                    // recalculés par les attributions, et une saisie
-                    // manuelle serait écrasée au premier mouvement.
-                    Forms\Components\Select::make('etat')
-                        ->label('État')
-                        ->options(EtatBoutique::options())
-                        ->default(EtatBoutique::DISPONIBLE->value)
-                        ->native(false)
-                        ->required(),
+                        ->minValue(0)
+                        ->live(onBlur: true),
+                    // La redevance n'est plus saisie : règle 12 de
+                    // CLAUDE.md, elle découle de la surface et du tarif.
+                    // Le champ n'est qu'un aperçu du calcul que le
+                    // modèle refera à l'enregistrement — il n'est donc
+                    // pas hydraté.
+                    Forms\Components\Placeholder::make('redevance_calculee')
+                        ->label('Redevance mensuelle de référence')
+                        ->content(function (Get $get): string {
+                            $superficie = $get('superficie');
+                            $tarif = $get('tarif_metre_carre');
+
+                            if (blank($superficie) || blank($tarif)) {
+                                return 'À calculer : renseignez la superficie et le tarif au mètre carré';
+                            }
+
+                            return number_format((float) $superficie * (float) $tarif, 0, ',', ' ').' FCFA';
+                        }),
                 ]),
+                // L'état n'est modifiable que pour poser ou lever
+                // INDISPONIBLE : DISPONIBLE et OCCUPEE sont recalculés
+                // par les attributions, et une saisie manuelle serait
+                // écrasée au premier mouvement.
+                Forms\Components\Select::make('etat')
+                    ->label('État')
+                    ->options(EtatBoutique::options())
+                    ->default(EtatBoutique::DISPONIBLE->value)
+                    ->native(false)
+                    ->required(),
             ]);
     }
 
@@ -122,11 +141,18 @@ class BoutiqueResource extends Resource
                     ->suffix(' m²')
                     ->sortable()
                     ->placeholder('—'),
+                Tables\Columns\TextColumn::make('tarif_metre_carre')
+                    ->label('Tarif au m²')
+                    ->money('XAF')
+                    ->sortable()
+                    ->placeholder('À renseigner')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('redevance_mensuelle')
                     ->label('Redevance de référence')
                     ->money('XAF')
+                    ->description('Superficie × tarif au m²')
                     ->sortable()
-                    ->placeholder('À renseigner'),
+                    ->placeholder('À calculer'),
                 Tables\Columns\TextColumn::make('etat')
                     ->label('État')
                     ->badge()
