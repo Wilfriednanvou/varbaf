@@ -55,7 +55,19 @@ Ces règles priment sur toute considération de simplicité d'implémentation. N
 
 ## Rôles réels de la structure
 
-Coordonnateur (super-utilisateur), Coordonnateur adjoint, et cinq chefs de section : Production, Formation, Administrative et Financière, Promotion et Commercialisation, Orientation-Information-Documentation. Les rôles applicatifs calquent cet organigramme.
+Coordonnateur, Coordonnateur adjoint, et cinq chefs de section : Production, Formation, Administrative et Financière, Promotion et Commercialisation, Orientation-Information-Documentation. Les rôles applicatifs calquent cet organigramme.
+
+**Le coordonnateur n'est pas le super-utilisateur.** Ce sont deux objets de nature différente :
+
+| | Coordonnateur | Super-utilisateur |
+|---|---|---|
+| Nature | Rôle métier, adossé à une fonction | Compte technique d'administration |
+| Périmètre | Valide les dossiers, attribue les boutiques, arrête les exercices, consulte les tableaux de bord | Tout, y compris s'attribuer des droits et administrer les rôles |
+| Justifié par | L'organigramme de la structure | L'exploitation du système |
+
+Les fusionner reviendrait à permettre à une personne exerçant une fonction administrative de modifier ses propres permissions et d'effacer des traces. Dans une structure qui manipule de l'argent public, c'est précisément ce qu'un contrôle interne cherche à empêcher — et c'est le prolongement direct de la règle de séparation des rôles énoncée plus bas.
+
+En pratique, le coordonnateur du village portera probablement les deux rôles. Ce sera une **décision d'attribution explicite**, consignée comme telle, jamais une propriété du modèle de données.
 
 ---
 
@@ -77,6 +89,8 @@ Nommage `<action>_<entite>` en snake_case : `lister_ventes`, `ajouter_vente`, `a
 - `canAccess()` sur chaque ressource vérifie `lister_<entites>`.
 - Chaque action porte `->visible(fn () => auth()->user()->can('<permission>'))`.
 - Séparation des rôles : le profil qui saisit une vente n'est pas celui qui clôture une section ou valide une campagne.
+- **Suppressions.** Ce qui porte une histoire ne se supprime pas, ce qui n'est qu'un libellé se corrige. Artisan, attribution, boutique, exercice, village, vente, mouvement de caisse : hors de portée de tout rôle métier — on désactive, on résilie, on clôture, on contre-passe. Corps de métier, entreprise artisanale et autres référentiels de libellés : ouverts à qui peut les créer, pour qu'une erreur de saisie se corrige sans passer par l'administrateur.
+- **Une trace se constate, elle ne se choisit pas.** Un champ qui enregistre *qui* a fait quelque chose prend le compte connecté, jamais une valeur choisie dans une liste. Si la mauvaise personne peut agir, la réponse est de lui retirer la permission, pas d'ouvrir un `Select`.
 
 ## Audit
 

@@ -150,12 +150,26 @@ class PermissionSeeder extends Seeder
      * Les modules Commerce et Trésorerie compléteront ces listes sans
      * élargir aucun périmètre.
      *
-     * `super_utilisateur` est conservé à part : c'est le compte
-     * technique d'administration, celui que le seeder crée pour la
-     * première connexion. CLAUDE.md décrit le coordonnateur comme
-     * super-utilisateur ; les fusionner reviendrait à donner à un rôle
-     * métier les droits d'administration du système, ce qui mérite
-     * d'être tranché explicitement plutôt qu'en passant.
+     * `super_utilisateur` est tenu à part : c'est un compte technique,
+     * pas une fonction. Le coordonnateur est un rôle métier — il valide
+     * les dossiers, attribue les boutiques, consulte les tableaux de
+     * bord. Les fusionner voudrait dire qu'une personne exerçant une
+     * fonction administrative peut modifier ses propres permissions et
+     * effacer des traces : dans une structure qui manipule de l'argent
+     * public, c'est précisément ce qu'un contrôle interne cherche à
+     * empêcher. En pratique le coordonnateur du village portera sans
+     * doute les deux rôles, mais ce sera une décision d'attribution
+     * explicite, jamais une propriété du modèle.
+     *
+     * **Suppressions.** Elles suivent une seule règle : ce qui porte une
+     * histoire ne se supprime pas, ce qui n'est qu'un libellé se
+     * corrige. Artisan, attribution, boutique, exercice et village
+     * restent hors de portée de tout rôle métier — on les désactive, on
+     * les résilie, on les clôture. Corps de métier et entreprise
+     * artisanale s'ouvrent en revanche à qui peut les créer : sans
+     * cela, un chef de section ayant saisi un doublon devrait appeler
+     * l'administrateur pour corriger sa propre erreur, et en pratique
+     * il contournerait en laissant traîner une ligne « à supprimer ».
      *
      * @return array<string, array{description: string, permissions: array<int, string>}>
      */
@@ -190,8 +204,8 @@ class PermissionSeeder extends Seeder
                     'lister_utilisateurs', 'ajouter_utilisateur', 'modifier_utilisateur',
                     'lister_roles',
                     'lister_journaux_audit',
-                    'ajouter_corps_metier', 'modifier_corps_metier',
-                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_corps_metier', 'modifier_corps_metier', 'supprimer_corps_metier',
+                    'ajouter_entreprise', 'modifier_entreprise', 'supprimer_entreprise',
                     'ajouter_artisan', 'modifier_artisan',
                     'ajouter_boutique', 'modifier_boutique',
                     'ajouter_espace', 'modifier_espace',
@@ -206,8 +220,8 @@ class PermissionSeeder extends Seeder
                     ...$lectureReferentiel,
                     'lister_agents', 'ajouter_agent', 'modifier_agent',
                     'lister_journaux_audit',
-                    'ajouter_corps_metier', 'modifier_corps_metier',
-                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_corps_metier', 'modifier_corps_metier', 'supprimer_corps_metier',
+                    'ajouter_entreprise', 'modifier_entreprise', 'supprimer_entreprise',
                     'ajouter_artisan', 'modifier_artisan',
                     'ajouter_boutique', 'modifier_boutique',
                     'ajouter_espace', 'modifier_espace',
@@ -224,7 +238,7 @@ class PermissionSeeder extends Seeder
                 'description' => 'Chef de section Production : encadre les artisans et la production, valide les produits',
                 'permissions' => [
                     ...$lectureReferentiel,
-                    'ajouter_corps_metier', 'modifier_corps_metier',
+                    'ajouter_corps_metier', 'modifier_corps_metier', 'supprimer_corps_metier',
                     'ajouter_artisan', 'modifier_artisan',
                     // La validation des produits (règle 13) viendra
                     // avec le module Commerce.
@@ -245,7 +259,7 @@ class PermissionSeeder extends Seeder
                     ...$lectureReferentiel,
                     'lister_agents', 'ajouter_agent', 'modifier_agent',
                     'lister_journaux_audit',
-                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_entreprise', 'modifier_entreprise', 'supprimer_entreprise',
                     'ajouter_boutique', 'modifier_boutique',
                     'ajouter_attribution', 'modifier_attribution',
                     'resilier_attribution', 'terminer_attribution',
@@ -271,7 +285,7 @@ class PermissionSeeder extends Seeder
                 'permissions' => [
                     ...$lectureReferentiel,
                     'ajouter_artisan', 'modifier_artisan',
-                    'ajouter_entreprise', 'modifier_entreprise',
+                    'ajouter_entreprise', 'modifier_entreprise', 'supprimer_entreprise',
                 ],
             ],
         ];
