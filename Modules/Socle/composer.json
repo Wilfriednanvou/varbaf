@@ -1,0 +1,17 @@
+{
+    "name": "varbaf/socle",
+    "description": "Module Socle — référentiel et sécurité de l'ERP VARBAF",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Socle\\": "app/",
+            "Modules\\Socle\\Database\\Factories\\": "database/factories/",
+            "Modules\\Socle\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

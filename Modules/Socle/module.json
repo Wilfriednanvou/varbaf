@@ -1,0 +1,11 @@
+{
+    "name": "Socle",
+    "alias": "socle",
+    "description": "Référentiel racine du système : village, exercice, agents, utilisateurs, rôles, permissions et journal d'audit.",
+    "keywords": ["socle", "referentiel", "securite"],
+    "priority": 100,
+    "providers": [
+        "Modules\\Socle\\Providers\\SocleServiceProvider"
+    ],
+    "files": []
+}

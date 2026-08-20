@@ -1,0 +1,46 @@
+<?php
+
+namespace Modules\Socle\Filament\Resources\AgentResource\Pages;
+
+use Filament\Actions;
+use Filament\Resources\Pages\ManageRecords;
+use Filament\Support\Enums\Alignment;
+use Modules\Socle\Filament\Resources\AgentResource;
+use Modules\Socle\Models\Agent;
+use Modules\Socle\Models\JournalAudit;
+
+class ManageAgents extends ManageRecords
+{
+    protected static string $resource = AgentResource::class;
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            route('filament.admin.pages.dashboard') => 'Accueil',
+            '' => 'Agents',
+        ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\CreateAction::make()
+                ->visible(fn () => auth()->user()->can('ajouter_agent'))
+                ->modalHeading('Nouvel agent')
+                ->modalWidth('3xl')
+                ->createAnother(false)
+                ->modalSubmitActionLabel('Enregistrer')
+                ->modalCancelActionLabel('Fermer')
+                ->modalFooterActionsAlignment(Alignment::End)
+                ->stickyModalHeader()
+                ->stickyModalFooter()
+                ->after(fn (Agent $record) => JournalAudit::enregistrer(
+                    'Création agent',
+                    'SOCLE',
+                    'Agent',
+                    $record->id,
+                    ['matricule' => $record->matricule, 'nom' => $record->nom_complet],
+                )),
+        ];
+    }
+}

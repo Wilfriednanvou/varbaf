@@ -17,13 +17,15 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Modules\Socle\Filament\SoclePlugin;
 
 /**
  * Panneau d'administration de l'ERP du Village Artisanal Régional de Bafoussam.
  *
- * Les ressources des modules métier sont enregistrées par chaque module,
- * via son propre fournisseur de services. Ce panneau ne découvre que les
- * composants du dossier app/Filament.
+ * Les ressources des modules métier sont apportées par un greffon propre
+ * à chaque module, déclaré dans ->plugins(). Ce panneau ne découvre
+ * lui-même que les composants du dossier app/Filament : un module reste
+ * ainsi retirable en supprimant une seule ligne.
  */
 class AdminPanelProvider extends PanelProvider
 {
@@ -46,6 +48,13 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
+            ])
+            // Un greffon par module, dans l'ordre de dépendance du
+            // tableau de CLAUDE.md. C'est la seule ligne à ajouter ici
+            // lorsqu'un module arrive : le module apporte lui-même ses
+            // ressources et ses pages.
+            ->plugins([
+                SoclePlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,
