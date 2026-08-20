@@ -5,14 +5,24 @@ namespace Modules\Socle\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
+use Modules\Socle\Exceptions\JournalAuditImmuableException;
 
 /**
  * Journal d'audit : trace de toute action sensible du système.
  *
- * Table en écriture seule. Aucune ressource n'expose de modification ni
- * de suppression, et le modèle ne porte volontairement pas de colonne
- * « updated_at » : une ligne d'audit modifiable n'aurait aucune valeur
- * probante en soutenance comme en exploitation.
+ * **Table en écriture seule, imposée par le modèle.** Les crochets
+ * « updating » et « deleting » lèvent une exception : la règle vaut
+ * donc pour tout le système, et plus seulement pour la ressource
+ * Filament qui masquait les boutons. Le modèle ne porte pas non plus
+ * de colonne « updated_at » — une ligne d'audit modifiable n'aurait
+ * aucune valeur probante en soutenance comme en exploitation.
+ *
+ * Limite connue : les crochets Eloquent ne se déclenchent pas sur une
+ * suppression de masse passée par le constructeur de requêtes
+ * (`JournalAudit::query()->delete()`) ni sur un `DELETE` SQL direct.
+ * Fermer complètement cette porte demanderait un déclencheur
+ * PostgreSQL ou un retrait du droit DELETE au rôle applicatif, ce qui
+ * dépasse le périmètre de ce correctif.
  *
  * Le nom de l'utilisateur est figé dans la ligne en plus de la clé
  * étrangère : si le compte est supprimé ou renommé, la trace reste
@@ -49,6 +59,20 @@ class JournalAudit extends Model
             'donnees' => 'array',
             'entite_id' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Une exception, et non un « return false » : ce dernier
+        // annulerait l'opération en silence, et l'appelant croirait sa
+        // suppression effectuée.
+        static::updating(function (self $ecriture): void {
+            throw JournalAuditImmuableException::modification();
+        });
+
+        static::deleting(function (self $ecriture): void {
+            throw JournalAuditImmuableException::suppression();
+        });
     }
 
     public function utilisateur(): BelongsTo

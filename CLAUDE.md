@@ -49,6 +49,13 @@ Ces règles priment sur toute considération de simplicité d'implémentation. N
 9. **Taux de commission.** Uniforme pour tous les artisans, historisé par date d'effet. Le taux appliqué est celui en vigueur à la date de la vente, puis figé sur la vente.
 10. **Reversements mensuels.** Une campagne sélectionne les ventes non rattachées à une campagne validée dont la date est antérieure à la date d'arrêté. Un décaissement par artisan. Solde négatif non payé et reporté.
 11. **Cloisonnement artisan.** Dans le panneau artisan, chaque requête est filtrée par l'artisan connecté, via un scope global. Un artisan ne voit jamais les données d'un autre.
+12. **Redevance au mètre carré.** La redevance mensuelle d'une boutique se calcule à partir de sa superficie et du tarif au mètre carré. Le premier mois suivant l'attribution est gratuit.
+13. **Validation des produits.** Un produit passe par les statuts soumis, validé, exposé, retiré. Seul le chef de section Production valide. Un produit non validé n'est ni vendable ni publiable sur le portail.
+14. **Alerte de rupture.** Quand le stock d'un produit atteint son seuil d'alerte, une notification est adressée à l'artisan et aux sections Production et Commercialisation.
+
+## Rôles réels de la structure
+
+Coordonnateur (super-utilisateur), Coordonnateur adjoint, et cinq chefs de section : Production, Formation, Administrative et Financière, Promotion et Commercialisation, Orientation-Information-Documentation. Les rôles applicatifs calquent cet organigramme.
 
 ---
 
@@ -73,7 +80,7 @@ Nommage `<action>_<entite>` en snake_case : `lister_ventes`, `ajouter_vente`, `a
 
 ## Audit
 
-Toute création, modification, suppression ou action métier sensible appelle `JournalAudit::enregistrer()` dans le `->after()` de l'action.
+Toute création, modification ou action métier sensible appelle `JournalAudit::enregistrer()` dans le `->after()` de l'action. **Exception : les suppressions** appellent l'audit dans le `->before()`, puisque l'enregistrement n'est plus lisible après coup.
 
 ## CSS
 

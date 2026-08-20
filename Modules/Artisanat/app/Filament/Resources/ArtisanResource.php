@@ -127,10 +127,17 @@ class ArtisanResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required(),
+                    // Le disque est nommé explicitement. Sans lui,
+                    // Filament retient config('filament.default_filesystem_disk'),
+                    // qui vaut env('FILESYSTEM_DISK') — soit « local »,
+                    // dont la racine est storage/app/private : la photo
+                    // serait écrite hors de toute URL publique et ne
+                    // s'afficherait jamais.
                     Forms\Components\FileUpload::make('photo')
                         ->label('Photo')
                         ->image()
                         ->imageEditor()
+                        ->disk('public')
                         ->directory('artisans')
                         ->visibility('public')
                         ->maxSize(2048),
@@ -150,8 +157,12 @@ class ArtisanResource extends Resource
     {
         return $table
             ->columns([
+                // Même disque que le champ de dépôt : sans cette ligne
+                // la colonne construirait l'URL sur le disque par
+                // défaut et n'afficherait qu'une image cassée.
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Photo')
+                    ->disk('public')
                     ->circular()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('matricule')

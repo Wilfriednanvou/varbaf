@@ -52,12 +52,10 @@ class VillageArtisanal {
 + dateModification: DateTime
 
 // === METHODES ===
-getArtisans(): List<Artisan> {
-  // Retourne les artisans rattaches au village
-}
-getStatistiques(): Map<String, Object> {
-  // Effectifs, taux d occupation, chiffre d affaires, recettes de commission
-}
+// Note d architecture : le village n expose ni getArtisans() ni
+// getStatistiques(). Ces lectures traversent les modules Artisanat,
+// Commerce et Tresorerie, ce qui creerait une dependance montante
+// interdite. Elles sont assurees par le module Pilotage via RapportService.
 }
 ```
 
@@ -133,6 +131,7 @@ class Artisan {
 + numeroEnregistrement: String  // Enregistrement au repertoire communal
 + dateEnregistrement: Date
 + photo: String
++ autorisationPublication: Boolean  // Consentement a la publication sur le portail public
 + actif: Boolean
 + corpsMetier: CorpsMetier      // (FK)
 + entreprise: EntrepriseArtisanale  // (FK, nullable)
@@ -175,7 +174,8 @@ class Boutique {
 + numero: String                // Ex: B-01 a B-24
 + superficie: Decimal
 + emplacement: String           // Sous-sol, rez-de-chaussee, etage
-+ redevanceMensuelle: Decimal   // Montant de reference
++ tarifMetreCarre: Decimal      // Tarif mensuel applique au metre carre
++ redevanceMensuelle: Decimal   // Calculee : superficie * tarifMetreCarre
 + etat: Enum(DISPONIBLE, OCCUPEE, INDISPONIBLE)
 + village: VillageArtisanal     // (FK)
 
@@ -194,8 +194,13 @@ estDisponible(dateDebut: Date, dateFin: Date): Boolean {
 class AttributionBoutique {
 + id: Long
 + dateDebut: Date
++ dateDebutFacturation: Date    // dateDebut + 1 mois : le premier mois est gratuit
++ periodicite: Enum(MENSUELLE, TRIMESTRIELLE)
 + dateFin: Date                 // Null si attribution en cours
 + redevanceConvenue: Decimal    // Montant fige a l attribution
++ dossierComplet: Boolean       // Demande timbree, attestation communale, images des oeuvres,
+                                // plan de localisation de l atelier, copie CNI
++ valideePar: Utilisateur       // Coordonnateur ayant valide le dossier (FK)
 + statut: Enum(ACTIVE, RESILIEE, TERMINEE)
 + motifResiliation: String
 + artisan: Artisan              // (FK)
@@ -248,6 +253,8 @@ class Produit {
 + description: String
 + prixUnitaire: Decimal         // Prix de vente courant
 + quantiteDisponible: Integer
++ seuilAlerte: Integer          // Declenche l alerte de rupture vers l artisan
++ statutValidation: Enum(SOUMIS, VALIDE, EXPOSE, RETIRE)  // Valide par le chef de section Production
 + pieceUnique: Boolean          // true si oeuvre non reproductible
 + photo: String
 + actif: Boolean
@@ -553,9 +560,11 @@ enregistrer(): Boolean {
 
 ## Module 4 : Sécurité et gestion des accès
 
-Repris du module Sécurité d'ASM, avec les classes `Utilisateur`, `Role`, `Permission`, `SessionConnexion` et `JournalAudit`.
+Repris du module Sécurité d'ASM, avec les classes `Utilisateur`, `Role`, `Permission` et `JournalAudit`.
 
 Adaptations :
+- `SessionConnexion` est **retirée du périmètre** : le journal d'audit couvre le besoin de traçabilité.
+- La classe est nommée `Utilisateur` dans le dossier ; l'implémentation conserve le modèle `User` et la table `users` de Laravel.
 - `Utilisateur.agent: Agent` remplace le lien vers `Personnel`.
 - Les permissions suivent la convention `<action>_<entite>` en snake_case : `lister_ventes`, `ajouter_vente`, `annuler_vente`, `ouvrir_section_caisse`, `cloturer_section_caisse`, `valider_campagne_reversement`, `modifier_taux_commission`.
 - `JournalAudit.enregistrer()` est appelé sur toute création, modification, annulation de vente, ouverture ou clôture de section, et validation de campagne de reversement.

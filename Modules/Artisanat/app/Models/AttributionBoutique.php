@@ -6,21 +6,34 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Modules\Artisanat\Enums\EtatBoutique;
 use Modules\Artisanat\Enums\PeriodiciteRedevance;
 use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Exceptions\AttributionChevauchanteException;
+use Modules\Artisanat\Exceptions\AttributionInvalideException;
 use Modules\Socle\Models\Exercice;
 
 /**
  * Occupation d'une boutique par un artisan sur une période donnée.
  *
- * **Règle imposée au niveau du modèle : une boutique ne peut porter
- * deux attributions actives qui se chevauchent.** Le contrôle est
- * placé dans le crochet « saving » et non dans la ressource Filament,
- * afin qu'il s'applique aussi aux seeders, aux commandes artisan et à
- * tinker. La ressource ajoute par-dessus une règle de formulaire qui
- * produit le même verdict, pour que l'utilisateur voie un message sous
- * le champ au lieu d'une exception.
+ * **Quatre règles sont imposées au niveau du modèle**, toutes dans le
+ * crochet « saving » et toutes conditionnées au statut ACTIVE :
+ *
+ * 1. une boutique ne peut porter deux attributions actives qui se
+ *    chevauchent ;
+ * 2. l'artisan attributaire doit être actif ;
+ * 3. l'exercice de rattachement ne doit pas être clôturé ;
+ * 4. la boutique ne doit pas être indisponible.
+ *
+ * Les règles 2 à 4 vivaient dans la ressource Filament — filtre sur le
+ * `Select` des artisans, options des `Select` boutique et exercice.
+ * Une règle qui ne vit que dans un formulaire n'existe pas pour un
+ * seeder, une commande artisan ou tinker : elles ont été déplacées ici.
+ *
+ * Le conditionnement au statut ACTIVE n'est pas un détail. Sans lui,
+ * `resilier()` échouerait sur un contrat dont l'artisan vient d'être
+ * désactivé — c'est-à-dire exactement dans le cas où il faut pouvoir
+ * résilier.
  *
  * Deux attributions se chevauchent lorsque chacune commence avant que
  * l'autre ne finisse. Une date de fin nulle vaut « sans terme » et
@@ -87,6 +100,7 @@ class AttributionBoutique extends Model
     protected static function booted(): void
     {
         static::saving(function (self $attribution): void {
+            $attribution->garantirConditionsDAttribution();
             $attribution->garantirAbsenceDeChevauchement();
         });
 
@@ -157,6 +171,46 @@ class AttributionBoutique extends Model
             ->where(fn (Builder $requete) => $requete
                 ->whereNull('date_fin')
                 ->orWhereDate('date_fin', '>=', $debut));
+    }
+
+    /**
+     * Artisan actif, exercice ouvert, boutique disponible.
+     *
+     * Les trois entités sont relues par leur clé plutôt que par la
+     * relation : après un changement de `artisan_id`, `boutique_id` ou
+     * `exercice_id` sur un enregistrement déjà chargé, Eloquent
+     * conserve la relation mise en cache et contrôlerait alors
+     * l'ancienne valeur.
+     *
+     * Une entité introuvable ne déclenche rien : la contrainte de clé
+     * étrangère de la base refusera l'écriture avec un message plus
+     * juste que celui qu'on inventerait ici.
+     *
+     * @throws AttributionInvalideException
+     */
+    public function garantirConditionsDAttribution(): void
+    {
+        if ($this->statut !== StatutAttribution::ACTIVE) {
+            return;
+        }
+
+        $artisan = filled($this->artisan_id) ? Artisan::find($this->artisan_id) : null;
+
+        if ($artisan && ! $artisan->actif) {
+            throw AttributionInvalideException::artisanInactif($artisan->identite);
+        }
+
+        $exercice = filled($this->exercice_id) ? Exercice::find($this->exercice_id) : null;
+
+        if ($exercice && $exercice->cloture) {
+            throw AttributionInvalideException::exerciceCloture($exercice->libelle);
+        }
+
+        $boutique = filled($this->boutique_id) ? Boutique::find($this->boutique_id) : null;
+
+        if ($boutique && $boutique->etat === EtatBoutique::INDISPONIBLE) {
+            throw AttributionInvalideException::boutiqueIndisponible($boutique->numero);
+        }
     }
 
     /**

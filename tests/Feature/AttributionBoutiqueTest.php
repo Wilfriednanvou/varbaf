@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Artisanat\Enums\EtatBoutique;
 use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Exceptions\AttributionChevauchanteException;
+use Modules\Artisanat\Exceptions\AttributionInvalideException;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\AttributionBoutique;
 use Modules\Artisanat\Models\Boutique;
@@ -188,12 +189,45 @@ class AttributionBoutiqueTest extends TestCase
         $this->assertSame(EtatBoutique::DISPONIBLE, $this->boutique->fresh()->etat);
     }
 
-    public function test_une_boutique_indisponible_n_est_jamais_marquee_occupee(): void
+    public function test_une_boutique_indisponible_ne_peut_pas_etre_attribuee(): void
     {
         $this->boutique->update(['etat' => EtatBoutique::INDISPONIBLE]);
 
-        $this->attribuer(now()->subMonth()->toDateString(), null);
+        $this->expectException(AttributionInvalideException::class);
 
-        $this->assertSame(EtatBoutique::INDISPONIBLE, $this->boutique->fresh()->etat);
+        $this->attribuer('2026-01-01', '2026-06-30');
+    }
+
+    public function test_un_artisan_desactive_ne_peut_pas_recevoir_de_boutique(): void
+    {
+        $this->artisan->update(['actif' => false]);
+
+        $this->expectException(AttributionInvalideException::class);
+
+        $this->attribuer('2026-01-01', '2026-06-30');
+    }
+
+    public function test_un_exercice_cloture_n_accepte_plus_d_attribution(): void
+    {
+        $this->exercice->cloturer();
+
+        $this->expectException(AttributionInvalideException::class);
+
+        $this->attribuer('2026-01-01', '2026-06-30');
+    }
+
+    /**
+     * Le cas qui justifie de conditionner les contrôles au statut
+     * ACTIVE : un artisan désactivé après coup est précisément celui
+     * dont il faut pouvoir résilier le contrat.
+     */
+    public function test_une_attribution_reste_resiliable_apres_desactivation_de_l_artisan(): void
+    {
+        $attribution = $this->attribuer('2026-01-01', '2026-06-30');
+
+        $this->artisan->update(['actif' => false]);
+
+        $this->assertTrue($attribution->resilier('Artisan parti du village'));
+        $this->assertSame(StatutAttribution::RESILIEE, $attribution->fresh()->statut);
     }
 }
