@@ -1,0 +1,98 @@
+# VARBAF — Système d'information du Village Artisanal Régional de Bafoussam
+
+Projet de stage académique. **Échéance impérative : 5 septembre 2026.** Gel du code le 3 septembre.
+Toute l'interface, les libellés, les commentaires et les messages sont en **français**.
+
+---
+
+## Stack
+
+- PHP 8.3, Laravel 12
+- Filament 5 (panneau `admin`)
+- `nwidart/laravel-modules` pour le découpage modulaire
+- `spatie/laravel-permission` pour les rôles et permissions
+- PostgreSQL 14+
+- Locale : `APP_LOCALE=fr`
+
+---
+
+## Architecture
+
+Modules dans `Modules/<NomModule>/`, dans cet ordre de dépendance :
+
+| # | Module | Contenu |
+|---|---|---|
+| 1 | Socle | Village, exercice, utilisateurs, rôles, permissions, journal d'audit |
+| 2 | Artisanat | Artisans, corps de métier, entreprises, boutiques, espaces, attributions |
+| 3 | Commerce | Catégories, produits, dépôts, journal de stock, ventes, taux de commission |
+| 4 | Tresorerie | Caisses, sections, brouillard, comptes artisans, campagnes de reversement |
+| 5 | Pilotage | Tableaux de bord, indicateurs, fonctionnalité IA |
+| 6 | Portail | Site vitrine public, publication des produits, artisans vedettes |
+
+**Règle de dépendance descendante.** Un module ne référence que les modules dont il dépend. Le Commerce n'écrit jamais directement dans les tables de la Trésorerie : il appelle le service exposé. Aucune dépendance montante.
+
+---
+
+## Règles métier non négociables
+
+Ces règles priment sur toute considération de simplicité d'implémentation. Ne jamais les contourner sans validation explicite.
+
+1. **Figement.** Une vente recopie à l'enregistrement : référence produit, désignation, prix unitaire, quantité, boutique, artisan, taux de commission. Ces valeurs ne sont jamais recalculées depuis les référentiels.
+2. **Journal unique de caisse.** Toute opération financière passe par le service d'écriture au brouillard. Aucun module n'insère directement dans `mouvements_caisse`.
+3. **Journal unique de stock.** Toute variation de stock (dépôt, vente, retrait, perte) passe par `mouvements_stock`. La quantité en stock est un solde calculé, jamais un champ saisi.
+4. **Immuabilité après arrêté.** Un mouvement est corrigeable tant que sa journée n'a pas été arrêtée. Après l'arrêté de caisse du jour, il devient immuable : correction par contre-passation uniquement.
+5. **Arrêté journalier.** Un arrêté de caisse par caisse et par jour : le caissier saisit le montant compté, le système calcule l'écart, un écart non nul exige une justification. Une journée arrêtée est verrouillée.
+5. **Numérotation.** Les mouvements de caisse sont numérotés séquentiellement par section, sans rupture.
+6. **Section ouverte.** Aucune opération hors d'une section de caisse ouverte. Une seule section ouverte par caisse.
+7. **Une vente, une boutique.** L'écran de vente impose de choisir d'abord une boutique, puis de sélectionner les produits dans la liste de cette seule boutique. La référence produit est générée automatiquement à la création, jamais saisie. Les informations client (nom, contact, consentement, provenance) sont facultatives.
+8. **Solde artisan calculé.** `solde dû = somme des parts artisan − somme des reversements`. Jamais stocké comme valeur modifiable.
+9. **Taux de commission.** Uniforme pour tous les artisans, historisé par date d'effet. Le taux appliqué est celui en vigueur à la date de la vente, puis figé sur la vente.
+10. **Reversements mensuels.** Une campagne sélectionne les ventes non rattachées à une campagne validée dont la date est antérieure à la date d'arrêté. Un décaissement par artisan. Solde négatif non payé et reporté.
+11. **Cloisonnement artisan.** Dans le panneau artisan, chaque requête est filtrée par l'artisan connecté, via un scope global. Un artisan ne voit jamais les données d'un autre.
+
+---
+
+## Conventions Filament
+
+- Pattern **ManageRecords** : CRUD via modals, pas de page dédiée.
+- Formulaires : `Filament\Schemas\Schema` avec `->columns(1)`, puis `Grid::make(2)` pour les paires de champs.
+- Placeholders français obligatoires sur les `TextInput`. `helperText` uniquement sur les `Toggle`.
+- Champs uniques : `->unique(ignoreRecord: true)`.
+- Actions de ligne : `->iconButton()` + `->tooltip()`.
+- Modals : `modalWidth('3xl')`, `stickyModalHeader()`, `stickyModalFooter()`, alignement `Alignment::End`, boutons **Enregistrer** et **Fermer** (jamais « Annuler »), `createAnother(false)` sur les créations.
+- `getBreadcrumbs()` défini dans chaque page `Manage<Entite>`.
+- Colonnes : `->searchable()` et `->sortable()` sur les champs pertinents, `->toggleable(isToggledHiddenByDefault: true)` sur les colonnes secondaires.
+
+## Permissions
+
+Nommage `<action>_<entite>` en snake_case : `lister_ventes`, `ajouter_vente`, `annuler_vente`, `ouvrir_section_caisse`, `cloturer_section_caisse`, `valider_campagne_reversement`, `modifier_taux_commission`.
+
+- `canAccess()` sur chaque ressource vérifie `lister_<entites>`.
+- Chaque action porte `->visible(fn () => auth()->user()->can('<permission>'))`.
+- Séparation des rôles : le profil qui saisit une vente n'est pas celui qui clôture une section ou valide une campagne.
+
+## Audit
+
+Toute création, modification, suppression ou action métier sensible appelle `JournalAudit::enregistrer()` dans le `->after()` de l'action.
+
+## CSS
+
+Aucun CSS personnalisé hors du fichier de thème du panneau. Pas de style inline dans les vues Blade ni dans les ressources.
+
+---
+
+## Méthode de travail
+
+- Un module à la fois, dans l'ordre du tableau ci-dessus.
+- Migrations puis modèles puis ressources Filament, dans cet ordre.
+- Seeders alimentés par les données réelles du village (registre de ventes transcrit), jamais par des données fictives du type « Produit test ».
+- Commit après chaque entité fonctionnelle, message en français.
+- `php artisan migrate:fresh --seed` doit fonctionner sans erreur à tout moment.
+
+## À ne pas faire
+
+- Ne pas ajouter de fonctionnalité hors du périmètre défini dans `docs/retroplanning.md`.
+- Ne pas installer de paquet supplémentaire sans nécessité démontrée.
+- Ne pas coder le portail public dans le panneau Filament : c'est une interface publique distincte.
+- Ne pas implémenter de vente, commande ou paiement en ligne dans le portail public.
+- Ne pas modifier les règles métier ci-dessus pour simplifier une implémentation.
