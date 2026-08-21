@@ -133,9 +133,49 @@ class PermissionSeeder extends Seeder
             ['name' => 'lister_attributions', 'module' => 'ARTISANAT', 'description' => 'Consulter les attributions de boutiques'],
             ['name' => 'ajouter_attribution', 'module' => 'ARTISANAT', 'description' => 'Attribuer une boutique à un artisan'],
             ['name' => 'modifier_attribution', 'module' => 'ARTISANAT', 'description' => 'Modifier une attribution de boutique'],
+            ['name' => 'valider_dossier_attribution', 'module' => 'ARTISANAT', 'description' => 'Constater la complétude du dossier administratif d\'une attribution'],
             ['name' => 'resilier_attribution', 'module' => 'ARTISANAT', 'description' => 'Résilier une attribution avant terme'],
             ['name' => 'terminer_attribution', 'module' => 'ARTISANAT', 'description' => 'Clore une attribution arrivée à échéance'],
             ['name' => 'supprimer_attribution', 'module' => 'ARTISANAT', 'description' => 'Supprimer une attribution de boutique'],
+
+            // === COMMERCE : catégories de produits ===
+            ['name' => 'lister_categories_produits', 'module' => 'COMMERCE', 'description' => 'Consulter les catégories de produits'],
+            ['name' => 'ajouter_categorie_produit', 'module' => 'COMMERCE', 'description' => 'Créer une catégorie de produit'],
+            ['name' => 'modifier_categorie_produit', 'module' => 'COMMERCE', 'description' => 'Modifier une catégorie de produit'],
+            ['name' => 'supprimer_categorie_produit', 'module' => 'COMMERCE', 'description' => 'Supprimer une catégorie de produit'],
+
+            // === COMMERCE : taux de commission ===
+            ['name' => 'lister_taux_commission', 'module' => 'COMMERCE', 'description' => 'Consulter l\'historique des taux de commission'],
+            ['name' => 'ajouter_taux_commission', 'module' => 'COMMERCE', 'description' => 'Enregistrer un nouveau taux de commission'],
+            ['name' => 'modifier_taux_commission', 'module' => 'COMMERCE', 'description' => 'Corriger un taux de commission non encore entré en vigueur'],
+
+            // === COMMERCE : produits ===
+            ['name' => 'lister_produits', 'module' => 'COMMERCE', 'description' => 'Consulter le catalogue des produits'],
+            ['name' => 'ajouter_produit', 'module' => 'COMMERCE', 'description' => 'Déposer un produit au catalogue'],
+            ['name' => 'modifier_produit', 'module' => 'COMMERCE', 'description' => 'Modifier un produit'],
+            ['name' => 'supprimer_produit', 'module' => 'COMMERCE', 'description' => 'Supprimer un produit'],
+            ['name' => 'valider_produit', 'module' => 'COMMERCE', 'description' => 'Valider un produit soumis (section Production)'],
+            ['name' => 'exposer_produit', 'module' => 'COMMERCE', 'description' => 'Mettre un produit en vitrine (section Promotion)'],
+            ['name' => 'retirer_produit', 'module' => 'COMMERCE', 'description' => 'Retirer un produit de la circulation'],
+
+            // === COMMERCE : dépôts ===
+            ['name' => 'lister_depots', 'module' => 'COMMERCE', 'description' => 'Consulter les dépôts d\'articles'],
+            ['name' => 'ajouter_depot', 'module' => 'COMMERCE', 'description' => 'Enregistrer un dépôt en brouillon'],
+            ['name' => 'modifier_depot', 'module' => 'COMMERCE', 'description' => 'Modifier un dépôt en brouillon'],
+            ['name' => 'supprimer_depot', 'module' => 'COMMERCE', 'description' => 'Supprimer un dépôt en brouillon'],
+            ['name' => 'valider_depot', 'module' => 'COMMERCE', 'description' => 'Valider un dépôt : entrée en stock et décharge signée'],
+            ['name' => 'imprimer_decharge_depot', 'module' => 'COMMERCE', 'description' => 'Éditer la décharge de dépôt'],
+
+            // === COMMERCE : journal de stock ===
+            ['name' => 'lister_mouvements_stock', 'module' => 'COMMERCE', 'description' => 'Consulter le journal de stock'],
+            ['name' => 'retirer_stock', 'module' => 'COMMERCE', 'description' => 'Enregistrer une reprise d\'articles par l\'artisan'],
+            ['name' => 'contrepasser_mouvement_stock', 'module' => 'COMMERCE', 'description' => 'Corriger un mouvement de stock par contre-passation'],
+
+            // === COMMERCE : ventes ===
+            ['name' => 'lister_ventes', 'module' => 'COMMERCE', 'description' => 'Consulter le registre des ventes'],
+            ['name' => 'ajouter_vente', 'module' => 'COMMERCE', 'description' => 'Saisir une vente au comptoir'],
+            ['name' => 'annuler_vente', 'module' => 'COMMERCE', 'description' => 'Annuler une vente : retour en stock et contre-passation en caisse'],
+            ['name' => 'imprimer_recu_vente', 'module' => 'COMMERCE', 'description' => 'Éditer le reçu de vente'],
         ];
     }
 
@@ -186,6 +226,11 @@ class PermissionSeeder extends Seeder
             'lister_boutiques',
             'lister_espaces',
             'lister_attributions',
+            'lister_categories_produits',
+            'lister_produits',
+            'lister_depots',
+            'lister_mouvements_stock',
+            'lister_ventes',
         ];
 
         return [
@@ -211,6 +256,33 @@ class PermissionSeeder extends Seeder
                     'ajouter_espace', 'modifier_espace',
                     'ajouter_attribution', 'modifier_attribution',
                     'resilier_attribution', 'terminer_attribution',
+                    // Le droit de produire la trace est distinct du
+                    // droit de modifier l'enregistrement : constater la
+                    // complétude d'un dossier engage celui qui coche,
+                    // et n'appartient qu'au coordonnateur.
+                    'valider_dossier_attribution',
+                    'ajouter_categorie_produit', 'modifier_categorie_produit', 'supprimer_categorie_produit',
+                    // Le taux de commission engage la recette du
+                    // village : sa décision revient à la direction.
+                    'lister_taux_commission', 'ajouter_taux_commission', 'modifier_taux_commission',
+                    'ajouter_produit', 'modifier_produit', 'retirer_produit',
+                    // Règle 13 amendée : la responsabilité de la
+                    // validation reste au chef de section Production,
+                    // le coordonnateur supplée en son absence. Sans
+                    // cela, une seule absence bloquerait toute entrée
+                    // en exposition — un point de défaillance unique
+                    // sur le flux principal. Le contrôle est
+                    // qualitatif, non financier : RG-23 ne s'y applique
+                    // pas, et le journal d'audit conserve de toute
+                    // façon l'identité du validateur réel.
+                    'valider_produit',
+                    'ajouter_depot', 'modifier_depot', 'supprimer_depot',
+                    'valider_depot', 'imprimer_decharge_depot',
+                    'retirer_stock', 'contrepasser_mouvement_stock',
+                    // La direction annule et réédite, mais ne saisit
+                    // pas : RG-23 sépare l'agent de saisie du profil
+                    // habilité à défaire une opération.
+                    'annuler_vente', 'imprimer_recu_vente',
                 ],
             ],
 
@@ -227,6 +299,13 @@ class PermissionSeeder extends Seeder
                     'ajouter_espace', 'modifier_espace',
                     'ajouter_attribution', 'modifier_attribution',
                     'terminer_attribution',
+                    'ajouter_categorie_produit', 'modifier_categorie_produit', 'supprimer_categorie_produit',
+                    'lister_taux_commission',
+                    'ajouter_produit', 'modifier_produit', 'retirer_produit',
+                    'ajouter_depot', 'modifier_depot', 'supprimer_depot',
+                    'valider_depot', 'imprimer_decharge_depot',
+                    'retirer_stock',
+                    'imprimer_recu_vente',
                     // Volontairement absents : cloturer_exercice et
                     // resilier_attribution. Clôturer un exercice est
                     // irréversible, résilier rompt un contrat : ces deux
@@ -240,8 +319,18 @@ class PermissionSeeder extends Seeder
                     ...$lectureReferentiel,
                     'ajouter_corps_metier', 'modifier_corps_metier', 'supprimer_corps_metier',
                     'ajouter_artisan', 'modifier_artisan',
-                    // La validation des produits (règle 13) viendra
-                    // avec le module Commerce.
+                    'ajouter_categorie_produit', 'modifier_categorie_produit', 'supprimer_categorie_produit',
+                    'ajouter_produit', 'modifier_produit', 'retirer_produit',
+                    // Règle 13 : « Seul le chef de section Production
+                    // valide. » Aucun autre rôle métier ne porte cette
+                    // permission, pas même le coordonnateur.
+                    'valider_produit',
+                    // Le dépôt et le stock sont le quotidien de la
+                    // section : elle reçoit les pièces, les compte et
+                    // les rend.
+                    'ajouter_depot', 'modifier_depot', 'supprimer_depot',
+                    'valider_depot', 'imprimer_decharge_depot',
+                    'retirer_stock', 'contrepasser_mouvement_stock',
                 ],
             ],
 
@@ -263,6 +352,13 @@ class PermissionSeeder extends Seeder
                     'ajouter_boutique', 'modifier_boutique',
                     'ajouter_attribution', 'modifier_attribution',
                     'resilier_attribution', 'terminer_attribution',
+                    // Lecture seule sur le taux : la section suit la
+                    // recette, elle ne fixe pas le barème.
+                    'lister_taux_commission',
+                    // Elle réédite les décharges et les reçus pour les
+                    // dossiers administratifs, sans toucher au stock.
+                    'imprimer_decharge_depot',
+                    'imprimer_recu_vente',
                 ],
             ],
 
@@ -277,6 +373,15 @@ class PermissionSeeder extends Seeder
                     // Commerce — et la règle de séparation des rôles
                     // interdit qu'elles se cumulent avec la tenue de
                     // caisse.
+                    //
+                    // La mise en vitrine, elle, est son métier : elle
+                    // choisit ce que le portail met en avant, parmi les
+                    // produits que la Production a validés.
+                    'exposer_produit', 'retirer_produit',
+                    // La saisie de vente est son métier. Elle ne peut
+                    // pas annuler ce qu'elle a saisi : RG-23 réserve ce
+                    // geste à un profil distinct de l'agent de saisie.
+                    'ajouter_vente', 'imprimer_recu_vente',
                 ],
             ],
 

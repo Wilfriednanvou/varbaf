@@ -1,0 +1,11 @@
+{
+    "name": "Commerce",
+    "alias": "commerce",
+    "description": "Catégories, produits, taux de commission, dépôts, journal de stock et ventes.",
+    "keywords": ["commerce", "produits", "ventes"],
+    "priority": 80,
+    "providers": [
+        "Modules\\Commerce\\Providers\\CommerceServiceProvider"
+    ],
+    "files": []
+}

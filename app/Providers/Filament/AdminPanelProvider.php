@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Artisanat\Filament\ArtisanatPlugin;
+use Modules\Commerce\Filament\CommercePlugin;
 use Modules\Socle\Filament\SoclePlugin;
 
 /**
@@ -57,6 +58,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 SoclePlugin::make(),
                 ArtisanatPlugin::make(),
+                CommercePlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

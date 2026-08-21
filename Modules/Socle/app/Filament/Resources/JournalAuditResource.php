@@ -162,6 +162,12 @@ class JournalAuditResource extends Resource
                 Actions\ViewAction::make()
                     ->iconButton()
                     ->tooltip('Consulter')
+                    // Redondant avec canAccess(), qui verrouille déjà
+                    // la page. La convention veut néanmoins qu'aucune
+                    // action ne s'affiche sans permission nominale, et
+                    // c'est l'absence de toute exception qui rend le
+                    // test de conventions probant.
+                    ->visible(fn () => auth()->user()->can('lister_journaux_audit'))
                     ->modalHeading('Détail de l\'écriture d\'audit')
                     ->modalWidth('3xl')
                     ->modalCancelActionLabel('Fermer')

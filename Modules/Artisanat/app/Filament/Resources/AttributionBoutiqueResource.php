@@ -212,9 +212,16 @@ class AttributionBoutiqueResource extends Resource
                         ->label('Dossier validé par')
                         ->content(fn (?Model $record) => $record?->valideePar?->name ?? 'Pas encore validé'),
                 ]),
+                // Le droit de constater la complétude est distinct du
+                // droit de modifier l'attribution : une trace ne vaut
+                // que si le droit de la produire est nominatif. Un
+                // compte sans cette permission ne voit pas la case, et
+                // le champ n'étant alors pas déshydraté, la valeur
+                // déjà enregistrée est préservée telle quelle.
                 Forms\Components\Toggle::make('dossier_complet')
                     ->label('Dossier administratif complet')
                     ->default(false)
+                    ->visible(fn () => auth()->user()->can('valider_dossier_attribution'))
                     ->helperText('Demande timbrée, attestation communale, images des œuvres, plan de localisation de l\'atelier et copie de la CNI. Cocher cette case vous enregistre comme validateur du dossier'),
             ]);
     }

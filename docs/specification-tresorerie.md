@@ -178,7 +178,9 @@ Contrôle physique quotidien de la caisse. Enregistrement de contrôle, non cont
 
 **RG-11** — Le taux de commission est uniforme pour tous les artisans. Il est historisé par date d'effet ; le taux appliqué à une vente est celui en vigueur à sa date de vente.
 
-**RG-12** — La commission est calculée sur le montant total de la vente : `montant_commission = montant_total × taux_commission`, et `part_artisan = montant_total − montant_commission`.
+**RG-12** — Le taux est exprimé en pourcentage. La commission est calculée sur le montant total de la vente : `montant_commission = montant_total × taux_commission / 100`, et `part_artisan = montant_total − montant_commission`.
+
+**RG-12 bis** — Le franc CFA n'ayant pas de subdivision, tous les montants sont des entiers. La commission est arrondie à l'unité ; la part artisan est obtenue **par différence**, jamais calculée séparément. Cette règle garantit que commission et part artisan totalisent toujours exactement le montant encaissé.
 
 **RG-13** — L'intégralité du montant de la vente entre en caisse. La part artisan constitue une dette du village envers l'artisan jusqu'à son reversement.
 

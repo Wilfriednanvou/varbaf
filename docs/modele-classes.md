@@ -252,8 +252,7 @@ class Produit {
 + designation: String           // Nom du produit
 + description: String
 + prixUnitaire: Decimal         // Prix de vente courant
-+ quantiteDisponible: Integer
-+ seuilAlerte: Integer          // Declenche l alerte de rupture vers l artisan
++ seuilAlerte: Integer          // Declenche l alerte de rupture vers les sections Production et Commercialisation
 + statutValidation: Enum(SOUMIS, VALIDE, EXPOSE, RETIRE)  // Valide par le chef de section Production
 + pieceUnique: Boolean          // true si oeuvre non reproductible
 + photo: String
@@ -265,10 +264,11 @@ class Produit {
 
 // === METHODES ===
 estDisponible(quantite: Integer): Boolean {
-  // Verifie la disponibilite pour la quantite demandee
+  // Compare la quantite demandee au solde issu de mouvements_stock
 }
-decrementerStock(quantite: Integer): Boolean {
-  // Diminue la quantite disponible apres une vente
+getQuantiteEnStock(): Integer {
+  // Solde calcule : depots - ventes - retraits - pertes
+  // Aucune colonne de quantite n est stockee sur le produit (regle 3)
 }
 }
 ```

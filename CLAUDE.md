@@ -50,7 +50,7 @@ Ces règles priment sur toute considération de simplicité d'implémentation. N
 10. **Reversements mensuels.** Une campagne sélectionne les ventes non rattachées à une campagne validée dont la date est antérieure à la date d'arrêté. Un décaissement par artisan. Solde négatif non payé et reporté.
 11. **Cloisonnement artisan.** Dans le panneau artisan, chaque requête est filtrée par l'artisan connecté, via un scope global. Un artisan ne voit jamais les données d'un autre.
 12. **Redevance au mètre carré.** La redevance mensuelle d'une boutique se calcule à partir de sa superficie et du tarif au mètre carré. Le premier mois suivant l'attribution est gratuit.
-13. **Validation des produits.** Un produit passe par les statuts soumis, validé, exposé, retiré. Seul le chef de section Production valide. Un produit non validé n'est ni vendable ni publiable sur le portail.
+13. **Validation des produits.** Un produit passe par les statuts soumis, validé, exposé, retiré. La validation relève du chef de section Production ; le coordonnateur peut suppléer en son absence, le journal d'audit conservant l'identité du validateur réel. Un produit non validé n'est ni vendable ni publiable sur le portail.
 14. **Alerte de rupture.** Quand le stock d'un produit atteint son seuil d'alerte, une notification est adressée à l'artisan et aux sections Production et Commercialisation.
 
 ## Rôles réels de la structure
@@ -62,12 +62,14 @@ Coordonnateur, Coordonnateur adjoint, et cinq chefs de section : Production, For
 | | Coordonnateur | Super-utilisateur |
 |---|---|---|
 | Nature | Rôle métier, adossé à une fonction | Compte technique d'administration |
-| Périmètre | Valide les dossiers, attribue les boutiques, arrête les exercices, consulte les tableaux de bord | Tout, y compris s'attribuer des droits et administrer les rôles |
+| Périmètre | Valide les dossiers et les produits, attribue les boutiques, arrête les exercices, consulte les tableaux de bord | Tout, y compris s'attribuer des droits et administrer les rôles |
 | Justifié par | L'organigramme de la structure | L'exploitation du système |
 
 Les fusionner reviendrait à permettre à une personne exerçant une fonction administrative de modifier ses propres permissions et d'effacer des traces. Dans une structure qui manipule de l'argent public, c'est précisément ce qu'un contrôle interne cherche à empêcher — et c'est le prolongement direct de la règle de séparation des rôles énoncée plus bas.
 
 En pratique, le coordonnateur du village portera probablement les deux rôles. Ce sera une **décision d'attribution explicite**, consignée comme telle, jamais une propriété du modèle de données.
+
+**Suppléance.** Une responsabilité de nature qualitative — valider un produit — peut être suppléée par la hiérarchie : sans cela, l'absence d'une seule personne bloque le flux principal. Une responsabilité de nature financière — clôturer une section, valider une campagne de reversement — ne se supplée pas, parce que le risque n'est pas l'immobilisme mais l'auto-attribution d'un avantage. La distinction est celle de RG-23.
 
 ---
 
@@ -88,8 +90,9 @@ Nommage `<action>_<entite>` en snake_case : `lister_ventes`, `ajouter_vente`, `a
 
 - `canAccess()` sur chaque ressource vérifie `lister_<entites>`.
 - Chaque action porte `->visible(fn () => auth()->user()->can('<permission>'))`.
-- Séparation des rôles : le profil qui saisit une vente n'est pas celui qui clôture une section ou valide une campagne.
-- **Suppressions.** Ce qui porte une histoire ne se supprime pas, ce qui n'est qu'un libellé se corrige. Artisan, attribution, boutique, exercice, village, vente, mouvement de caisse : hors de portée de tout rôle métier — on désactive, on résilie, on clôture, on contre-passe. Corps de métier, entreprise artisanale et autres référentiels de libellés : ouverts à qui peut les créer, pour qu'une erreur de saisie se corrige sans passer par l'administrateur.
+- Séparation des rôles — **RG-23** de `docs/specification-tresorerie.md`, qui porte les règles RG-01 à RG-27 du module Trésorerie : l'ouverture et la clôture d'une section de caisse, ainsi que la validation d'une campagne de reversement, reviennent à un profil habilité **distinct** de celui de l'agent de saisie.
+- **Le `->visible()` est la seule barrière.** Aucune Policy n'est déclarée : la couche d'autorisation de Filament laisse passer tout compte du panneau (DT-08). `tests/Feature/ConventionsFilamentTest.php` échoue si une action est déclarée sans `->visible()`, ou avec un `->visible()` qui n'interroge aucune permission.
+- **Suppressions.** Ce qui porte une histoire ne se supprime pas, ce qui n'est qu'un libellé se corrige. Artisan, attribution, boutique, exercice, village, produit, vente, mouvement de stock, mouvement de caisse : hors de portée de tout rôle métier — on désactive, on résilie, on clôture, on contre-passe. Corps de métier, entreprise artisanale, catégorie de produit et autres référentiels de libellés : ouverts à qui peut les créer, pour qu'une erreur de saisie se corrige sans passer par l'administrateur.
 - **Une trace se constate, elle ne se choisit pas.** Un champ qui enregistre *qui* a fait quelque chose prend le compte connecté, jamais une valeur choisie dans une liste. Si la mauvaise personne peut agir, la réponse est de lui retirer la permission, pas d'ouvrir un `Select`.
 
 ## Audit

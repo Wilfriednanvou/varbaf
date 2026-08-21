@@ -1,0 +1,17 @@
+{
+    "name": "varbaf/commerce",
+    "description": "Module Commerce — catalogue, commission et ventes de l'ERP VARBAF",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Commerce\\": "app/",
+            "Modules\\Commerce\\Database\\Factories\\": "database/factories/",
+            "Modules\\Commerce\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
