@@ -32,4 +32,20 @@ class CampagneReversementException extends RuntimeException
             "Une ligne de reversement se recalcule en repréparant la campagne, elle ne se retouche pas."
         );
     }
+
+    public static function dejaValidee(string $periode): self
+    {
+        return new self(
+            "La campagne de {$periode} est déjà validée : ses ventes sont rattachées définitivement (RG-21). "
+            .'Les ventes retenues trop tard partiront sur la campagne suivante.'
+        );
+    }
+
+    public static function aucunReversementAValider(string $periode): self
+    {
+        return new self(
+            "La campagne de {$periode} n'a rien à reverser. Préparez-la d'abord : "
+            .'sans reversement calculé, la valider ne rattacherait aucune vente.'
+        );
+    }
 }

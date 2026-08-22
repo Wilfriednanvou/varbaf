@@ -244,8 +244,13 @@ class ServiceTresorerie implements JournalDeCaisse
      * une section ouverte. Ce choix est centralisé ici pour être
      * facilement amendable quand la question « caisse unique ou
      * multiple ? » sera tranchée.
+     *
+     * Publique parce que la campagne de reversement en a besoin elle
+     * aussi : elle décaisse par le brouillard et doit viser la même
+     * section que le reste du module. Dupliquer la résolution ailleurs
+     * ferait exactement ce que ce commentaire cherche à éviter.
      */
-    protected function resoudreSectionOuverte(): SectionCaisse
+    public function resoudreSectionOuverte(): SectionCaisse
     {
         // Si une section est ciblée par l'écran opérationnel, on la
         // retourne directement. Le contrôle « estOuverte » est fait

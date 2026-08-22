@@ -50,6 +50,16 @@ class CampagneReversement extends Model
         'date_validation',
     ];
 
+    /**
+     * L'état de départ est porté par le modèle et pas seulement par le
+     * défaut de la colonne : sans cela, une campagne fraîchement créée
+     * aurait un `statut` nul en mémoire jusqu'au premier `refresh()`,
+     * et les crochets liraient `null` là où ils attendent un état.
+     */
+    protected $attributes = [
+        'statut' => 'EN_PREPARATION',
+    ];
+
     protected function casts(): array
     {
         return [
