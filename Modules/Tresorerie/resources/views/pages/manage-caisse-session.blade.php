@@ -98,9 +98,17 @@
             >
                 Brouillard
             </x-filament::tabs.item>
+
+            <x-filament::tabs.item
+                icon="heroicon-o-clipboard-document-check"
+                :active="$activeTab === 'arretes'"
+                wire:click="$set('activeTab', 'arretes')"
+            >
+                Arrêtés
+            </x-filament::tabs.item>
         </x-filament::tabs>
 
-        {{-- Seul l'onglet actif monte son composant : les deux autres
+        {{-- Seul l'onglet actif monte son composant : les autres
              n'interrogent pas la base tant qu'on ne les regarde pas. --}}
         @if ($activeTab === 'ventes')
             <livewire:tresorerie::ventes-caisse-table
@@ -116,6 +124,11 @@
             <livewire:tresorerie::brouillard-caisse-table
                 :section-id="$selectedSectionId"
                 :key="'brouillard-' . $selectedSectionId"
+            />
+        @elseif ($activeTab === 'arretes')
+            <livewire:tresorerie::arretes-caisse-table
+                :section-id="$selectedSectionId"
+                :key="'arretes-' . $selectedSectionId"
             />
         @endif
     @endif
