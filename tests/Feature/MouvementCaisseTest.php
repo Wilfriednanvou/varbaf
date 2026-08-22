@@ -18,6 +18,7 @@ use Modules\Tresorerie\Exceptions\SectionCaisseException;
 use Modules\Tresorerie\Models\Caisse;
 use Modules\Tresorerie\Models\MouvementCaisse;
 use Modules\Tresorerie\Models\SectionCaisse;
+use Modules\Tresorerie\Services\ServiceArreteCaisse;
 use Modules\Tresorerie\Services\ServiceTresorerie;
 use Tests\TestCase;
 
@@ -264,6 +265,99 @@ class MouvementCaisseTest extends TestCase
         $this->section->update(['etat' => 'OUVERTE']);
     }
 
+    /**
+     * RG-07 : « la clôture n'est possible que si toutes ses journées ont
+     * été arrêtées ». Sans ce contrôle, un exercice entier se clôturait
+     * sans qu'aucun comptage physique n'ait eu lieu — et l'arrêté
+     * journalier, seul mécanisme de contrôle interne du module, ne
+     * servait plus à rien.
+     */
+    public function test_une_section_ne_se_cloture_pas_tant_qu_une_journee_n_est_pas_arretee(): void
+    {
+        $this->enregistrerEntree(5000);
+
+        $this->assertNotEmpty(
+            $this->section->journeesNonArretees(),
+            "La journée du mouvement n'a pas été arrêtée.",
+        );
+
+        $this->expectException(SectionCaisseException::class);
+
+        $this->section->cloturer();
+    }
+
+    public function test_une_section_dont_les_journees_sont_arretees_se_cloture(): void
+    {
+        $this->enregistrerEntree(5000);
+
+        app(ServiceArreteCaisse::class)->arreter($this->section, now(), 5000);
+
+        $this->assertSame([], $this->section->journeesNonArretees());
+        $this->assertSame(5000, $this->section->cloturer());
+        $this->assertTrue($this->section->fresh()->estCloturee());
+    }
+
+    public function test_une_section_sans_mouvement_se_cloture_sans_arrete(): void
+    {
+        // Rien à compter, rien à arrêter : une section ouverte par
+        // erreur et refermée aussitôt ne doit pas exiger un arrêté.
+        $this->assertSame(0, $this->section->cloturer());
+        $this->assertTrue($this->section->fresh()->estCloturee());
+    }
+
+    // === RG-02 : SOLDE D'OUVERTURE HÉRITÉ ===
+
+    public function test_le_solde_d_ouverture_reprend_la_cloture_precedente(): void
+    {
+        $this->enregistrerEntree(12000);
+        $this->enregistrerSortie(2000);
+
+        app(ServiceArreteCaisse::class)->arreter($this->section, now(), 10000);
+        $this->assertSame(10000, $this->section->cloturer());
+
+        $suivante = SectionCaisse::create([
+            'caisse_id' => $this->caisse->id,
+            'libelle' => 'Section suivante',
+            'date_ouverture' => now(),
+            // Une valeur fausse est fournie à dessein : le modèle la
+            // remplace. RG-02 ne se laisse pas écraser à la saisie.
+            'solde_ouverture' => 999999,
+            'etat' => EtatSectionCaisse::OUVERTE,
+            'ouverte_par' => auth()->id(),
+            'village_id' => $this->village->id,
+            'exercice_id' => $this->section->exercice_id,
+        ]);
+
+        $this->assertSame(
+            10000,
+            $suivante->solde_ouverture,
+            "Le solde d'ouverture est celui de clôture de la section précédente (RG-02).",
+        );
+    }
+
+    public function test_la_premiere_section_d_une_caisse_ouvre_a_zero(): void
+    {
+        $autreCaisse = Caisse::create([
+            'code' => 'CAISSE-NEUVE',
+            'libelle' => 'Caisse neuve',
+            'etat' => 'ACTIVE',
+            'village_id' => $this->village->id,
+        ]);
+
+        $section = SectionCaisse::create([
+            'caisse_id' => $autreCaisse->id,
+            'libelle' => 'Première section',
+            'date_ouverture' => now(),
+            'solde_ouverture' => 50000,
+            'etat' => EtatSectionCaisse::OUVERTE,
+            'ouverte_par' => auth()->id(),
+            'village_id' => $this->village->id,
+            'exercice_id' => $this->section->exercice_id,
+        ]);
+
+        $this->assertSame(0, $section->solde_ouverture);
+    }
+
     // === MONTANT INVALIDE ===
 
     public function test_un_montant_nul_ou_negatif_est_refuse(): void
@@ -370,7 +464,7 @@ class MouvementCaisseTest extends TestCase
 
     // === HELPERS ===
 
-    protected function enregistrerEntree(float $montant, string $libelle = 'Test entrée'): MouvementCaisse
+    protected function enregistrerEntree(int $montant, string $libelle = 'Test entrée'): MouvementCaisse
     {
         return $this->service->enregistrer(
             $this->section,
@@ -381,7 +475,7 @@ class MouvementCaisseTest extends TestCase
         );
     }
 
-    protected function enregistrerSortie(float $montant, string $libelle = 'Test sortie'): MouvementCaisse
+    protected function enregistrerSortie(int $montant, string $libelle = 'Test sortie'): MouvementCaisse
     {
         return $this->service->enregistrer(
             $this->section,

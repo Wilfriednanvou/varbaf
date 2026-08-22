@@ -21,6 +21,7 @@ use Modules\Socle\Models\Agent;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\Utilisateur;
 use Modules\Socle\Models\VillageArtisanal;
+use Modules\Tresorerie\Enums\EtatSectionCaisse;
 use Modules\Tresorerie\Models\Caisse;
 use Modules\Tresorerie\Models\CampagneReversement;
 use Modules\Tresorerie\Models\LibelleMouvement;
@@ -215,7 +216,15 @@ class RapportServiceTest extends TestCase
 
     public function test_une_caisse_sans_section_ouverte_n_apparait_pas(): void
     {
-        $this->section->cloturer();
+        // Fermeture forcée : `cloturer()` refuse désormais une
+        // section dont les journées ne sont pas arrêtées (RG-07), et
+        // ce test veut seulement l'état « plus de section ouverte ».
+        $this->section->forceFill([
+            'etat' => EtatSectionCaisse::CLOTUREE,
+            'date_cloture' => now(),
+            'solde_cloture' => $this->section->soldeCourant(),
+            'cloturee_par' => auth()->id(),
+        ])->save();
 
         $this->assertSame([], $this->rapport->soldesParCaisse());
         $this->assertSame(0, $this->rapport->soldeDeCaisseConsolide());

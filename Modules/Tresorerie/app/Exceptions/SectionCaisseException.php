@@ -2,6 +2,7 @@
 
 namespace Modules\Tresorerie\Exceptions;
 
+use Illuminate\Support\Carbon;
 use RuntimeException;
 
 /**
@@ -47,6 +48,34 @@ class SectionCaisseException extends RuntimeException
     {
         return new self(
             "La section « {$libelle} » est clôturée et ne peut plus être modifiée."
+        );
+    }
+
+    /**
+     * RG-07 : une section ne se clôture pas tant qu'une de ses journées
+     * n'a pas été arrêtée.
+     *
+     * Le message nomme les journées en cause — jusqu'à cinq — parce
+     * qu'un refus qui n'indique pas quoi corriger oblige le caissier à
+     * chercher lui-même, et qu'il cherchera mal.
+     *
+     * @param  array<int, string>  $journees
+     */
+    public static function journeesNonArretees(string $libelle, array $journees): self
+    {
+        $apercu = collect($journees)
+            ->take(5)
+            ->map(fn (string $jour) => Carbon::parse($jour)->format('d/m/Y'))
+            ->implode(', ');
+
+        $reste = count($journees) > 5
+            ? ' et '.(count($journees) - 5).' autre(s)'
+            : '';
+
+        return new self(
+            "La section « {$libelle} » ne peut pas être clôturée : "
+            ."certaines journées n'ont pas été arrêtées ({$apercu}{$reste}). "
+            .'Arrêtez-les avant de clôturer (RG-07).'
         );
     }
 }

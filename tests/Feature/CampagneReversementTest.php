@@ -21,6 +21,7 @@ use Modules\Socle\Models\Agent;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\Utilisateur;
 use Modules\Socle\Models\VillageArtisanal;
+use Modules\Tresorerie\Enums\EtatSectionCaisse;
 use Modules\Tresorerie\Enums\NatureMouvementCaisse;
 use Modules\Tresorerie\Enums\StatutCampagneReversement;
 use Modules\Tresorerie\Enums\StatutReversement;
@@ -351,9 +352,18 @@ class CampagneReversementTest extends TestCase
 
         $decaissementsAvant = $this->nombreDeDecaissements();
 
-        // La section est clôturée : l'écriture au brouillard sera
-        // refusée (RG-03), au milieu de la validation.
-        $this->section->cloturer();
+        // La section est fermée de force, sans passer par
+        // `cloturer()` : depuis RG-07, celle-ci refuse de clôturer
+        // une section dont les journées ne sont pas arrêtées, et ce
+        // test a justement besoin de mouvements non arrêtés. On veut
+        // ici l'état, pas le geste métier — même procédé que
+        // `MouvementCaisseTest`.
+        $this->section->forceFill([
+            'etat' => EtatSectionCaisse::CLOTUREE,
+            'date_cloture' => now(),
+            'solde_cloture' => $this->section->soldeCourant(),
+            'cloturee_par' => auth()->id(),
+        ])->save();
 
         try {
             $this->service->valider($campagne, $this->section);

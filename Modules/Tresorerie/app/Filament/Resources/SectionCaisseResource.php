@@ -6,6 +6,7 @@ use Filament\Actions;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,7 +43,10 @@ class SectionCaisseResource extends Resource
                         ->relationship('caisse', 'libelle')
                         ->required()
                         ->searchable()
-                        ->preload(),
+                        ->preload()
+                        // Le solde d'ouverture affiché dépend de la
+                        // caisse : il se recalcule dès qu'elle change.
+                        ->live(),
                     Forms\Components\TextInput::make('libelle')
                         ->label('Libellé')
                         ->placeholder('Section exercice 2026')
@@ -53,12 +57,19 @@ class SectionCaisseResource extends Resource
                         ->label('Date d\'ouverture')
                         ->default(now())
                         ->required(),
-                    Forms\Components\TextInput::make('solde_ouverture')
-                        ->label('Solde d\'ouverture')
-                        ->placeholder('0')
-                        ->integer()
-                        ->default(0)
-                        ->required(),
+                    // RG-02 : le solde d'ouverture est celui de clôture
+                    // de la section précédente. Affiché, jamais saisi —
+                    // le modèle le calcule à l'enregistrement.
+                    Forms\Components\Placeholder::make('solde_ouverture_affiche')
+                        ->label('Solde d\'ouverture (repris de la section précédente)')
+                        ->content(fn (Get $get) => filled($get('caisse_id'))
+                            ? number_format(
+                                SectionCaisse::soldeDOuverturePour((int) $get('caisse_id')),
+                                0,
+                                ',',
+                                ' ',
+                            ).' FCFA'
+                            : 'Choisissez d\'abord une caisse'),
                 ]),
                 Forms\Components\Hidden::make('ouverte_par')
                     ->default(fn () => auth()->id()),

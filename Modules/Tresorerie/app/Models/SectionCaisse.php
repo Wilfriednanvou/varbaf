@@ -57,6 +57,17 @@ class SectionCaisse extends Model
     protected static function booted(): void
     {
         static::creating(function (self $section): void {
+            // RG-02 : le solde d'ouverture est celui de clôture de la
+            // section précédente de la même caisse.
+            //
+            // Calculé ici, et non proposé comme valeur par défaut à
+            // l'écran. Une valeur par défaut se corrige dans le
+            // formulaire : la règle se laissait alors écraser à la
+            // saisie, ce qui en faisait une suggestion et non une
+            // règle — et ouvrait la voie la plus directe pour
+            // fabriquer du solde de caisse.
+            $section->solde_ouverture = static::soldeDOuverturePour($section->caisse_id);
+
             // RG-01 : une seule section ouverte par caisse. Vérifié ici
             // (et pas seulement dans l'écran) pour qu'aucun appel — seeder,
             // console, écran — ne puisse contourner la règle ; l'index
@@ -155,6 +166,21 @@ class SectionCaisse extends Model
             throw SectionCaisseException::dejaCloturee($this->libelle);
         }
 
+        // RG-07 : la clôture n'est possible que si toutes les journées
+        // de la section ont été arrêtées.
+        //
+        // Sans ce contrôle, un exercice entier pouvait se clôturer sans
+        // qu'aucun comptage physique n'ait eu lieu — ce qui vidait de
+        // sa substance le mécanisme de contrôle interne quotidien que
+        // l'arrêté journalier apporte (§7.7). La section couvrant un
+        // exercice, l'écart n'aurait été constaté qu'un an trop tard,
+        // ou jamais.
+        $joursNonArretes = $this->journeesNonArretees();
+
+        if ($joursNonArretes !== []) {
+            throw SectionCaisseException::journeesNonArretees($this->libelle, $joursNonArretes);
+        }
+
         $soldeCourant = $this->soldeCourant();
 
         $this->forceFill([
@@ -181,6 +207,75 @@ class SectionCaisse extends Model
             ->sum('montant');
 
         return $this->solde_ouverture + $entrees - $sorties;
+    }
+
+    /**
+     * Les journées de la section qui portent des mouvements sans avoir
+     * été arrêtées (RG-07).
+     *
+     * La requête part de `MouvementCaisse` et non de la relation
+     * `mouvements()` : celle-ci trie par numéro d'ordre, et PostgreSQL
+     * refuse un `SELECT DISTINCT` dont le `ORDER BY` porte sur une
+     * colonne absente de la projection.
+     *
+     * Les dates arrêtées sont chargées en une fois plutôt qu'interrogées
+     * par jour : une section couvre un exercice, et un test par journée
+     * ferait plusieurs centaines de requêtes pour une seule clôture.
+     *
+     * @return array<int, string> journées au format AAAA-MM-JJ
+     */
+    public function journeesNonArretees(): array
+    {
+        $joursAvecMouvements = MouvementCaisse::query()
+            ->where('section_id', $this->getKey())
+            ->selectRaw('date(date_operation) as jour')
+            ->distinct()
+            ->orderBy('jour')
+            ->pluck('jour')
+            ->map(fn ($jour) => $jour instanceof \DateTimeInterface
+                ? $jour->format('Y-m-d')
+                : substr((string) $jour, 0, 10));
+
+        if ($joursAvecMouvements->isEmpty()) {
+            return [];
+        }
+
+        $joursArretes = ArreteCaisse::query()
+            ->where('caisse_id', $this->caisse_id)
+            ->pluck('date_arrete')
+            ->map(fn ($jour) => $jour instanceof \DateTimeInterface
+                ? $jour->format('Y-m-d')
+                : substr((string) $jour, 0, 10))
+            ->all();
+
+        return $joursAvecMouvements
+            ->reject(fn (string $jour) => in_array($jour, $joursArretes, true))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Le solde de clôture de la dernière section clôturée de la caisse,
+     * ou zéro s'il n'y en a pas (RG-02).
+     *
+     * Triée par date de clôture et non par identifiant : c'est la
+     * chronologie des exercices qui fait la continuité du solde, pas
+     * l'ordre d'insertion des lignes.
+     */
+    public static function soldeDOuverturePour(?int $caisseId): int
+    {
+        if (! $caisseId) {
+            return 0;
+        }
+
+        $derniere = static::query()
+            ->where('caisse_id', $caisseId)
+            ->where('etat', EtatSectionCaisse::CLOTUREE->value)
+            ->orderByDesc('date_cloture')
+            ->orderByDesc('id')
+            ->first();
+
+        return (int) ($derniere?->solde_cloture ?? 0);
     }
 
     public function getIdentiteAttribute(): string

@@ -216,20 +216,18 @@ class ManageCaisseSession extends Page
                             ->label('Libellé de la section')
                             ->placeholder('Section exercice 2026')
                             ->required(),
-                        Forms\Components\TextInput::make('solde_ouverture')
-                            ->label('Solde d\'ouverture')
-                            ->integer()
-                            ->default(function () {
-                                // RG-02 : solde d'ouverture = solde de clôture précédent
-                                $derniere = SectionCaisse::query()
-                                    ->where('caisse_id', $this->caisseId)
-                                    ->where('etat', EtatSectionCaisse::CLOTUREE->value)
-                                    ->orderByDesc('id')
-                                    ->first();
-
-                                return $derniere ? $derniere->solde_cloture : 0;
-                            })
-                            ->required(),
+                        // RG-02 : le solde d'ouverture ne se saisit pas.
+                        // Il est affiché pour information et calculé par
+                        // le modèle à l'enregistrement — un champ, même
+                        // pré-rempli, se corrige avant validation.
+                        Forms\Components\Placeholder::make('solde_ouverture_affiche')
+                            ->label('Solde d\'ouverture (repris de la section précédente)')
+                            ->content(fn () => number_format(
+                                SectionCaisse::soldeDOuverturePour($this->caisseId),
+                                0,
+                                ',',
+                                ' ',
+                            ).' FCFA'),
                     ]),
                 ])
                 ->action(function (array $data) {
@@ -261,7 +259,8 @@ class ManageCaisseSession extends Page
                         'caisse_id' => $caisse->getKey(),
                         'libelle' => $data['libelle'],
                         'date_ouverture' => now(),
-                        'solde_ouverture' => (int) $data['solde_ouverture'],
+                        // `solde_ouverture` est absent : le crochet
+                        // `creating` du modèle le calcule (RG-02).
                         'etat' => EtatSectionCaisse::OUVERTE,
                         'ouverte_par' => auth()->id(),
                         // Le village est celui de la caisse, jamais le

@@ -291,7 +291,6 @@ class SessionCaisseTest extends TestCase
         Livewire::test(ManageCaisseSession::class, ['caisse' => $this->caisse->id])
             ->callAction('ouvrir_section', [
                 'libelle' => 'Section ouverte par l\'écran',
-                'solde_ouverture' => 0,
             ]);
 
         $section = SectionCaisse::query()
@@ -316,7 +315,6 @@ class SessionCaisseTest extends TestCase
         Livewire::test(ManageCaisseSession::class, ['caisse' => $this->caisse->id])
             ->callAction('ouvrir_section', [
                 'libelle' => 'Section sans exercice',
-                'solde_ouverture' => 0,
             ])
             ->assertNotified('Aucun exercice en cours');
 
@@ -342,7 +340,6 @@ class SessionCaisseTest extends TestCase
                 'caisse_id' => $this->caisse->id,
                 'libelle' => 'Section ouverte par la ressource',
                 'date_ouverture' => now(),
-                'solde_ouverture' => 0,
             ]);
 
         $section = SectionCaisse::query()
