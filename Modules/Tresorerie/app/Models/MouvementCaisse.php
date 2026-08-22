@@ -78,18 +78,28 @@ class MouvementCaisse extends Model
             // n'est pas refusé pour autant — sa date demandée l'est :
             // il est reporté à aujourd'hui, avec mention de la date
             // qu'il aurait dû porter.
+            //
+            // La comparaison porte sur **le dernier jour arrêté**, et
+            // non sur le jour visé. Chercher un arrêté à la date exacte
+            // laissait passer une écriture antidatée d'un jour non
+            // arrêté situé avant un jour arrêté : elle entrait alors
+            // dans le périmètre du solde théorique de cet arrêté, qui
+            // devenait faux rétroactivement — alors qu'il est immuable
+            // et continue d'afficher son ancien chiffre. Un écart de
+            // caisse pouvait ainsi naître après le contrôle censé le
+            // constater.
             $dateCible = $mouvement->date_operation instanceof \DateTimeInterface
                 ? Carbon::instance($mouvement->date_operation)
                 : Carbon::parse($mouvement->date_operation ?? now());
 
             $caisseId = $mouvement->section?->caisse_id;
 
-            $journeeArretee = $caisseId && ArreteCaisse::query()
+            $journeeVerrouillee = $caisseId && ArreteCaisse::query()
                 ->where('caisse_id', $caisseId)
-                ->whereDate('date_arrete', $dateCible->toDateString())
+                ->whereDate('date_arrete', '>=', $dateCible->toDateString())
                 ->exists();
 
-            if ($journeeArretee) {
+            if ($journeeVerrouillee) {
                 $mouvement->date_origine = $dateCible->toDateString();
                 $mouvement->date_operation = now();
             }

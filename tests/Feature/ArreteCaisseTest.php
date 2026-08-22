@@ -224,4 +224,80 @@ class ArreteCaisseTest extends TestCase
         $this->assertNull($mouvement->date_origine);
         $this->assertSame(1, MouvementCaisse::count());
     }
+
+    /**
+     * Le trou que la comparaison à la date exacte laissait ouvert.
+     *
+     * Hier est arrêté, avant-hier ne l'a jamais été. Un mouvement daté
+     * d'avant-hier passait alors sans être reporté — et entrait dans le
+     * périmètre du solde théorique de l'arrêté d'hier, qui devenait faux
+     * rétroactivement tout en restant immuable. Un écart de caisse
+     * pouvait ainsi naître après le contrôle censé le constater.
+     */
+    public function test_un_mouvement_date_avant_une_journee_arretee_est_aussi_reporte(): void
+    {
+        $hier = now()->subDay();
+        $avantHier = now()->subDays(2);
+
+        $this->service->arreter($this->section, $hier, 0);
+
+        $mouvement = $this->tresorerie->enregistrer(
+            $this->section,
+            NatureMouvementCaisse::DEPENSE,
+            SensMouvementCaisse::SORTIE,
+            1500,
+            "Dépense d'avant-hier retrouvée",
+            dateOperation: $avantHier,
+        );
+
+        $this->assertTrue($mouvement->date_operation->isToday());
+        $this->assertSame($avantHier->toDateString(), $mouvement->date_origine->toDateString());
+
+        // Et l'arrêté d'hier continue de dire vrai : le mouvement reporté
+        // n'est pas entré dans son périmètre.
+        $this->assertSame(
+            0,
+            $this->service->soldeTheorique($this->section, $hier),
+            "Un arrêté immuable ne doit pas voir son solde théorique changer après coup.",
+        );
+    }
+
+    // === Y8 : l'écart se déduit, il ne se saisit pas ===
+
+    public function test_un_ecart_fourni_a_la_creation_est_ignore_et_recalcule(): void
+    {
+        // Un écart nul annoncé sur des soldes qui ne se rejoignent pas
+        // franchissait la garde de RG-26 sans commentaire.
+        $arrete = ArreteCaisse::create([
+            'caisse_id' => $this->caisse->id,
+            'section_id' => $this->section->id,
+            'date_arrete' => now()->toDateString(),
+            'solde_theorique' => 0,
+            'solde_physique' => 5000,
+            'ecart' => 0,
+            'commentaire_ecart' => 'Billet trouvé dans le tiroir.',
+            'date_validation' => now(),
+        ]);
+
+        $this->assertSame(
+            5000,
+            $arrete->ecart,
+            "L'écart est déduit des deux soldes, jamais repris de ce qu'on lui passe.",
+        );
+    }
+
+    public function test_un_ecart_nul_annonce_sur_des_soldes_discordants_est_refuse(): void
+    {
+        $this->expectException(ArreteCaisseException::class);
+
+        ArreteCaisse::create([
+            'caisse_id' => $this->caisse->id,
+            'section_id' => $this->section->id,
+            'date_arrete' => now()->toDateString(),
+            'solde_theorique' => 0,
+            'solde_physique' => 5000,
+            'ecart' => 0,
+            'date_validation' => now(),
+        ]);
+    }
 }
