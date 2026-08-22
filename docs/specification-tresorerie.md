@@ -152,7 +152,9 @@ Contrôle physique quotidien de la caisse. Enregistrement de contrôle, non cont
 
 **RG-04** — Les mouvements d'une section sont numérotés séquentiellement, sans rupture ni réutilisation de numéro.
 
-**RG-05** — Un mouvement peut être corrigé ou supprimé tant que la journée à laquelle il appartient n'a pas fait l'objet d'un arrêté de caisse. Une fois la journée arrêtée, le mouvement devient immuable : toute correction s'effectue par contre-passation, qui crée un nouveau mouvement de sens inverse référençant le mouvement d'origine.
+**RG-05** — Un mouvement est immuable dès son enregistrement. Il ne se modifie ni ne se supprime, quelle que soit son ancienneté : toute correction s'effectue par contre-passation, qui crée un nouveau mouvement de sens inverse référençant le mouvement d'origine.
+
+> *Règle amendée le 22/08.* La première rédaction ouvrait une fenêtre de correction directe jusqu'à l'arrêté de la journée. Le code ne l'a jamais implémentée : les crochets `updating` et `deleting` de `MouvementCaisse` refusent depuis l'origine toute écriture, sans condition de date. L'amendement retient le comportement du code, pour deux raisons. D'abord, une fenêtre de correction fait dépendre l'immuabilité d'une donnée extérieure au mouvement — l'existence d'un arrêté — de sorte que la même ligne serait modifiable ou non selon le moment où on la regarde. Ensuite, une correction directe, même légitime, ne laisse aucune trace : le brouillard montrerait un chiffre juste sans montrer qu'il a été faux, et c'est exactement ce qu'un journal de caisse existe pour empêcher. Voir « Convention amendée » dans `docs/dette-technique.md`.
 
 **RG-06** — Tous les modules enregistrent leurs flux via un service unique d'écriture au brouillard. Aucune écriture directe en base n'est autorisée depuis un autre module.
 
