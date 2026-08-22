@@ -50,6 +50,13 @@ class ManageCaisseSession extends Page
 
     public ?int $selectedSectionId = null;
 
+    /**
+     * Onglet actif — une propriété de page, pas un état Alpine : seul
+     * l'onglet affiché monte son composant Livewire (et n'interroge
+     * donc la base que pour ce qu'on regarde réellement).
+     */
+    public string $activeTab = 'ventes';
+
     public static function getRoutePath(Panel $panel): string
     {
         return '/caisses/{caisse}/session/{section?}';

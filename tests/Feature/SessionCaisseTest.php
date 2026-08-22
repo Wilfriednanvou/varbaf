@@ -246,7 +246,7 @@ class SessionCaisseTest extends TestCase
             'caisse' => $this->caisse->id,
         ])
             ->assertSuccessful()
-            ->assertSee('Aucune section n\'est actuellement ouverte', escape: false)
+            ->assertSee('Aucune section n\'est actuellement ouverte')
             ->assertActionVisible('ouvrir_section');
     }
 
@@ -263,7 +263,7 @@ class SessionCaisseTest extends TestCase
 
         Livewire::test(ManageCaisseSession::class, ['caisse' => $caisseVierge->id])
             ->assertSuccessful()
-            ->assertSee('Aucune section de caisse n\'a été créée', escape: false)
+            ->assertSee('Aucune section de caisse n\'a été créée')
             ->assertActionVisible('ouvrir_section');
     }
 
