@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Modules\Commerce\Contracts\JournalDeCaisse;
 use Modules\Socle\Enums\CategorieVillage;
 use Modules\Socle\Models\Exercice;
@@ -285,6 +287,85 @@ class MouvementCaisseTest extends TestCase
 
         $this->assertTrue($journal->estOperationnel());
         $this->assertInstanceOf(ServiceTresorerie::class, $journal);
+    }
+
+    // === VERROU DE NUMÉROTATION (RG-04, §7.3) ===
+
+    /**
+     * `SELECT ... FOR UPDATE` ne verrouille que les lignes qu'il
+     * retourne. Verrouiller les mouvements d'une section encore vide ne
+     * verrouille donc rien, et deux saisies simultanées obtiennent le
+     * même numéro d'ordre. Le verrou doit porter sur la ligne de
+     * section, qui existe toujours.
+     *
+     * Le test lit le SQL réellement émis : la concurrence, elle, ne se
+     * laisse pas éprouver de façon déterministe.
+     */
+    public function test_l_ecriture_verrouille_la_ligne_de_section_et_non_le_brouillard(): void
+    {
+        $this->enregistrerEntree(1000);
+
+        $requetes = [];
+        DB::listen(function ($requete) use (&$requetes): void {
+            $requetes[] = $requete->sql;
+        });
+
+        $this->enregistrerEntree(2000);
+
+        $verrous = array_values(array_filter(
+            $requetes,
+            fn (string $sql) => str_contains($sql, 'for update'),
+        ));
+
+        $this->assertNotEmpty($verrous, 'Une écriture au brouillard doit poser un verrou.');
+
+        foreach ($verrous as $sql) {
+            $this->assertStringContainsString(
+                'sections_caisse',
+                $sql,
+                'Le verrou doit porter sur la ligne de section, qui existe toujours.',
+            );
+            $this->assertStringNotContainsString(
+                'mouvements_caisse',
+                $sql,
+                'Verrouiller les mouvements ne verrouille rien sur une section vide, et charge toute la section sur une section pleine.',
+            );
+        }
+    }
+
+    /**
+     * La boucle de reprise n'existe que pour le doublon de numéro
+     * d'ordre. Une erreur qui ne se résoudra jamais — ici un libellé
+     * plus long que sa colonne — doit remonter du premier coup.
+     */
+    public function test_une_erreur_autre_qu_un_doublon_n_est_pas_reessayee(): void
+    {
+        $tentatives = 0;
+
+        MouvementCaisse::creating(function () use (&$tentatives): void {
+            $tentatives++;
+        });
+
+        try {
+            $this->service->enregistrer(
+                $this->section,
+                NatureMouvementCaisse::DEPENSE,
+                SensMouvementCaisse::SORTIE,
+                1000,
+                str_repeat('x', 300), // `libelle` est un varchar(255)
+            );
+
+            $this->fail("Une erreur SQL autre qu'un doublon doit remonter.");
+        } catch (QueryException) {
+            // Attendu : l'exception remonte, c'est le nombre de
+            // tentatives qui est en cause ici.
+        }
+
+        $this->assertSame(
+            1,
+            $tentatives,
+            'Une erreur qui ne se résoudra jamais ne doit pas être réessayée trois fois.',
+        );
     }
 
     // === HELPERS ===

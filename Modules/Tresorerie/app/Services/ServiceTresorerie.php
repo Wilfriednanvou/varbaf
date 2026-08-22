@@ -3,6 +3,7 @@
 namespace Modules\Tresorerie\Services;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Commerce\Contracts\JournalDeCaisse;
@@ -37,6 +38,18 @@ class ServiceTresorerie implements JournalDeCaisse
      * Nombre de tentatives en cas de collision sur le numéro d'ordre.
      */
     private const MAX_TENTATIVES = 3;
+
+    /**
+     * SQLSTATE d'une violation de contrainte d'unicité en PostgreSQL.
+     *
+     * C'est la seule erreur qu'une nouvelle tentative peut résoudre :
+     * deux saisies simultanées ayant visé le même numéro d'ordre, la
+     * seconde aboutit en reprenant le numéro suivant. Une clé étrangère
+     * absente ou une valeur trop longue ne se résoudra jamais d'elle-même
+     * — la réessayer ne fait que retarder le message d'erreur de trois
+     * allers-retours en base.
+     */
+    private const VIOLATION_UNICITE = '23505';
 
     /**
      * Section ciblée pour les opérations en cours.
@@ -100,6 +113,7 @@ class ServiceTresorerie implements JournalDeCaisse
         ?Model $origine = null,
         ?MouvementCaisse $contrepasse = null,
         ?LibelleMouvement $libelleMouvement = null,
+        ?\DateTimeInterface $dateOperation = null,
     ): MouvementCaisse {
         // RG-12 bis : validé sur la valeur arrondie — un montant qui
         // s'arrondirait à zéro n'est pas un mouvement valide.
@@ -119,13 +133,27 @@ class ServiceTresorerie implements JournalDeCaisse
             try {
                 return DB::transaction(function () use (
                     $section, $nature, $sens, $montant, $libelle,
-                    $pieceJustificative, $origine, $contrepasse, $libelleMouvement
+                    $pieceJustificative, $origine, $contrepasse, $libelleMouvement, $dateOperation
                 ): MouvementCaisse {
-                    // Verrou sur les mouvements existants de la section
-                    MouvementCaisse::query()
-                        ->where('section_id', $section->getKey())
+                    // Verrou sur la ligne de section — et non sur les
+                    // mouvements.
+                    //
+                    // `SELECT ... FOR UPDATE` ne verrouille que les
+                    // lignes qu'il retourne : sur une section encore
+                    // vide, verrouiller les mouvements ne verrouille
+                    // rien du tout, et deux saisies simultanées visent
+                    // le même numéro d'ordre. La ligne de section, elle,
+                    // existe toujours — c'est elle qui sérialise les
+                    // écritures.
+                    //
+                    // Elle évite en outre de charger en mémoire les
+                    // milliers de lignes que la section finira par
+                    // porter (§7.6 de la spécification), à chaque
+                    // écriture, pour n'en tirer aucune donnée.
+                    SectionCaisse::query()
+                        ->whereKey($section->getKey())
                         ->lockForUpdate()
-                        ->get();
+                        ->first();
 
                     $soldeCourant = $this->solde($section);
 
@@ -141,7 +169,7 @@ class ServiceTresorerie implements JournalDeCaisse
 
                     return MouvementCaisse::query()->create([
                         'numero_ordre' => $dernierNumero + 1,
-                        'date_operation' => now(),
+                        'date_operation' => $dateOperation ?? now(),
                         'section_id' => $section->getKey(),
                         'nature' => $nature,
                         'libelle_mouvement_id' => $libelleMouvement?->getKey(),
@@ -156,7 +184,14 @@ class ServiceTresorerie implements JournalDeCaisse
                         'saisi_par' => Auth::id(),
                     ]);
                 });
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
+                // Seul un doublon de numéro d'ordre justifie une
+                // nouvelle tentative. Tout le reste remonte
+                // immédiatement, avec son message d'origine.
+                if ((string) $e->getCode() !== self::VIOLATION_UNICITE) {
+                    throw $e;
+                }
+
                 $tentative++;
 
                 if ($tentative >= self::MAX_TENTATIVES) {
