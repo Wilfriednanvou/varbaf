@@ -1,0 +1,11 @@
+{
+    "name": "Portail",
+    "alias": "portail",
+    "description": "Site vitrine public du village artisanal — consultation seule.",
+    "keywords": ["portail", "vitrine", "public"],
+    "priority": 100,
+    "providers": [
+        "Modules\\Portail\\Providers\\PortailServiceProvider"
+    ],
+    "files": []
+}

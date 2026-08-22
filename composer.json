@@ -38,7 +38,10 @@
             "Modules\\Commerce\\Database\\Seeders\\": "Modules/Commerce/database/seeders/",
             "Modules\\Pilotage\\": "Modules/Pilotage/app/",
             "Modules\\Pilotage\\Database\\Factories\\": "Modules/Pilotage/database/factories/",
-            "Modules\\Pilotage\\Database\\Seeders\\": "Modules/Pilotage/database/seeders/"
+            "Modules\\Pilotage\\Database\\Seeders\\": "Modules/Pilotage/database/seeders/",
+            "Modules\\Portail\\": "Modules/Portail/app/",
+            "Modules\\Portail\\Database\\Factories\\": "Modules/Portail/database/factories/",
+            "Modules\\Portail\\Database\\Seeders\\": "Modules/Portail/database/seeders/"
         }
     },
     "autoload-dev": {
@@ -96,6 +99,7 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform-check": false,
         "allow-plugins": {
             "php-http/discovery": true,
             "wikimedia/composer-merge-plugin": true

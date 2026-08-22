@@ -1,0 +1,11 @@
+{
+    "name": "nwidart/portail",
+    "description": "Module Portail public du SI VARBAF",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Portail\\": "app/",
+            "Modules\\Portail\\Database\\Factories\\": "database/factories/",
+            "Modules\\Portail\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
