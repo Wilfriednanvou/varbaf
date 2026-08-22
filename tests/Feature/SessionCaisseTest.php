@@ -17,8 +17,10 @@ use Modules\Socle\Models\Agent;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\Utilisateur;
 use Modules\Socle\Models\VillageArtisanal;
+use Modules\Tresorerie\Enums\EtatSectionCaisse;
 use Modules\Tresorerie\Filament\Pages\ManageCaisseSession;
 use Modules\Tresorerie\Filament\Resources\CaisseResource\Pages\ManageCaisses;
+use Modules\Tresorerie\Filament\Resources\SectionCaisseResource\Pages\ManageSectionsCaisse;
 use Modules\Tresorerie\Livewire\MouvementsCaisseTable;
 use Modules\Tresorerie\Livewire\VentesCaisseTable;
 use Modules\Tresorerie\Models\Caisse;
@@ -265,6 +267,86 @@ class SessionCaisseTest extends TestCase
             ->assertSuccessful()
             ->assertSee('Aucune section de caisse n\'a été créée')
             ->assertActionVisible('ouvrir_section');
+    }
+
+    // === OUVERTURE DE SECTION — l'action est appelée, pas seulement vue ===
+
+    /**
+     * Un test qui se contente de `assertActionVisible` ne prouve que
+     * l'affichage du bouton. Celui-ci appelle l'action : c'est la seule
+     * façon d'éprouver ce que fait `->action()`, où `village_id` et
+     * `exercice_id` sont résolus.
+     */
+    public function test_l_action_ouvrir_section_cree_la_section_avec_le_village_de_la_caisse_et_l_exercice_en_cours(): void
+    {
+        $this->actingAs($this->caissier);
+
+        $this->sectionOuverte->cloturer();
+
+        Livewire::test(ManageCaisseSession::class, ['caisse' => $this->caisse->id])
+            ->callAction('ouvrir_section', [
+                'libelle' => 'Section ouverte par l\'écran',
+                'solde_ouverture' => 0,
+            ]);
+
+        $section = SectionCaisse::query()
+            ->where('caisse_id', $this->caisse->id)
+            ->where('libelle', 'Section ouverte par l\'écran')
+            ->first();
+
+        $this->assertNotNull($section, "L'action doit créer la section, pas seulement s'afficher.");
+        $this->assertSame(EtatSectionCaisse::OUVERTE, $section->etat);
+        $this->assertSame($this->exercice->id, $section->exercice_id, "L'exercice doit être celui en cours.");
+        $this->assertSame($this->village->id, $section->village_id, 'Le village doit être celui de la caisse.');
+        $this->assertSame($this->caissier->id, $section->ouverte_par);
+    }
+
+    public function test_ouvrir_une_section_sans_exercice_en_cours_est_refuse_par_un_message(): void
+    {
+        $this->actingAs($this->caissier);
+
+        $this->sectionOuverte->cloturer();
+        $this->exercice->cloturer();
+
+        Livewire::test(ManageCaisseSession::class, ['caisse' => $this->caisse->id])
+            ->callAction('ouvrir_section', [
+                'libelle' => 'Section sans exercice',
+                'solde_ouverture' => 0,
+            ])
+            ->assertNotified('Aucun exercice en cours');
+
+        $this->assertSame(
+            0,
+            SectionCaisse::query()->where('libelle', 'Section sans exercice')->count(),
+            "Aucune section ne doit être créée sans exercice en cours."
+        );
+    }
+
+    /**
+     * Second chemin d'ouverture : la ressource « Sections de caisse ».
+     * Il résout les mêmes valeurs dérivées et mérite le même test.
+     */
+    public function test_la_ressource_ouvre_aussi_la_section_avec_les_valeurs_derivees(): void
+    {
+        $this->actingAs($this->caissier);
+
+        $this->sectionOuverte->cloturer();
+
+        Livewire::test(ManageSectionsCaisse::class)
+            ->callAction('create', [
+                'caisse_id' => $this->caisse->id,
+                'libelle' => 'Section ouverte par la ressource',
+                'date_ouverture' => now(),
+                'solde_ouverture' => 0,
+            ]);
+
+        $section = SectionCaisse::query()
+            ->where('libelle', 'Section ouverte par la ressource')
+            ->first();
+
+        $this->assertNotNull($section, "L'action de la ressource doit créer la section.");
+        $this->assertSame($this->exercice->id, $section->exercice_id);
+        $this->assertSame($this->village->id, $section->village_id);
     }
 
     // === LECTURE SEULE — défense côté serveur ===

@@ -62,10 +62,13 @@ class SectionCaisseResource extends Resource
                 ]),
                 Forms\Components\Hidden::make('ouverte_par')
                     ->default(fn () => auth()->id()),
-                Forms\Components\Hidden::make('village_id')
-                    ->default(fn () => \Modules\Socle\Models\VillageArtisanal::query()->value('id')),
-                Forms\Components\Hidden::make('exercice_id')
-                    ->default(fn () => \Modules\Socle\Models\Exercice::query()->where('actif', true)->value('id')),
+
+                // `village_id` et `exercice_id` ne figurent plus au
+                // formulaire : ce sont des valeurs dérivées — le village
+                // est celui de la caisse choisie, l'exercice est celui en
+                // cours. `ManageSectionsCaisse` les pose à
+                // l'enregistrement et refuse l'ouverture si aucun
+                // exercice n'est en cours.
             ]);
     }
 

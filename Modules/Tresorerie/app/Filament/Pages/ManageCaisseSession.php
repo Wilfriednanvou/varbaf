@@ -12,7 +12,6 @@ use Filament\Support\Enums\Alignment;
 use Livewire\Attributes\Computed;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
-use Modules\Socle\Models\VillageArtisanal;
 use Modules\Tresorerie\Enums\EtatSectionCaisse;
 use Modules\Tresorerie\Filament\Resources\CaisseResource;
 use Modules\Tresorerie\Models\Caisse;
@@ -234,15 +233,41 @@ class ManageCaisseSession extends Page
                     ]),
                 ])
                 ->action(function (array $data) {
+                    $caisse = $this->caisse;
+
+                    if (! $caisse) {
+                        return;
+                    }
+
+                    // `Exercice::courant()` est le point d'entrée que le
+                    // Socle expose : aucun autre module ne requête la
+                    // table des exercices. `exercice_id` étant NOT NULL,
+                    // l'absence d'exercice en cours doit produire un
+                    // message lisible, pas une erreur SQL au moment de
+                    // l'insertion.
+                    $exercice = Exercice::courant();
+
+                    if (! $exercice) {
+                        Notification::make()
+                            ->title('Aucun exercice en cours')
+                            ->body("Ouvrez un exercice avant d'ouvrir une section de caisse.")
+                            ->danger()
+                            ->send();
+
+                        return;
+                    }
+
                     $section = SectionCaisse::create([
-                        'caisse_id' => $this->caisseId,
+                        'caisse_id' => $caisse->getKey(),
                         'libelle' => $data['libelle'],
                         'date_ouverture' => now(),
                         'solde_ouverture' => (int) $data['solde_ouverture'],
                         'etat' => EtatSectionCaisse::OUVERTE,
                         'ouverte_par' => auth()->id(),
-                        'village_id' => $this->caisse?->village_id ?? VillageArtisanal::query()->value('id'),
-                        'exercice_id' => Exercice::query()->where('actif', true)->value('id'),
+                        // Le village est celui de la caisse, jamais le
+                        // premier village trouvé en base.
+                        'village_id' => $caisse->village_id,
+                        'exercice_id' => $exercice->getKey(),
                     ]);
 
                     JournalAudit::enregistrer(
