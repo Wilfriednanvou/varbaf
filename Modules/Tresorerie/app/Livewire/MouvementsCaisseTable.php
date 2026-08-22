@@ -14,6 +14,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Filament\Support\Enums\Alignment;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Modules\Socle\Models\JournalAudit;
 use Modules\Tresorerie\Enums\NatureMouvementCaisse;
@@ -48,6 +49,14 @@ class MouvementsCaisseTable extends Component implements HasActions, HasSchemas,
     use InteractsWithTable;
     use VerifieSectionOuverte;
 
+    /**
+     * `#[Locked]` : une propriété publique Livewire non verrouillée est
+     * réinscriptible depuis le navigateur. Sans elle, un compte habilité
+     * à saisir pourrait viser la section ouverte d'une autre caisse —
+     * `refuserSiSectionFermee()` vérifie que la section est ouverte, pas
+     * que c'est celle que l'écran affiche.
+     */
+    #[Locked]
     public int $sectionId;
 
     public function render()
@@ -139,9 +148,20 @@ class MouvementsCaisseTable extends Component implements HasActions, HasSchemas,
             return;
         }
 
-        $record = MouvementCaisse::find($mouvementId);
+        // Le mouvement est cherché **dans la section affichée**, jamais
+        // par son seul identifiant : sans ce filtre, l'identifiant reçu
+        // suffirait à contre-passer un mouvement d'une autre caisse.
+        $record = MouvementCaisse::query()
+            ->where('section_id', $this->sectionId)
+            ->find($mouvementId);
 
         if (! $record) {
+            Notification::make()
+                ->title('Mouvement introuvable')
+                ->body("Ce mouvement n'appartient pas à la section de caisse affichée.")
+                ->danger()
+                ->send();
+
             return;
         }
 

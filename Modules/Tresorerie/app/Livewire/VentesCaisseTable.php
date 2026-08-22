@@ -17,6 +17,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Commerce\Enums\EtatVente;
@@ -49,6 +50,14 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
     use InteractsWithTable;
     use VerifieSectionOuverte;
 
+    /**
+     * `#[Locked]` : une propriété publique Livewire non verrouillée est
+     * réinscriptible depuis le navigateur. Sans elle, un compte habilité
+     * à saisir pourrait viser la section ouverte d'une autre caisse —
+     * `refuserSiSectionFermee()` vérifie que la section est ouverte, pas
+     * que c'est celle que l'écran affiche.
+     */
+    #[Locked]
     public int $sectionId;
 
     public function render()
@@ -113,9 +122,20 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
             return;
         }
 
-        $vente = Vente::find($venteId);
+        // La vente est cherchée **dans la section affichée**, jamais par
+        // son seul identifiant : sans ce filtre, l'identifiant reçu
+        // suffirait à annuler la vente d'une autre caisse.
+        $vente = Vente::query()
+            ->where('section_caisse_id', $this->sectionId)
+            ->find($venteId);
 
         if (! $vente) {
+            Notification::make()
+                ->title('Vente introuvable')
+                ->body("Cette vente n'appartient pas à la section de caisse affichée.")
+                ->danger()
+                ->send();
+
             return;
         }
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\Boutique;
@@ -12,12 +13,15 @@ use Modules\Commerce\Enums\EtatVente;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Models\CategorieProduit;
 use Modules\Commerce\Models\Produit;
+use Modules\Commerce\Models\Vente;
 use Modules\Commerce\Services\ServiceMouvementStock;
 use Modules\Socle\Models\Agent;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\Utilisateur;
 use Modules\Socle\Models\VillageArtisanal;
 use Modules\Tresorerie\Enums\EtatSectionCaisse;
+use Modules\Tresorerie\Enums\NatureMouvementCaisse;
+use Modules\Tresorerie\Enums\SensMouvementCaisse;
 use Modules\Tresorerie\Filament\Pages\ManageCaisseSession;
 use Modules\Tresorerie\Filament\Resources\CaisseResource\Pages\ManageCaisses;
 use Modules\Tresorerie\Filament\Resources\SectionCaisseResource\Pages\ManageSectionsCaisse;
@@ -27,6 +31,7 @@ use Modules\Tresorerie\Models\Caisse;
 use Modules\Tresorerie\Models\LibelleMouvement;
 use Modules\Tresorerie\Models\MouvementCaisse;
 use Modules\Tresorerie\Models\SectionCaisse;
+use Modules\Tresorerie\Services\ServiceTresorerie;
 use Tests\TestCase;
 
 /**
@@ -439,5 +444,109 @@ class SessionCaisseTest extends TestCase
         $this->assertNotNull($contrepassation, 'La contre-passation doit apparaître au brouillard.');
         $this->assertSame('SORTIE', $contrepassation->sens->value);
         $this->assertSame($mouvementVente->montant, $contrepassation->montant);
+    }
+
+    // === CLOISONNEMENT PAR SECTION ===
+
+    /**
+     * `sectionId` est une propriété publique Livewire : sans `#[Locked]`,
+     * elle est réinscriptible depuis le navigateur, et l'écran d'une
+     * caisse devient un point d'écriture sur toutes les autres.
+     */
+    public function test_la_section_affichee_ne_se_reecrit_pas_depuis_le_client(): void
+    {
+        $this->actingAs($this->caissier);
+
+        $autreSection = $this->autreSectionOuverte();
+
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        Livewire::test(MouvementsCaisseTable::class, ['sectionId' => $this->sectionOuverte->id])
+            ->set('sectionId', $autreSection->id);
+    }
+
+    /**
+     * Le verrou ferme la porte principale ; le filtrage sur la section
+     * ferme la porte de service. Un identifiant de mouvement reçu ne
+     * suffit pas : encore faut-il qu'il appartienne à la section
+     * affichée.
+     */
+    public function test_contrepasser_refuse_un_mouvement_d_une_autre_section(): void
+    {
+        $this->actingAs($this->caissier);
+
+        $autreSection = $this->autreSectionOuverte();
+
+        $mouvementEtranger = app(ServiceTresorerie::class)->enregistrer(
+            section: $autreSection,
+            nature: NatureMouvementCaisse::DEPENSE,
+            sens: SensMouvementCaisse::SORTIE,
+            montant: 4000,
+            libelle: 'Dépense de la caisse secondaire',
+        );
+
+        Livewire::test(MouvementsCaisseTable::class, ['sectionId' => $this->sectionOuverte->id])
+            ->call('contrepasserMouvement', $mouvementEtranger->id, 'Tentative hors section')
+            ->assertNotified('Mouvement introuvable');
+
+        $this->assertSame(
+            0,
+            MouvementCaisse::query()->where('mouvement_contrepasse_id', $mouvementEtranger->id)->count(),
+            "Le mouvement d'une autre caisse ne doit pas avoir été contre-passé."
+        );
+    }
+
+    public function test_annuler_refuse_une_vente_d_une_autre_section(): void
+    {
+        $this->actingAs($this->vendeuse);
+
+        Livewire::test(VentesCaisseTable::class, ['sectionId' => $this->sectionOuverte->id])
+            ->call('creerVente', [
+                'lignes' => [['produit_id' => $this->produit->id, 'quantite' => 1]],
+                'mode_reglement' => 'ESPECES',
+            ]);
+
+        $vente = Vente::query()->firstOrFail();
+
+        $autreSection = $this->autreSectionOuverte();
+
+        Livewire::test(VentesCaisseTable::class, ['sectionId' => $autreSection->id])
+            ->call('annulerVente', $vente->id, 'Tentative hors section')
+            ->assertNotified('Vente introuvable');
+
+        $this->assertSame(
+            EtatVente::VALIDEE,
+            $vente->fresh()->etat,
+            "La vente d'une autre caisse ne doit pas avoir été annulée."
+        );
+    }
+
+    // === HELPERS ===
+
+    /**
+     * Une seconde caisse avec sa propre section ouverte. RG-01 porte sur
+     * la caisse, pas sur le village : deux caisses peuvent avoir chacune
+     * une section ouverte, et c'est exactement la situation où le
+     * cloisonnement doit tenir.
+     */
+    protected function autreSectionOuverte(): SectionCaisse
+    {
+        $autreCaisse = Caisse::create([
+            'code' => 'CAISSE-SECONDAIRE',
+            'libelle' => 'Caisse secondaire',
+            'etat' => 'ACTIVE',
+            'village_id' => $this->village->id,
+        ]);
+
+        return SectionCaisse::create([
+            'caisse_id' => $autreCaisse->id,
+            'libelle' => 'Section de la caisse secondaire',
+            'date_ouverture' => now(),
+            'solde_ouverture' => 0,
+            'etat' => 'OUVERTE',
+            'ouverte_par' => $this->caissier->id,
+            'village_id' => $this->village->id,
+            'exercice_id' => $this->exercice->id,
+        ]);
     }
 }

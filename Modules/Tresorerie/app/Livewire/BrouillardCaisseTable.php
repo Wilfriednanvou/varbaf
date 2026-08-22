@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Modules\Tresorerie\Enums\NatureMouvementCaisse;
 use Modules\Tresorerie\Enums\SensMouvementCaisse;
@@ -31,6 +32,12 @@ class BrouillardCaisseTable extends Component implements HasActions, HasSchemas,
     use InteractsWithSchemas;
     use InteractsWithTable;
 
+    /**
+     * `#[Locked]` : même en consultation seule, la section affichée ne se
+     * choisit pas depuis le navigateur. Le brouillard d'une caisse n'a
+     * pas à être lisible depuis l'écran d'une autre.
+     */
+    #[Locked]
     public int $sectionId;
 
     public function render()
