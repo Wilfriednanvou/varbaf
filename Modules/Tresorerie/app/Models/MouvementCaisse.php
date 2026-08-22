@@ -5,6 +5,7 @@ namespace Modules\Tresorerie\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use Modules\Socle\Models\Utilisateur;
 use Modules\Tresorerie\Enums\NatureMouvementCaisse;
 use Modules\Tresorerie\Enums\SensMouvementCaisse;
@@ -31,6 +32,7 @@ use Modules\Tresorerie\Exceptions\MouvementCaisseImmuableException;
  * @property string $libelle
  * @property int $section_id
  * @property int|null $libelle_mouvement_id
+ * @property \Illuminate\Support\Carbon|null $date_origine
  */
 class MouvementCaisse extends Model
 {
@@ -41,6 +43,7 @@ class MouvementCaisse extends Model
     protected $fillable = [
         'numero_ordre',
         'date_operation',
+        'date_origine',
         'section_id',
         'nature',
         'libelle_mouvement_id',
@@ -59,6 +62,7 @@ class MouvementCaisse extends Model
     {
         return [
             'date_operation' => 'datetime',
+            'date_origine' => 'date',
             'nature' => NatureMouvementCaisse::class,
             'sens' => SensMouvementCaisse::class,
             'montant' => 'integer',
@@ -69,6 +73,28 @@ class MouvementCaisse extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (self $mouvement): void {
+            // RG-27 : une journée arrêtée est verrouillée. Le mouvement
+            // n'est pas refusé pour autant — sa date demandée l'est :
+            // il est reporté à aujourd'hui, avec mention de la date
+            // qu'il aurait dû porter.
+            $dateCible = $mouvement->date_operation instanceof \DateTimeInterface
+                ? Carbon::instance($mouvement->date_operation)
+                : Carbon::parse($mouvement->date_operation ?? now());
+
+            $caisseId = $mouvement->section?->caisse_id;
+
+            $journeeArretee = $caisseId && ArreteCaisse::query()
+                ->where('caisse_id', $caisseId)
+                ->whereDate('date_arrete', $dateCible->toDateString())
+                ->exists();
+
+            if ($journeeArretee) {
+                $mouvement->date_origine = $dateCible->toDateString();
+                $mouvement->date_operation = now();
+            }
+        });
+
         static::updating(function (self $mouvement): void {
             throw MouvementCaisseImmuableException::modification();
         });

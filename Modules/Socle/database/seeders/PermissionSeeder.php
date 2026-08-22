@@ -197,6 +197,20 @@ class PermissionSeeder extends Seeder
             ['name' => 'lister_mouvements_caisse', 'module' => 'TRESORERIE', 'description' => 'Consulter le brouillard de caisse'],
             ['name' => 'saisir_mouvement_caisse', 'module' => 'TRESORERIE', 'description' => 'Saisir un mouvement au brouillard'],
             ['name' => 'contrepasser_mouvement_caisse', 'module' => 'TRESORERIE', 'description' => 'Corriger un mouvement de caisse par contre-passation'],
+
+            // === TRESORERIE : arrêté de caisse journalier ===
+            ['name' => 'arreter_caisse', 'module' => 'TRESORERIE', 'description' => 'Établir l\'arrêté de caisse du jour'],
+
+            // === TRESORERIE : situation artisan ===
+            ['name' => 'consulter_situation_artisan', 'module' => 'TRESORERIE', 'description' => 'Consulter les ventes, la part due et le solde d\'un artisan'],
+
+            // === TRESORERIE : campagnes de reversement ===
+            ['name' => 'lister_campagnes_reversement', 'module' => 'TRESORERIE', 'description' => 'Consulter les campagnes de reversement'],
+            ['name' => 'preparer_campagne_reversement', 'module' => 'TRESORERIE', 'description' => 'Ouvrir une campagne et calculer les parts dues par artisan'],
+            ['name' => 'supprimer_campagne_reversement', 'module' => 'TRESORERIE', 'description' => 'Abandonner une campagne encore en préparation'],
+            ['name' => 'valider_campagne_reversement', 'module' => 'TRESORERIE', 'description' => 'Valider une campagne : rattacher les ventes et décaisser les parts artisan'],
+            ['name' => 'imprimer_etat_reversement', 'module' => 'TRESORERIE', 'description' => 'Éditer l\'état récapitulatif d\'une campagne'],
+            ['name' => 'imprimer_recu_reversement', 'module' => 'TRESORERIE', 'description' => 'Éditer le reçu de reversement d\'un artisan'],
         ];
     }
 
@@ -255,6 +269,7 @@ class PermissionSeeder extends Seeder
             'lister_caisses',
             'lister_sections_caisse',
             'lister_mouvements_caisse',
+            'lister_campagnes_reversement',
         ];
 
         return [
@@ -312,6 +327,18 @@ class PermissionSeeder extends Seeder
                     'ouvrir_section_caisse', 'cloturer_section_caisse',
                     'lister_libelles_mouvement', 'ajouter_libelle_mouvement', 'modifier_libelle_mouvement', 'supprimer_libelle_mouvement',
                     'saisir_mouvement_caisse', 'contrepasser_mouvement_caisse',
+                    'arreter_caisse', 'consulter_situation_artisan',
+                    // RG-23 : valider une campagne engage un
+                    // décaissement au profit de tiers. Le geste revient
+                    // au coordonnateur, et à lui seul — CLAUDE.md range
+                    // la validation d'une campagne parmi les
+                    // responsabilités financières, qui ne se suppléent
+                    // pas. Volontairement absente :
+                    // preparer_campagne_reversement, qui appartient à la
+                    // section qui tient la caisse. Celui qui calcule les
+                    // parts n'est pas celui qui ordonne de les payer.
+                    'valider_campagne_reversement',
+                    'imprimer_etat_reversement', 'imprimer_recu_reversement',
                 ],
             ],
 
@@ -335,10 +362,16 @@ class PermissionSeeder extends Seeder
                     'valider_depot', 'imprimer_decharge_depot',
                     'retirer_stock',
                     'imprimer_recu_vente',
+                    'consulter_situation_artisan',
                     // Volontairement absents : cloturer_exercice et
                     // resilier_attribution. Clôturer un exercice est
                     // irréversible, résilier rompt un contrat : ces deux
                     // actes engagent le coordonnateur lui-même.
+                    // Absent aussi : arreter_caisse — la même logique
+                    // que cloturer_section_caisse, hors de son périmètre.
+                    // Et valider_campagne_reversement, pour la même
+                    // raison : une responsabilité financière ne se
+                    // supplée pas, c'est la distinction posée par RG-23.
                 ],
             ],
 
@@ -393,6 +426,13 @@ class PermissionSeeder extends Seeder
                     'ouvrir_section_caisse', 'cloturer_section_caisse',
                     'lister_libelles_mouvement', 'ajouter_libelle_mouvement', 'modifier_libelle_mouvement',
                     'saisir_mouvement_caisse', 'contrepasser_mouvement_caisse',
+                    'arreter_caisse', 'consulter_situation_artisan',
+                    // Préparer une campagne, c'est arrêter les comptes du
+                    // mois : le travail de la section qui tient la
+                    // caisse. La valider, c'est ordonner un décaissement
+                    // — RG-23 le réserve au coordonnateur.
+                    'preparer_campagne_reversement', 'supprimer_campagne_reversement',
+                    'imprimer_etat_reversement', 'imprimer_recu_reversement',
                 ],
             ],
 
