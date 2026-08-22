@@ -40,7 +40,8 @@ class ArreteCaisse extends Model
         'date_arrete',
         'solde_theorique',
         'solde_physique',
-        'ecart',
+        // `ecart` est volontairement absent : il est déduit des deux
+        // soldes par le crochet `creating`, jamais saisi.
         'commentaire_ecart',
         'arrete_par',
         'date_validation',
@@ -60,6 +61,16 @@ class ArreteCaisse extends Model
     protected static function booted(): void
     {
         static::creating(function (self $arrete): void {
+            // L'écart se déduit, il ne se saisit pas.
+            //
+            // Il était calculé par le service et passé en attribut
+            // remplissable : un appel fournissant un écart incohérent —
+            // zéro sur des soldes qui ne se rejoignent pas — franchissait
+            // la garde de RG-26 sans le moindre commentaire. Le
+            // recalculer ici ferme cette voie, et rend vrai ce que le
+            // commentaire de cette classe affirmait déjà.
+            $arrete->ecart = (int) $arrete->solde_physique - (int) $arrete->solde_theorique;
+
             // RG-26 : un écart non nul exige sa justification. Vérifié
             // ici pour qu'aucune voie d'écriture — écran, service,
             // console — ne puisse l'omettre.

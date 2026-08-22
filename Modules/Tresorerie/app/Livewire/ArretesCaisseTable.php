@@ -19,6 +19,8 @@ use Illuminate\Support\Carbon;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Tresorerie\Exceptions\ArreteCaisseException;
+use Modules\Tresorerie\Exceptions\SectionCaisseException;
 use Modules\Tresorerie\Livewire\Concerns\VerifieSectionOuverte;
 use Modules\Tresorerie\Models\ArreteCaisse;
 use Modules\Tresorerie\Services\ServiceArreteCaisse;
@@ -123,7 +125,12 @@ class ArretesCaisseTable extends Component implements HasActions, HasSchemas, Ha
                     : 'Écart constaté : ' . number_format($arrete->ecart, 0, ',', ' ') . ' FCFA.')
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (ArreteCaisseException|SectionCaisseException|\InvalidArgumentException $e) {
+            // Seules les exceptions métier sont traduites en message :
+            // leur texte est écrit pour être lu par un caissier. Une
+            // panne technique — `QueryException` en tête — doit remonter
+            // au gestionnaire d'erreurs et être journalisée, pas
+            // s'afficher telle quelle dans une notification.
             Notification::make()
                 ->title('Erreur lors de l\'arrêté')
                 ->body($e->getMessage())
@@ -210,7 +217,17 @@ class ArretesCaisseTable extends Component implements HasActions, HasSchemas, Ha
                         Forms\Components\Textarea::make('commentaire_ecart')
                             ->label('Commentaire de justification')
                             ->placeholder('Obligatoire si un écart est constaté')
-                            ->required(fn (Get $get) => $this->ecart($get('date_arrete'), $get('solde_physique')) !== 0)
+                            // Obligatoire quand un écart est constaté —
+                            // pas quand il n'est pas encore calculable.
+                            // `ecart()` rend `null` tant que le solde
+                            // compté est vide, et `null !== 0` affichait
+                            // le champ comme obligatoire dès l'ouverture
+                            // de la modale, avant toute saisie.
+                            ->required(function (Get $get): bool {
+                                $ecart = $this->ecart($get('date_arrete'), $get('solde_physique'));
+
+                                return $ecart !== null && $ecart !== 0;
+                            })
                             ->rows(3),
                     ])
                     ->action(fn (array $data) => $this->creerArrete($data)),

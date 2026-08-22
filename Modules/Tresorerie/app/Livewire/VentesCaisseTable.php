@@ -24,9 +24,15 @@ use Modules\Commerce\Enums\EtatVente;
 use Modules\Commerce\Enums\ModeReglement;
 use Modules\Commerce\Enums\ProvenanceClient;
 use Modules\Commerce\Models\Produit;
+use Modules\Commerce\Exceptions\AucunTauxCommissionException;
+use Modules\Commerce\Exceptions\ProduitInvalideException;
+use Modules\Commerce\Exceptions\StockInsuffisantException;
+use Modules\Commerce\Exceptions\VenteInvalideException;
 use Modules\Commerce\Models\Vente;
 use Modules\Commerce\Services\ServiceVente;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Tresorerie\Exceptions\MouvementCaisseImmuableException;
+use Modules\Tresorerie\Exceptions\SectionCaisseException;
 use Modules\Tresorerie\Livewire\Concerns\VerifieSectionOuverte;
 use Modules\Tresorerie\Services\ServiceTresorerie;
 use Filament\Schemas\Components\Utilities\Get;
@@ -102,7 +108,12 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
                 ->body("Ticket {$vente->numero} — " . number_format((float) $vente->montant_total, 0, ',', ' ') . ' FCFA')
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (VenteInvalideException|StockInsuffisantException|ProduitInvalideException|AucunTauxCommissionException|SectionCaisseException|MouvementCaisseImmuableException|\InvalidArgumentException $e) {
+            // Seules les exceptions métier deviennent un message :
+            // leur texte est écrit pour être lu au comptoir. Une
+            // panne technique remonte au gestionnaire d'erreurs, où
+            // elle est journalisée — afficher une `QueryException`
+            // mettrait du SQL sous les yeux d'une vendeuse.
             Notification::make()
                 ->title('Erreur lors de l\'enregistrement')
                 ->body($e->getMessage())
@@ -157,7 +168,12 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
                 ->body("Ticket {$vente->numero} annulé et contre-passé.")
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (VenteInvalideException|StockInsuffisantException|ProduitInvalideException|AucunTauxCommissionException|SectionCaisseException|MouvementCaisseImmuableException|\InvalidArgumentException $e) {
+            // Seules les exceptions métier deviennent un message :
+            // leur texte est écrit pour être lu au comptoir. Une
+            // panne technique remonte au gestionnaire d'erreurs, où
+            // elle est journalisée — afficher une `QueryException`
+            // mettrait du SQL sous les yeux d'une vendeuse.
             Notification::make()
                 ->title('Erreur lors de l\'annulation')
                 ->body($e->getMessage())

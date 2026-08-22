@@ -273,7 +273,7 @@ class ServiceCampagneReversement
                     section: $section,
                     nature: NatureMouvementCaisse::REVERSEMENT,
                     sens: SensMouvementCaisse::SORTIE,
-                    montant: (float) $reversement->montant_paye,
+                    montant: (int) $reversement->montant_paye,
                     libelle: "Reversement {$campagne->libellePeriode()} — "
                         .($reversement->artisan?->identite ?? "artisan #{$reversement->artisan_id}"),
                     origine: $reversement,

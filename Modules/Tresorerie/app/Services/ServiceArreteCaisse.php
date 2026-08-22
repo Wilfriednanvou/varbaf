@@ -71,7 +71,9 @@ class ServiceArreteCaisse
             'date_arrete' => $dateArrete->toDateString(),
             'solde_theorique' => $soldeTheorique,
             'solde_physique' => $soldePhysique,
-            'ecart' => $soldePhysique - $soldeTheorique,
+            // `ecart` n'est pas passé : le modèle le déduit des deux
+            // soldes. Deux endroits qui calculent la même soustraction
+            // finissent par ne plus donner le même résultat.
             'commentaire_ecart' => $commentaireEcart,
             'arrete_par' => Auth::id(),
             'date_validation' => now(),

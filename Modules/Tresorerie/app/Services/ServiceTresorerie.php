@@ -73,22 +73,17 @@ class ServiceTresorerie implements JournalDeCaisse
     }
 
     /**
-     * Solde courant d'une section : cumul des entrées moins les sorties
-     * depuis le solde d'ouverture.
+     * Solde courant d'une section (RG-12 bis : entier).
+     *
+     * Relais vers `SectionCaisse::soldeCourant()` plutôt qu'un second
+     * calcul : les deux méthodes faisaient la même somme, l'une en
+     * `float` et l'autre en `int`. Deux définitions du même solde
+     * finissent toujours par diverger d'un franc, et c'est ce franc-là
+     * qu'on cherche ensuite pendant une heure au rapprochement.
      */
-    public function solde(SectionCaisse $section): float
+    public function solde(SectionCaisse $section): int
     {
-        $entrees = (float) MouvementCaisse::query()
-            ->where('section_id', $section->getKey())
-            ->where('sens', SensMouvementCaisse::ENTREE->value)
-            ->sum('montant');
-
-        $sorties = (float) MouvementCaisse::query()
-            ->where('section_id', $section->getKey())
-            ->where('sens', SensMouvementCaisse::SORTIE->value)
-            ->sum('montant');
-
-        return (float) $section->solde_ouverture + $entrees - $sorties;
+        return $section->soldeCourant();
     }
 
     /**
@@ -107,7 +102,7 @@ class ServiceTresorerie implements JournalDeCaisse
         SectionCaisse $section,
         NatureMouvementCaisse $nature,
         SensMouvementCaisse $sens,
-        float $montant,
+        int $montant,
         string $libelle,
         ?string $pieceJustificative = null,
         ?Model $origine = null,
@@ -115,9 +110,11 @@ class ServiceTresorerie implements JournalDeCaisse
         ?LibelleMouvement $libelleMouvement = null,
         ?\DateTimeInterface $dateOperation = null,
     ): MouvementCaisse {
-        // RG-12 bis : validé sur la valeur arrondie — un montant qui
-        // s'arrondirait à zéro n'est pas un mouvement valide.
-        if ((int) round($montant) <= 0) {
+        // RG-12 bis : le franc CFA n'a pas de subdivision. La signature
+        // prend un entier plutôt qu'un flottant arrondi ici : PHP refuse
+        // désormais lui-même ce que la règle interdit, et « 1 000,6 F »
+        // ne devient plus silencieusement 1 001 F au passage.
+        if ($montant <= 0) {
             throw new \InvalidArgumentException(
                 "Le montant d'un mouvement de caisse doit être strictement positif (reçu : {$montant})."
             );
@@ -161,11 +158,9 @@ class ServiceTresorerie implements JournalDeCaisse
                         ->where('section_id', $section->getKey())
                         ->max('numero_ordre');
 
-                    // RG-12 bis : le montant est un entier, comme sur la
-                    // vente — arrondi ici pour que la valeur stockée soit
-                    // toujours propre, quelle que soit l'origine de l'appel.
-                    $montantEntier = (int) round($montant);
-                    $soldeApres = $soldeCourant + ($sens->signe() * $montantEntier);
+                    // Le montant est entier par signature (RG-12 bis) :
+                    // plus rien à arrondir ici.
+                    $soldeApres = $soldeCourant + ($sens->signe() * $montant);
 
                     return MouvementCaisse::query()->create([
                         'numero_ordre' => $dernierNumero + 1,
@@ -174,7 +169,7 @@ class ServiceTresorerie implements JournalDeCaisse
                         'nature' => $nature,
                         'libelle_mouvement_id' => $libelleMouvement?->getKey(),
                         'sens' => $sens,
-                        'montant' => $montantEntier,
+                        'montant' => $montant,
                         'solde_apres' => $soldeApres,
                         'libelle' => $libelle,
                         'piece_justificative' => $pieceJustificative,
@@ -224,7 +219,7 @@ class ServiceTresorerie implements JournalDeCaisse
             $mouvement->section,
             NatureMouvementCaisse::CONTREPASSATION,
             $mouvement->sens->inverse(),
-            (float) $mouvement->montant,
+            (int) $mouvement->montant,
             "Contre-passation mvt n° {$mouvement->numero_ordre} : {$motif}",
             null,
             null,
@@ -282,7 +277,7 @@ class ServiceTresorerie implements JournalDeCaisse
             $section,
             NatureMouvementCaisse::VENTE,
             SensMouvementCaisse::ENTREE,
-            (float) $vente->montant_total,
+            (int) $vente->montant_total,
             "Vente {$vente->numero}",
             $vente->numero,
             $vente,

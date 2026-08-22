@@ -19,6 +19,8 @@ use Livewire\Component;
 use Modules\Socle\Models\JournalAudit;
 use Modules\Tresorerie\Enums\NatureMouvementCaisse;
 use Modules\Tresorerie\Enums\SensMouvementCaisse;
+use Modules\Tresorerie\Exceptions\MouvementCaisseImmuableException;
+use Modules\Tresorerie\Exceptions\SectionCaisseException;
 use Modules\Tresorerie\Livewire\Concerns\VerifieSectionOuverte;
 use Modules\Tresorerie\Models\LibelleMouvement;
 use Modules\Tresorerie\Models\MouvementCaisse;
@@ -110,7 +112,7 @@ class MouvementsCaisseTable extends Component implements HasActions, HasSchemas,
                 section: $section,
                 nature: $nature,
                 sens: SensMouvementCaisse::from($data['sens']),
-                montant: (float) $data['montant'],
+                montant: (int) $data['montant'],
                 libelle: $libelleMouvement->libelle,
                 pieceJustificative: $data['piece_justificative'] ?? null,
                 libelleMouvement: $libelleMouvement,
@@ -126,10 +128,15 @@ class MouvementsCaisseTable extends Component implements HasActions, HasSchemas,
 
             Notification::make()
                 ->title('Mouvement enregistré')
-                ->body("Mouvement n° {$mouvement->numero_ordre} — " . number_format((float) $mouvement->montant, 0, ',', ' ') . ' FCFA')
+                ->body("Mouvement n° {$mouvement->numero_ordre} — " . number_format($mouvement->montant, 0, ',', ' ') . ' FCFA')
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (SectionCaisseException|MouvementCaisseImmuableException|\InvalidArgumentException $e) {
+            // Seules les exceptions métier deviennent un message : leur
+            // texte est écrit pour l'utilisateur. Une panne technique
+            // remonte au gestionnaire d'erreurs — afficher une
+            // `QueryException` mettrait du SQL sous les yeux d'un
+            // caissier.
             Notification::make()
                 ->title('Erreur lors de l\'enregistrement')
                 ->body($e->getMessage())
@@ -181,7 +188,7 @@ class MouvementsCaisseTable extends Component implements HasActions, HasSchemas,
                 ->body("Mouvement n° {$record->numero_ordre} annulé par le mouvement n° {$contrepassation->numero_ordre}.")
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (SectionCaisseException|MouvementCaisseImmuableException|\InvalidArgumentException $e) {
             Notification::make()
                 ->title('Erreur lors de la contre-passation')
                 ->body($e->getMessage())
