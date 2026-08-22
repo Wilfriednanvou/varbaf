@@ -1,0 +1,11 @@
+{
+    "name": "nwidart/pilotage",
+    "description": "Module Pilotage du SI VARBAF",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Pilotage\\": "app/",
+            "Modules\\Pilotage\\Database\\Factories\\": "database/factories/",
+            "Modules\\Pilotage\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

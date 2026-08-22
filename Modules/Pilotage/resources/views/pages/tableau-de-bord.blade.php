@@ -1,0 +1,74 @@
+<x-filament-panels::page>
+    {{-- Les filtres vivent sur la page, pas sur chaque widget : trois
+         sélecteurs d'exercice côte à côte finiraient par afficher trois
+         périodes différentes sans que le lecteur s'en aperçoive. --}}
+    <x-filament::section heading="Portée des indicateurs">
+        <div>
+            <x-filament::input.wrapper>
+                <x-filament::input.select wire:model.live="exerciceId">
+                    <option value="">Tous les exercices</option>
+                    @foreach ($this->exercices as $exercice)
+                        <option value="{{ $exercice['id'] }}">{{ $exercice['libelle'] }}</option>
+                    @endforeach
+                </x-filament::input.select>
+            </x-filament::input.wrapper>
+
+            <x-filament::input.wrapper>
+                <x-filament::input type="date" wire:model.live="du" />
+            </x-filament::input.wrapper>
+
+            <x-filament::input.wrapper>
+                <x-filament::input type="date" wire:model.live="au" />
+            </x-filament::input.wrapper>
+
+            @if ($du || $au)
+                <x-filament::button
+                    color="gray"
+                    icon="heroicon-o-x-mark"
+                    wire:click="reinitialiserIntervalle"
+                >
+                    Retirer l'intervalle
+                </x-filament::button>
+            @endif
+        </div>
+
+        <p>Indicateurs de vente {{ $this->filtre->libelleIntervalle() }}.</p>
+    </x-filament::section>
+
+    {{-- La clé porte l'empreinte des filtres : elle change quand ils
+         changent, et Livewire remonte les widgets au lieu de réutiliser
+         les composants existants avec leurs anciens chiffres. --}}
+    @php($empreinte = $this->empreinteFiltre())
+    @php($filtres = $this->filtresTableau())
+
+    <livewire:pilotage::indicateurs-cles
+        :filtres="$filtres"
+        :key="'indicateurs-'.$empreinte"
+    />
+
+    @can('consulter_indicateurs_financiers')
+        <livewire:pilotage::soldes-de-caisse
+            :filtres="$filtres"
+            :key="'caisses-'.$empreinte"
+        />
+    @endcan
+
+    @can('consulter_indicateurs_commerciaux')
+        <livewire:pilotage::ventes-par-axe
+            :filtres="$filtres"
+            :key="'axes-'.$empreinte"
+        />
+
+        <livewire:pilotage::provenance-des-clients
+            :filtres="$filtres"
+            :key="'provenance-'.$empreinte"
+        />
+    @endcan
+
+    @can('consulter_alertes_stock')
+        <livewire:pilotage::alertes-stock
+            :filtres="$filtres"
+            :key="'alertes-'.$empreinte"
+        />
+    @endcan
+</x-filament-panels::page>

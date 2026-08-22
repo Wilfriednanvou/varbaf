@@ -1,0 +1,11 @@
+{
+    "name": "Pilotage",
+    "alias": "pilotage",
+    "description": "Tableaux de bord et indicateurs de suivi du village artisanal.",
+    "keywords": ["pilotage", "tableau de bord", "indicateurs"],
+    "priority": 90,
+    "providers": [
+        "Modules\\Pilotage\\Providers\\PilotageServiceProvider"
+    ],
+    "files": []
+}

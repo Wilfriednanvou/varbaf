@@ -211,6 +211,18 @@ class PermissionSeeder extends Seeder
             ['name' => 'valider_campagne_reversement', 'module' => 'TRESORERIE', 'description' => 'Valider une campagne : rattacher les ventes et décaisser les parts artisan'],
             ['name' => 'imprimer_etat_reversement', 'module' => 'TRESORERIE', 'description' => 'Éditer l\'état récapitulatif d\'une campagne'],
             ['name' => 'imprimer_recu_reversement', 'module' => 'TRESORERIE', 'description' => 'Éditer le reçu de reversement d\'un artisan'],
+
+            // === PILOTAGE : tableau de bord ===
+            //
+            // Quatre permissions et non une seule : un chef de section
+            // Production a besoin des alertes de stock, il n'a pas à
+            // lire la trésorerie du village. Le découpage suit ce que
+            // chaque section a à connaître, pas la commodité d'un écran
+            // unique.
+            ['name' => 'consulter_tableau_bord', 'module' => 'PILOTAGE', 'description' => 'Accéder au tableau de bord'],
+            ['name' => 'consulter_indicateurs_financiers', 'module' => 'PILOTAGE', 'description' => 'Voir les soldes de caisse et les dettes envers les artisans'],
+            ['name' => 'consulter_indicateurs_commerciaux', 'module' => 'PILOTAGE', 'description' => 'Voir la ventilation des ventes et la provenance des clients'],
+            ['name' => 'consulter_alertes_stock', 'module' => 'PILOTAGE', 'description' => 'Voir les produits sous leur seuil d\'alerte'],
         ];
     }
 
@@ -339,6 +351,11 @@ class PermissionSeeder extends Seeder
                     // parts n'est pas celui qui ordonne de les payer.
                     'valider_campagne_reversement',
                     'imprimer_etat_reversement', 'imprimer_recu_reversement',
+                    // Pilotage : la direction voit tout.
+                    'consulter_tableau_bord',
+                    'consulter_indicateurs_financiers',
+                    'consulter_indicateurs_commerciaux',
+                    'consulter_alertes_stock',
                 ],
             ],
 
@@ -363,6 +380,12 @@ class PermissionSeeder extends Seeder
                     'retirer_stock',
                     'imprimer_recu_vente',
                     'consulter_situation_artisan',
+                    // Pilotage : lecture complète. Consulter n'engage
+                    // rien — c'est agir qui se supplée mal.
+                    'consulter_tableau_bord',
+                    'consulter_indicateurs_financiers',
+                    'consulter_indicateurs_commerciaux',
+                    'consulter_alertes_stock',
                     // Volontairement absents : cloturer_exercice et
                     // resilier_attribution. Clôturer un exercice est
                     // irréversible, résilier rompt un contrat : ces deux
@@ -393,6 +416,11 @@ class PermissionSeeder extends Seeder
                     'ajouter_depot', 'modifier_depot', 'supprimer_depot',
                     'valider_depot', 'imprimer_decharge_depot',
                     'retirer_stock', 'contrepasser_mouvement_stock',
+                    // Pilotage : les alertes de stock sont son métier.
+                    // Les indicateurs financiers ne le sont pas — la
+                    // section produit, elle ne suit pas la trésorerie.
+                    'consulter_tableau_bord',
+                    'consulter_alertes_stock',
                 ],
             ],
 
@@ -433,6 +461,12 @@ class PermissionSeeder extends Seeder
                     // — RG-23 le réserve au coordonnateur.
                     'preparer_campagne_reversement', 'supprimer_campagne_reversement',
                     'imprimer_etat_reversement', 'imprimer_recu_reversement',
+                    // Pilotage : la section qui tient la caisse suit les
+                    // recettes et la trésorerie de bout en bout.
+                    'consulter_tableau_bord',
+                    'consulter_indicateurs_financiers',
+                    'consulter_indicateurs_commerciaux',
+                    'consulter_alertes_stock',
                 ],
             ],
 
@@ -458,6 +492,13 @@ class PermissionSeeder extends Seeder
                     'ajouter_vente', 'imprimer_recu_vente',
                     // Lecture seule sur la caisse : RG-23 interdit
                     // qu'elle cumule vente et tenue de caisse.
+                    //
+                    // Pilotage : elle suit son chiffre et la provenance
+                    // des visiteurs, qui orientent son travail de
+                    // promotion. Pas les soldes de caisse — la même
+                    // frontière que ci-dessus.
+                    'consulter_tableau_bord',
+                    'consulter_indicateurs_commerciaux',
                 ],
             ],
 

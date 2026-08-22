@@ -35,7 +35,10 @@
             "Modules\\Artisanat\\Database\\Seeders\\": "Modules/Artisanat/database/seeders/",
             "Modules\\Commerce\\": "Modules/Commerce/app/",
             "Modules\\Commerce\\Database\\Factories\\": "Modules/Commerce/database/factories/",
-            "Modules\\Commerce\\Database\\Seeders\\": "Modules/Commerce/database/seeders/"
+            "Modules\\Commerce\\Database\\Seeders\\": "Modules/Commerce/database/seeders/",
+            "Modules\\Pilotage\\": "Modules/Pilotage/app/",
+            "Modules\\Pilotage\\Database\\Factories\\": "Modules/Pilotage/database/factories/",
+            "Modules\\Pilotage\\Database\\Seeders\\": "Modules/Pilotage/database/seeders/"
         }
     },
     "autoload-dev": {

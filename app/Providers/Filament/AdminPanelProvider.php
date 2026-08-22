@@ -19,6 +19,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Artisanat\Filament\ArtisanatPlugin;
 use Modules\Commerce\Filament\CommercePlugin;
+use Modules\Pilotage\Filament\PilotagePlugin;
 use Modules\Socle\Filament\SoclePlugin;
 use Modules\Tresorerie\Filament\TresoreriePlugin;
 
@@ -61,6 +62,7 @@ class AdminPanelProvider extends PanelProvider
                 ArtisanatPlugin::make(),
                 CommercePlugin::make(),
                 TresoreriePlugin::make(),
+                PilotagePlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,
