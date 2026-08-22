@@ -17,7 +17,7 @@ use Tests\TestCase;
 /**
  * Vérifie les deux invariants du catalogue : la référence est un
  * identifiant figé (RG-09), et le statut de validation ne saute pas
- * d'étape (règle 13).
+ * d'étape (règle 14).
  */
 class ProduitTest extends TestCase
 {

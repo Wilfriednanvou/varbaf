@@ -17,8 +17,11 @@ use Modules\Commerce\Models\MouvementStock;
 use Modules\Commerce\Models\Produit;
 use Modules\Commerce\Models\TauxCommission;
 use Modules\Commerce\Models\Vente;
-use Modules\Commerce\Services\JournalDeCaisseEnAttente;
 use Modules\Commerce\Services\ServiceMouvementStock;
+use Modules\Tresorerie\Models\Caisse;
+use Modules\Tresorerie\Models\MouvementCaisse;
+use Modules\Tresorerie\Models\SectionCaisse;
+use Modules\Tresorerie\Services\ServiceTresorerie;
 use Modules\Commerce\Services\ServiceVente;
 use Modules\Socle\Enums\CategorieVillage;
 use Modules\Socle\Models\Agent;
@@ -107,6 +110,28 @@ class VenteTest extends TestCase
 
         $this->actingAs($vendeur);
 
+        // Créer la caisse et ouvrir une section pour que le
+        // ServiceTresorerie puisse enregistrer les encaissements.
+        $caisse = Caisse::create([
+            'code' => 'CAISSE-TEST',
+            'libelle' => 'Caisse de test',
+            'etat' => 'ACTIVE',
+            'village_id' => $this->village->id,
+        ]);
+
+        $exercice = Exercice::query()->where('en_cours', true)->firstOrFail();
+
+        SectionCaisse::create([
+            'caisse_id' => $caisse->id,
+            'libelle' => 'Section test',
+            'date_ouverture' => now(),
+            'solde_ouverture' => 0,
+            'etat' => 'OUVERTE',
+            'ouverte_par' => $vendeur->id,
+            'village_id' => $this->village->id,
+            'exercice_id' => $exercice->id,
+        ]);
+
         $this->service = app(ServiceVente::class);
     }
 
@@ -144,13 +169,13 @@ class VenteTest extends TestCase
             ['produit_id' => $this->produit->id, 'quantite' => 1],
         ]);
 
-        $this->assertSame('3333.00', $vente->montant_total);
-        $this->assertSame('500.00', $vente->montant_commission);
-        $this->assertSame('2833.00', $vente->part_artisan);
+        $this->assertSame(3333, $vente->montant_total);
+        $this->assertSame(500, $vente->montant_commission);
+        $this->assertSame(2833, $vente->part_artisan);
 
         $this->assertSame(
-            (float) $vente->montant_total,
-            (float) $vente->montant_commission + (float) $vente->part_artisan,
+            $vente->montant_total,
+            $vente->montant_commission + $vente->part_artisan,
             'Commission et part artisan doivent totaliser exactement le montant encaissé.'
         );
     }
@@ -161,15 +186,11 @@ class VenteTest extends TestCase
             [$commission, $partArtisan] = $this->service->repartir($montant, $taux);
 
             $this->assertSame(
-                (float) $montant,
+                $montant,
                 $commission + $partArtisan,
                 "La répartition de {$montant} F à {$taux} % ne totalise pas le montant encaissé."
             );
-            $this->assertSame(
-                $commission,
-                round($commission),
-                'La commission doit être un nombre entier de francs.'
-            );
+            $this->assertIsInt($commission, 'La commission doit être un nombre entier de francs.');
         }
     }
 
@@ -205,8 +226,8 @@ class VenteTest extends TestCase
 
         $this->assertSame($this->produit->reference, $ligne->reference_produit);
         $this->assertSame('Panier tressé', $ligne->designation);
-        $this->assertSame('3333.00', $ligne->prix_unitaire);
-        $this->assertSame('6666.00', $ligne->montant_ligne);
+        $this->assertSame(3333, $ligne->prix_unitaire);
+        $this->assertSame(6666, $ligne->montant_ligne);
     }
 
     public function test_renommer_le_produit_ne_change_pas_la_vente_passee(): void
@@ -220,7 +241,7 @@ class VenteTest extends TestCase
         $ligne = $vente->fresh()->lignes()->first();
 
         $this->assertSame('Panier tressé', $ligne->designation);
-        $this->assertSame('3333.00', $ligne->prix_unitaire);
+        $this->assertSame(3333, $ligne->prix_unitaire);
     }
 
     public function test_une_vente_enregistree_ne_peut_pas_etre_modifiee(): void
@@ -283,24 +304,29 @@ class VenteTest extends TestCase
     }
 
     /**
-     * Le brouillard n'existe pas encore, mais l'appel est observable :
-     * c'est ce qui permet de vérifier aujourd'hui ce que la Trésorerie
-     * consommera la semaine prochaine.
+     * Le brouillard de caisse est maintenant opérationnel : la vente
+     * dépose un mouvement d'entrée dans la section ouverte.
      */
     public function test_l_encaissement_est_depose_sur_le_port_de_la_caisse(): void
     {
-        /** @var JournalDeCaisseEnAttente $caisse */
-        $caisse = app(JournalDeCaisse::class);
-        $caisse->oublier();
+        $journal = app(JournalDeCaisse::class);
+        $this->assertTrue($journal->estOperationnel());
+        $this->assertInstanceOf(ServiceTresorerie::class, $journal);
 
         $vente = $this->service->enregistrer([
             ['produit_id' => $this->produit->id, 'quantite' => 1],
         ]);
 
-        $this->assertCount(1, $caisse->encaissements);
-        $this->assertSame($vente->numero, $caisse->encaissements[0]['numero']);
-        $this->assertSame('3333.00', $caisse->encaissements[0]['montant']);
-        $this->assertFalse($caisse->estOperationnel());
+        // Un mouvement d'encaissement a été créé au brouillard
+        $mouvement = MouvementCaisse::query()
+            ->where('origine_type', 'Vente')
+            ->where('origine_id', $vente->id)
+            ->first();
+
+        $this->assertNotNull($mouvement);
+        $this->assertEquals(3333, $mouvement->montant);
+        $this->assertEquals('ENTREE', $mouvement->sens->value);
+        $this->assertEquals('VENTE', $mouvement->nature->value);
     }
 
     // ===================================================================
@@ -432,10 +458,6 @@ class VenteTest extends TestCase
 
     public function test_l_annulation_remet_le_stock_et_contrepasse_la_caisse(): void
     {
-        /** @var JournalDeCaisseEnAttente $caisse */
-        $caisse = app(JournalDeCaisse::class);
-        $caisse->oublier();
-
         $vente = $this->service->enregistrer([
             ['produit_id' => $this->produit->id, 'quantite' => 4],
         ]);
@@ -446,10 +468,18 @@ class VenteTest extends TestCase
 
         $this->assertSame(EtatVente::ANNULEE, $vente->fresh()->etat);
         $this->assertSame(10, $this->produit->fresh()->getQuantiteEnStock());
-        $this->assertCount(1, $caisse->contrepassations);
+
+        // La contre-passation existe au brouillard
+        $contrepassation = MouvementCaisse::query()
+            ->where('nature', 'CONTREPASSATION')
+            ->whereNotNull('mouvement_contrepasse_id')
+            ->first();
+
+        $this->assertNotNull($contrepassation);
+        $this->assertEquals('SORTIE', $contrepassation->sens->value);
 
         // Les montants ne bougent pas : c'est l'état qui change.
-        $this->assertSame('13332.00', $vente->fresh()->montant_total);
+        $this->assertSame(13332, $vente->fresh()->montant_total);
     }
 
     public function test_une_vente_ne_s_annule_pas_deux_fois(): void

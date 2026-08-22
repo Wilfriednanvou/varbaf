@@ -17,6 +17,7 @@ use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Filament\Resources\ProduitResource\Pages;
 use Modules\Commerce\Models\Produit;
 use Modules\Commerce\Services\ServiceMouvementStock;
+use Modules\Commerce\Services\ServiceValidationProduit;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
 
@@ -25,7 +26,7 @@ use Modules\Socle\Models\JournalAudit;
  *
  * Le statut de validation n'est jamais saisi au formulaire : il évolue
  * par trois actions distinctes, chacune portant sa permission. C'est la
- * traduction de la règle 13 — seul le chef de section Production
+ * traduction de la règle 14 — seul le chef de section Production
  * valide, et la mise en vitrine relève de la Promotion.
  */
 class ProduitResource extends Resource
@@ -57,7 +58,7 @@ class ProduitResource extends Resource
      * Compteur des produits sous leur seuil d'alerte, affiché dans la
      * navigation.
      *
-     * C'est la part de la règle 14 qui reste utile même si personne ne
+     * C'est la part de la règle 15 qui reste utile même si personne ne
      * consulte ses notifications : le chiffre est là, en permanence,
      * sur l'écran d'accueil du panneau.
      */
@@ -316,7 +317,7 @@ class ProduitResource extends Resource
                     ->modalSubmitActionLabel('Enregistrer')
                     ->modalCancelActionLabel('Fermer')
                     ->modalFooterActionsAlignment(Alignment::End)
-                    ->action(fn (Produit $record) => $record->changerStatut(StatutValidationProduit::VALIDE))
+                    ->action(fn (Produit $record) => app(ServiceValidationProduit::class)->valider($record))
                     ->after(fn (Produit $record) => JournalAudit::enregistrer(
                         'Validation produit',
                         'COMMERCE',
@@ -339,7 +340,7 @@ class ProduitResource extends Resource
                     ->modalSubmitActionLabel('Enregistrer')
                     ->modalCancelActionLabel('Fermer')
                     ->modalFooterActionsAlignment(Alignment::End)
-                    ->action(fn (Produit $record) => $record->changerStatut(StatutValidationProduit::EXPOSE))
+                    ->action(fn (Produit $record) => app(ServiceValidationProduit::class)->exposer($record))
                     ->after(fn (Produit $record) => JournalAudit::enregistrer(
                         'Mise en vitrine produit',
                         'COMMERCE',
@@ -362,7 +363,7 @@ class ProduitResource extends Resource
                     ->modalSubmitActionLabel('Enregistrer')
                     ->modalCancelActionLabel('Fermer')
                     ->modalFooterActionsAlignment(Alignment::End)
-                    ->action(fn (Produit $record) => $record->changerStatut(StatutValidationProduit::RETIRE))
+                    ->action(fn (Produit $record) => app(ServiceValidationProduit::class)->retirer($record))
                     ->after(fn (Produit $record) => JournalAudit::enregistrer(
                         'Retrait produit',
                         'COMMERCE',

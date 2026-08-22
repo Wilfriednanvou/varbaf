@@ -15,9 +15,9 @@ use Modules\Commerce\Exceptions\VenteInvalideException;
  *
  * @property string $reference_produit
  * @property string $designation
- * @property string $prix_unitaire
+ * @property int $prix_unitaire
  * @property int $quantite
- * @property string $montant_ligne
+ * @property int $montant_ligne
  */
 class LigneVente extends Model
 {
@@ -36,8 +36,8 @@ class LigneVente extends Model
     protected function casts(): array
     {
         return [
-            'prix_unitaire' => 'decimal:2',
-            'montant_ligne' => 'decimal:2',
+            'prix_unitaire' => 'integer',
+            'montant_ligne' => 'integer',
             'quantite' => 'integer',
         ];
     }

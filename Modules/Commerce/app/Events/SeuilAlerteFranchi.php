@@ -8,7 +8,7 @@ use Modules\Commerce\Models\Produit;
 
 /**
  * Émis au moment précis où le stock d'un produit **franchit** son seuil
- * d'alerte à la baisse (règle 14).
+ * d'alerte à la baisse (règle 15).
  *
  * Au franchissement, pas à l'état. Émettre à chaque mouvement tant que
  * la quantité est sous le seuil produirait trois alertes pour trois

@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * Cycle de validation d'un produit (règle 13 de CLAUDE.md).
+ * Cycle de validation d'un produit (règle 14 de CLAUDE.md).
  *
  * L'ordre des cas n'est pas décoratif : c'est le chemin normal du
  * dépôt à la vitrine. Le passage de SOUMIS à EXPOSE sans validation

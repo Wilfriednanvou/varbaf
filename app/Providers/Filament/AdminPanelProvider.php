@@ -20,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Artisanat\Filament\ArtisanatPlugin;
 use Modules\Commerce\Filament\CommercePlugin;
 use Modules\Socle\Filament\SoclePlugin;
+use Modules\Tresorerie\Filament\TresoreriePlugin;
 
 /**
  * Panneau d'administration de l'ERP du Village Artisanal Régional de Bafoussam.
@@ -59,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 SoclePlugin::make(),
                 ArtisanatPlugin::make(),
                 CommercePlugin::make(),
+                TresoreriePlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

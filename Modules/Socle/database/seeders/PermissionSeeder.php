@@ -176,6 +176,27 @@ class PermissionSeeder extends Seeder
             ['name' => 'ajouter_vente', 'module' => 'COMMERCE', 'description' => 'Saisir une vente au comptoir'],
             ['name' => 'annuler_vente', 'module' => 'COMMERCE', 'description' => 'Annuler une vente : retour en stock et contre-passation en caisse'],
             ['name' => 'imprimer_recu_vente', 'module' => 'COMMERCE', 'description' => 'Éditer le reçu de vente'],
+
+            // === TRESORERIE : caisses ===
+            ['name' => 'lister_caisses', 'module' => 'TRESORERIE', 'description' => 'Consulter les caisses'],
+            ['name' => 'ajouter_caisse', 'module' => 'TRESORERIE', 'description' => 'Créer une caisse'],
+            ['name' => 'modifier_caisse', 'module' => 'TRESORERIE', 'description' => 'Modifier une caisse'],
+
+            // === TRESORERIE : sections de caisse ===
+            ['name' => 'lister_sections_caisse', 'module' => 'TRESORERIE', 'description' => 'Consulter les sections de caisse'],
+            ['name' => 'ouvrir_section_caisse', 'module' => 'TRESORERIE', 'description' => 'Ouvrir une nouvelle section de caisse'],
+            ['name' => 'cloturer_section_caisse', 'module' => 'TRESORERIE', 'description' => 'Clôturer une section de caisse'],
+
+            // === TRESORERIE : libellés de mouvement ===
+            ['name' => 'lister_libelles_mouvement', 'module' => 'TRESORERIE', 'description' => 'Consulter les libellés de mouvement'],
+            ['name' => 'ajouter_libelle_mouvement', 'module' => 'TRESORERIE', 'description' => 'Créer un libellé de mouvement'],
+            ['name' => 'modifier_libelle_mouvement', 'module' => 'TRESORERIE', 'description' => 'Modifier un libellé de mouvement'],
+            ['name' => 'supprimer_libelle_mouvement', 'module' => 'TRESORERIE', 'description' => 'Supprimer un libellé de mouvement'],
+
+            // === TRESORERIE : brouillard de caisse ===
+            ['name' => 'lister_mouvements_caisse', 'module' => 'TRESORERIE', 'description' => 'Consulter le brouillard de caisse'],
+            ['name' => 'saisir_mouvement_caisse', 'module' => 'TRESORERIE', 'description' => 'Saisir un mouvement au brouillard'],
+            ['name' => 'contrepasser_mouvement_caisse', 'module' => 'TRESORERIE', 'description' => 'Corriger un mouvement de caisse par contre-passation'],
         ];
     }
 
@@ -231,6 +252,9 @@ class PermissionSeeder extends Seeder
             'lister_depots',
             'lister_mouvements_stock',
             'lister_ventes',
+            'lister_caisses',
+            'lister_sections_caisse',
+            'lister_mouvements_caisse',
         ];
 
         return [
@@ -266,7 +290,7 @@ class PermissionSeeder extends Seeder
                     // village : sa décision revient à la direction.
                     'lister_taux_commission', 'ajouter_taux_commission', 'modifier_taux_commission',
                     'ajouter_produit', 'modifier_produit', 'retirer_produit',
-                    // Règle 13 amendée : la responsabilité de la
+                    // Règle 14 amendée : la responsabilité de la
                     // validation reste au chef de section Production,
                     // le coordonnateur supplée en son absence. Sans
                     // cela, une seule absence bloquerait toute entrée
@@ -283,6 +307,11 @@ class PermissionSeeder extends Seeder
                     // pas : RG-23 sépare l'agent de saisie du profil
                     // habilité à défaire une opération.
                     'annuler_vente', 'imprimer_recu_vente',
+                    // Trésorerie : direction complète
+                    'ajouter_caisse', 'modifier_caisse',
+                    'ouvrir_section_caisse', 'cloturer_section_caisse',
+                    'lister_libelles_mouvement', 'ajouter_libelle_mouvement', 'modifier_libelle_mouvement', 'supprimer_libelle_mouvement',
+                    'saisir_mouvement_caisse', 'contrepasser_mouvement_caisse',
                 ],
             ],
 
@@ -321,7 +350,7 @@ class PermissionSeeder extends Seeder
                     'ajouter_artisan', 'modifier_artisan',
                     'ajouter_categorie_produit', 'modifier_categorie_produit', 'supprimer_categorie_produit',
                     'ajouter_produit', 'modifier_produit', 'retirer_produit',
-                    // Règle 13 : « Seul le chef de section Production
+                    // Règle 14 : « Seul le chef de section Production
                     // valide. » Aucun autre rôle métier ne porte cette
                     // permission, pas même le coordonnateur.
                     'valider_produit',
@@ -359,6 +388,11 @@ class PermissionSeeder extends Seeder
                     // dossiers administratifs, sans toucher au stock.
                     'imprimer_decharge_depot',
                     'imprimer_recu_vente',
+                    // Trésorerie : c'est la section qui tient la caisse
+                    'ajouter_caisse', 'modifier_caisse',
+                    'ouvrir_section_caisse', 'cloturer_section_caisse',
+                    'lister_libelles_mouvement', 'ajouter_libelle_mouvement', 'modifier_libelle_mouvement',
+                    'saisir_mouvement_caisse', 'contrepasser_mouvement_caisse',
                 ],
             ],
 
@@ -382,6 +416,8 @@ class PermissionSeeder extends Seeder
                     // pas annuler ce qu'elle a saisi : RG-23 réserve ce
                     // geste à un profil distinct de l'agent de saisie.
                     'ajouter_vente', 'imprimer_recu_vente',
+                    // Lecture seule sur la caisse : RG-23 interdit
+                    // qu'elle cumule vente et tenue de caisse.
                 ],
             ],
 

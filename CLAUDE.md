@@ -42,16 +42,16 @@ Ces règles priment sur toute considération de simplicité d'implémentation. N
 3. **Journal unique de stock.** Toute variation de stock (dépôt, vente, retrait, perte) passe par `mouvements_stock`. La quantité en stock est un solde calculé, jamais un champ saisi.
 4. **Immuabilité après arrêté.** Un mouvement est corrigeable tant que sa journée n'a pas été arrêtée. Après l'arrêté de caisse du jour, il devient immuable : correction par contre-passation uniquement.
 5. **Arrêté journalier.** Un arrêté de caisse par caisse et par jour : le caissier saisit le montant compté, le système calcule l'écart, un écart non nul exige une justification. Une journée arrêtée est verrouillée.
-5. **Numérotation.** Les mouvements de caisse sont numérotés séquentiellement par section, sans rupture.
-6. **Section ouverte.** Aucune opération hors d'une section de caisse ouverte. Une seule section ouverte par caisse.
-7. **Une vente, une boutique.** L'écran de vente impose de choisir d'abord une boutique, puis de sélectionner les produits dans la liste de cette seule boutique. La référence produit est générée automatiquement à la création, jamais saisie. Les informations client (nom, contact, consentement, provenance) sont facultatives.
-8. **Solde artisan calculé.** `solde dû = somme des parts artisan − somme des reversements`. Jamais stocké comme valeur modifiable.
-9. **Taux de commission.** Uniforme pour tous les artisans, historisé par date d'effet. Le taux appliqué est celui en vigueur à la date de la vente, puis figé sur la vente.
-10. **Reversements mensuels.** Une campagne sélectionne les ventes non rattachées à une campagne validée dont la date est antérieure à la date d'arrêté. Un décaissement par artisan. Solde négatif non payé et reporté.
-11. **Cloisonnement artisan.** Dans le panneau artisan, chaque requête est filtrée par l'artisan connecté, via un scope global. Un artisan ne voit jamais les données d'un autre.
-12. **Redevance au mètre carré.** La redevance mensuelle d'une boutique se calcule à partir de sa superficie et du tarif au mètre carré. Le premier mois suivant l'attribution est gratuit.
-13. **Validation des produits.** Un produit passe par les statuts soumis, validé, exposé, retiré. La validation relève du chef de section Production ; le coordonnateur peut suppléer en son absence, le journal d'audit conservant l'identité du validateur réel. Un produit non validé n'est ni vendable ni publiable sur le portail.
-14. **Alerte de rupture.** Quand le stock d'un produit atteint son seuil d'alerte, une notification est adressée à l'artisan et aux sections Production et Commercialisation.
+6. **Numérotation.** Les mouvements de caisse sont numérotés séquentiellement par section, sans rupture.
+7. **Section ouverte.** Aucune opération hors d'une section de caisse ouverte. Une seule section ouverte par caisse.
+8. **Une vente, une boutique.** L'écran de vente impose de choisir d'abord une boutique, puis de sélectionner les produits dans la liste de cette seule boutique. La référence produit est générée automatiquement à la création, jamais saisie. Les informations client (nom, contact, consentement, provenance) sont facultatives.
+9. **Solde artisan calculé.** `solde dû = somme des parts artisan − somme des reversements`. Jamais stocké comme valeur modifiable.
+10. **Taux de commission.** Uniforme pour tous les artisans, historisé par date d'effet. Le taux appliqué est celui en vigueur à la date de la vente, puis figé sur la vente.
+11. **Reversements mensuels.** Une campagne sélectionne les ventes non rattachées à une campagne validée dont la date est antérieure à la date d'arrêté. Un décaissement par artisan. Solde négatif non payé et reporté.
+12. **Cloisonnement artisan.** Dans le panneau artisan, chaque requête est filtrée par l'artisan connecté, via un scope global. Un artisan ne voit jamais les données d'un autre.
+13. **Redevance au mètre carré.** La redevance mensuelle d'une boutique se calcule à partir de sa superficie et du tarif au mètre carré. Le premier mois suivant l'attribution est gratuit.
+14. **Validation des produits.** Un produit passe par les statuts soumis, validé, exposé, retiré. La validation relève du chef de section Production ; le coordonnateur peut suppléer en son absence, le journal d'audit conservant l'identité du validateur réel. Un produit non validé n'est ni vendable ni publiable sur le portail.
+15. **Alerte de rupture.** Quand le stock d'un produit atteint son seuil d'alerte, une notification est adressée à l'artisan et aux sections Production et Commercialisation.
 
 ## Rôles réels de la structure
 

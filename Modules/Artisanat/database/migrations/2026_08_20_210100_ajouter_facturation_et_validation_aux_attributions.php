@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
  * conception : début de facturation, complétude du dossier, validateur.
  *
  * `date_debut_facturation` matérialise la gratuité du premier mois
- * (règle 12 de CLAUDE.md). Elle est dérivée de `date_debut` et
+ * (règle 13 de CLAUDE.md). Elle est dérivée de `date_debut` et
  * recalculée par le modèle, mais stockée : les échéanciers et les états
  * de redevance devront la requêter directement, et un décalage entre
  * la date affichée et la date facturée serait invérifiable après coup.

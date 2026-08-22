@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Modules\Artisanat\Database\Seeders\ArtisanatDatabaseSeeder;
 use Modules\Commerce\Database\Seeders\CommerceDatabaseSeeder;
 use Modules\Socle\Database\Seeders\SocleDatabaseSeeder;
+use Modules\Tresorerie\Database\Seeders\TresorerieDatabaseSeeder;
 
 /**
  * Orchestrateur des seeders.
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
             SocleDatabaseSeeder::class,
             ArtisanatDatabaseSeeder::class,
             CommerceDatabaseSeeder::class,
+            TresorerieDatabaseSeeder::class,
         ]);
     }
 }

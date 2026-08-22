@@ -29,7 +29,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('prix_unitaire', 12, 2);
 
-            // Seuil de déclenchement de l'alerte de rupture (règle 14).
+            // Seuil de déclenchement de l'alerte de rupture (règle 15).
             // Nul = produit non surveillé.
             $table->unsignedInteger('seuil_alerte')->nullable();
 

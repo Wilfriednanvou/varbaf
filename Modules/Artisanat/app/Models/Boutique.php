@@ -62,7 +62,7 @@ class Boutique extends Model
 
     protected static function booted(): void
     {
-        // Règle 12 de CLAUDE.md : la redevance découle de la surface et
+        // Règle 13 de CLAUDE.md : la redevance découle de la surface et
         // du tarif au mètre carré. Le calcul vit dans le modèle et non
         // dans le formulaire, afin qu'une reprise de barème passée par
         // un seeder ou une commande produise le même résultat.

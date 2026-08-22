@@ -193,7 +193,7 @@ class AttributionBoutique extends Model
 
     /**
      * Le premier mois d'occupation est gratuit : la facturation ne
-     * commence qu'un mois après la date d'entrée (règle 12 de
+     * commence qu'un mois après la date d'entrée (règle 13 de
      * CLAUDE.md).
      *
      * La date est recalculée à chaque écriture plutôt que figée une

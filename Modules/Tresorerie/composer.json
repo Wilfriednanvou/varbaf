@@ -1,0 +1,11 @@
+{
+    "name": "nwidart/tresorerie",
+    "description": "Module Trésorerie du SI VARBAF",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Tresorerie\\": "app/",
+            "Modules\\Tresorerie\\Database\\Factories\\": "database/factories/",
+            "Modules\\Tresorerie\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

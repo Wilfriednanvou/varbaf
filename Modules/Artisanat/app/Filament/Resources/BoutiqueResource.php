@@ -90,7 +90,7 @@ class BoutiqueResource extends Resource
                         ->numeric()
                         ->minValue(0)
                         ->live(onBlur: true),
-                    // La redevance n'est plus saisie : règle 12 de
+                    // La redevance n'est plus saisie : règle 13 de
                     // CLAUDE.md, elle découle de la surface et du tarif.
                     // Le champ n'est qu'un aperçu du calcul que le
                     // modèle refera à l'enregistrement — il n'est donc

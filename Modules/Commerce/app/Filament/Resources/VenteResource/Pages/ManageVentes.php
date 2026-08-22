@@ -2,17 +2,16 @@
 
 namespace Modules\Commerce\Filament\Resources\VenteResource\Pages;
 
-use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
-use Filament\Support\Enums\Alignment;
 use Modules\Commerce\Contracts\JournalDeCaisse;
-use Modules\Commerce\Enums\ModeReglement;
 use Modules\Commerce\Filament\Resources\VenteResource;
 use Modules\Commerce\Models\TauxCommission;
-use Modules\Commerce\Models\Vente;
-use Modules\Commerce\Services\ServiceVente;
-use Modules\Socle\Models\JournalAudit;
 
+/**
+ * Écran de consultation. La saisie n'a qu'un chemin : le composant
+ * Livewire `VentesCaisseTable` de la session de caisse — voir
+ * `docs/specification-tresorerie.md` §7.5. Aucune action d'en-tête ici.
+ */
 class ManageVentes extends ManageRecords
 {
     protected static string $resource = VenteResource::class;
@@ -46,48 +45,5 @@ class ManageVentes extends ManageRecords
         }
 
         return $avertissements === [] ? null : implode(' ', $avertissements);
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\CreateAction::make()
-                ->label('Nouvelle vente')
-                ->visible(fn () => auth()->user()->can('ajouter_vente'))
-                ->modalHeading('Saisie d\'une vente')
-                ->modalDescription('Choisissez d\'abord la boutique, puis les produits de cette boutique. Une vente ne porte que sur une seule boutique.')
-                ->modalWidth('3xl')
-                ->createAnother(false)
-                ->modalSubmitActionLabel('Enregistrer')
-                ->modalCancelActionLabel('Fermer')
-                ->modalFooterActionsAlignment(Alignment::End)
-                ->stickyModalHeader()
-                ->stickyModalFooter()
-                // La création ne passe pas par Eloquent : le service est
-                // le seul à savoir enchaîner lignes, stock et caisse
-                // dans une transaction unique.
-                ->using(fn (array $data) => app(ServiceVente::class)->enregistrer(
-                    lignes: $data['lignes'] ?? [],
-                    modeReglement: ModeReglement::from($data['mode_reglement'] ?? ModeReglement::ESPECES->value),
-                    client: [
-                        'nom_client' => $data['nom_client'] ?? null,
-                        'contact_client' => $data['contact_client'] ?? null,
-                        'accepte_notifications' => $data['accepte_notifications'] ?? false,
-                        'provenance_client' => $data['provenance_client'] ?? null,
-                    ],
-                ))
-                ->after(fn (Vente $record) => JournalAudit::enregistrer(
-                    'Enregistrement vente',
-                    'COMMERCE',
-                    'Vente',
-                    $record->id,
-                    [
-                        'numero' => $record->numero,
-                        'montant' => $record->montant_total,
-                        'commission' => $record->montant_commission,
-                        'artisan' => $record->artisan?->matricule,
-                    ],
-                )),
-        ];
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Règle 12 de CLAUDE.md : la redevance mensuelle d'une boutique se
+ * Règle 13 de CLAUDE.md : la redevance mensuelle d'une boutique se
  * calcule à partir de sa superficie et du tarif au mètre carré.
  *
  * La colonne `redevance_mensuelle` existait déjà et n'est pas

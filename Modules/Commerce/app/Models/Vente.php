@@ -36,10 +36,10 @@ use Modules\Socle\Models\Exercice;
  * échouent ensemble.
  *
  * @property string $numero
- * @property string $montant_total
+ * @property int $montant_total
  * @property string $taux_commission
- * @property string $montant_commission
- * @property string $part_artisan
+ * @property int $montant_commission
+ * @property int $part_artisan
  * @property EtatVente $etat
  */
 class Vente extends Model
@@ -82,10 +82,10 @@ class Vente extends Model
         return [
             'date_vente' => 'datetime',
             'date_annulation' => 'datetime',
-            'montant_total' => 'decimal:2',
+            'montant_total' => 'integer',
             'taux_commission' => 'decimal:2',
-            'montant_commission' => 'decimal:2',
-            'part_artisan' => 'decimal:2',
+            'montant_commission' => 'integer',
+            'part_artisan' => 'integer',
             'accepte_notifications' => 'boolean',
             'mode_reglement' => ModeReglement::class,
             'provenance_client' => ProvenanceClient::class,

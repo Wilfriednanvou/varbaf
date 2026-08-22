@@ -6,34 +6,27 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Commerce\Enums\EtatVente;
-use Modules\Commerce\Enums\ModeReglement;
-use Modules\Commerce\Enums\ProvenanceClient;
 use Modules\Commerce\Filament\Resources\VenteResource\Pages;
-use Modules\Commerce\Models\Produit;
 use Modules\Commerce\Models\Vente;
 use Modules\Commerce\Services\ServiceVente;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
 
 /**
- * Écran de vente.
+ * Écran de consultation des ventes.
  *
- * Le cheminement impose la boutique avant les produits (RG-09 bis) :
- * c'est ce qui rend RG-08 — une vente, une boutique — structurellement
- * inviolable dans l'interface. `ServiceVente` reverifie la règle de son
- * côté, parce qu'un import de données n'emprunte pas ce cheminement.
- *
- * Une vente enregistrée ne se modifie pas : elle s'annule. L'écran
- * n'offre donc ni action de modification ni suppression.
+ * La saisie n'a qu'un seul chemin : le composant Livewire
+ * `Modules\Tresorerie\Livewire\VentesCaisseTable`, embarqué dans la
+ * session de caisse — seul endroit où `docs/specification-tresorerie.md`
+ * (§7.5) autorise l'écran de vente à vivre. Cette ressource ne propose
+ * donc ni création ni modification ni suppression : elle liste les
+ * ventes, imprime le reçu et permet l'annulation, deux opérations de
+ * consultation plutôt que de saisie.
  */
 class VenteResource extends Resource
 {
@@ -60,6 +53,11 @@ class VenteResource extends Resource
         return auth()->user()->can('lister_ventes');
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function canEdit(Model $record): bool
     {
         return false;
@@ -73,88 +71,6 @@ class VenteResource extends Resource
     public static function canDeleteAny(): bool
     {
         return false;
-    }
-
-    public static function form(Schema $form): Schema
-    {
-        return $form
-            ->columns(1)
-            ->schema([
-                // 1. La boutique d'abord. Tant qu'elle n'est pas
-                //    choisie, la liste des produits reste vide.
-                Forms\Components\Select::make('boutique_id')
-                    ->label('Boutique')
-                    ->relationship(
-                        name: 'boutique',
-                        titleAttribute: 'numero',
-                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('numero'),
-                    )
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->live()
-                    ->dehydrated(false),
-                // 2. Puis les produits de cette seule boutique.
-                Forms\Components\Repeater::make('lignes')
-                    ->label('Articles vendus')
-                    ->addActionLabel('Ajouter un article')
-                    ->reorderable(false)
-                    ->defaultItems(1)
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\Select::make('produit_id')
-                            ->label('Produit')
-                            ->options(fn (Get $get) => filled($get('../../boutique_id'))
-                                ? Produit::query()
-                                    ->vendable()
-                                    ->where('boutique_id', $get('../../boutique_id'))
-                                    ->orderBy('designation')
-                                    ->get()
-                                    ->mapWithKeys(fn (Produit $produit) => [
-                                        $produit->id => "{$produit->designation} — {$produit->prix_unitaire} FCFA (stock : {$produit->getQuantiteEnStock()})",
-                                    ])
-                                    ->all()
-                                : [])
-                            ->searchable()
-                            ->required()
-                            ->distinct()
-                            ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
-                        Forms\Components\TextInput::make('quantite')
-                            ->label('Quantité')
-                            ->placeholder('1')
-                            ->numeric()
-                            ->minValue(1)
-                            ->default(1)
-                            ->required(),
-                    ]),
-                Grid::make(2)->schema([
-                    Forms\Components\Select::make('mode_reglement')
-                        ->label('Mode de règlement')
-                        ->options(ModeReglement::options())
-                        ->default(ModeReglement::ESPECES->value)
-                        ->native(false)
-                        ->required(),
-                    Forms\Components\Select::make('provenance_client')
-                        ->label('Provenance du client')
-                        ->options(ProvenanceClient::options())
-                        ->native(false)
-                        ->placeholder('Non renseignée'),
-                ]),
-                Grid::make(2)->schema([
-                    Forms\Components\TextInput::make('nom_client')
-                        ->label('Nom du client')
-                        ->placeholder('Facultatif')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('contact_client')
-                        ->label('Téléphone ou adresse électronique')
-                        ->placeholder('Facultatif')
-                        ->maxLength(255),
-                ]),
-                Forms\Components\Toggle::make('accepte_notifications')
-                    ->label('Le client accepte de recevoir les informations du village')
-                    ->default(false)
-                    ->helperText('Consentement recueilli oralement au comptoir : il conditionne l\'envoi des annonces d\'événements'),
-            ]);
     }
 
     public static function table(Table $table): Table

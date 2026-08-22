@@ -1,0 +1,11 @@
+{
+    "name": "Tresorerie",
+    "alias": "tresorerie",
+    "description": "Caisses, sections, brouillard de caisse, libellés de mouvement.",
+    "keywords": ["tresorerie", "caisse", "brouillard"],
+    "priority": 70,
+    "providers": [
+        "Modules\\Tresorerie\\Providers\\TresorerieServiceProvider"
+    ],
+    "files": []
+}

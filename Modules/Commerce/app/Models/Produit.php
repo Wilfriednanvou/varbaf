@@ -12,6 +12,7 @@ use Modules\Artisanat\Models\Boutique;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Exceptions\ProduitInvalideException;
 use Modules\Commerce\Services\ServiceMouvementStock;
+use Modules\Socle\Models\Utilisateur;
 
 /**
  * Produit artisanal déposé au village.
@@ -37,6 +38,8 @@ use Modules\Commerce\Services\ServiceMouvementStock;
  * @property string $prix_unitaire
  * @property int|null $seuil_alerte
  * @property StatutValidationProduit $statut_validation
+ * @property int|null $valide_par
+ * @property \Illuminate\Support\Carbon|null $valide_le
  * @property bool $piece_unique
  * @property bool $actif
  */
@@ -45,8 +48,10 @@ class Produit extends Model
     protected $table = 'produits';
 
     /**
-     * `reference` et `statut_validation` sont absents : la première est
-     * calculée, le second n'évolue que par les actions dédiées.
+     * `reference`, `statut_validation`, `valide_par` et `valide_le` sont
+     * absents : la référence et le statut n'évoluent que par les
+     * actions dédiées, et l'identité du validateur se constate — via
+     * `ServiceValidationProduit` — elle ne se saisit jamais.
      */
     protected $fillable = [
         'designation',
@@ -71,6 +76,7 @@ class Produit extends Model
             'prix_unitaire' => 'decimal:2',
             'seuil_alerte' => 'integer',
             'statut_validation' => StatutValidationProduit::class,
+            'valide_le' => 'datetime',
             'piece_unique' => 'boolean',
             'actif' => 'boolean',
         ];
@@ -136,6 +142,11 @@ class Produit extends Model
     public function boutique(): BelongsTo
     {
         return $this->belongsTo(Boutique::class, 'boutique_id');
+    }
+
+    public function validePar(): BelongsTo
+    {
+        return $this->belongsTo(Utilisateur::class, 'valide_par');
     }
 
     /**

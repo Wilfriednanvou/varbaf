@@ -1,0 +1,313 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Commerce\Contracts\JournalDeCaisse;
+use Modules\Socle\Enums\CategorieVillage;
+use Modules\Socle\Models\Exercice;
+use Modules\Socle\Models\Utilisateur;
+use Modules\Socle\Models\VillageArtisanal;
+use Modules\Tresorerie\Enums\EtatSectionCaisse;
+use Modules\Tresorerie\Enums\NatureMouvementCaisse;
+use Modules\Tresorerie\Enums\SensMouvementCaisse;
+use Modules\Tresorerie\Exceptions\MouvementCaisseImmuableException;
+use Modules\Tresorerie\Exceptions\SectionCaisseException;
+use Modules\Tresorerie\Models\Caisse;
+use Modules\Tresorerie\Models\MouvementCaisse;
+use Modules\Tresorerie\Models\SectionCaisse;
+use Modules\Tresorerie\Services\ServiceTresorerie;
+use Tests\TestCase;
+
+/**
+ * Brouillard de caisse : les quatre garanties du service.
+ *
+ * Numérotation sans rupture (RG-04), immuabilité (RG-05), écriture
+ * via service unique (RG-06), et règles de section (RG-01, RG-03,
+ * RG-07). Calqué sur MouvementStockTest.
+ */
+class MouvementCaisseTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected VillageArtisanal $village;
+    protected Caisse $caisse;
+    protected SectionCaisse $section;
+    protected ServiceTresorerie $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->village = VillageArtisanal::create([
+            'code' => 'VARBAF',
+            'nom' => 'Village Artisanal Régional de Bafoussam',
+            'categorie' => CategorieVillage::REGIONAL,
+            'region' => 'Ouest',
+            'actif' => true,
+        ]);
+
+        $exercice = Exercice::create([
+            'libelle' => '2026',
+            'date_debut' => '2026-01-01',
+            'date_fin' => '2026-12-31',
+            'actif' => true,
+            'village_id' => $this->village->id,
+        ]);
+
+        $utilisateur = Utilisateur::create([
+            'name' => 'Test',
+            'email' => 'test@varbaf.local',
+            'password' => bcrypt('test'),
+            'est_super_utilisateur' => true,
+        ]);
+
+        $this->actingAs($utilisateur);
+
+        $this->caisse = Caisse::create([
+            'code' => 'CAISSE-TEST',
+            'libelle' => 'Caisse de test',
+            'etat' => 'ACTIVE',
+            'village_id' => $this->village->id,
+        ]);
+
+        $this->section = SectionCaisse::create([
+            'caisse_id' => $this->caisse->id,
+            'libelle' => 'Section test',
+            'date_ouverture' => now(),
+            'solde_ouverture' => 0,
+            'etat' => 'OUVERTE',
+            'ouverte_par' => $utilisateur->id,
+            'village_id' => $this->village->id,
+            'exercice_id' => $exercice->id,
+        ]);
+
+        $this->service = app(ServiceTresorerie::class);
+    }
+
+    // === NUMÉROTATION (RG-04) ===
+
+    public function test_la_numerotation_est_sequentielle_et_sans_rupture(): void
+    {
+        $m1 = $this->enregistrerEntree(1000);
+        $m2 = $this->enregistrerEntree(2000);
+        $m3 = $this->enregistrerSortie(500);
+
+        $this->assertSame(1, $m1->numero_ordre);
+        $this->assertSame(2, $m2->numero_ordre);
+        $this->assertSame(3, $m3->numero_ordre);
+    }
+
+    // === SOLDE PROGRESSIF ===
+
+    public function test_le_solde_apres_est_calcule_a_chaque_ligne(): void
+    {
+        $m1 = $this->enregistrerEntree(5000);
+        $m2 = $this->enregistrerEntree(3000);
+        $m3 = $this->enregistrerSortie(2000);
+
+        $this->assertEquals(5000, (float) $m1->solde_apres);
+        $this->assertEquals(8000, (float) $m2->solde_apres);
+        $this->assertEquals(6000, (float) $m3->solde_apres);
+    }
+
+    public function test_le_solde_du_service_correspond_au_cumul(): void
+    {
+        $this->enregistrerEntree(10000);
+        $this->enregistrerSortie(3000);
+
+        $this->assertEquals(7000, $this->service->solde($this->section));
+    }
+
+    // === IMMUABILITÉ (RG-05) ===
+
+    public function test_un_mouvement_ne_peut_pas_etre_modifie(): void
+    {
+        $mouvement = $this->enregistrerEntree(1000);
+
+        $this->expectException(MouvementCaisseImmuableException::class);
+
+        $mouvement->update(['montant' => 9999]);
+    }
+
+    public function test_un_mouvement_ne_peut_pas_etre_supprime(): void
+    {
+        $mouvement = $this->enregistrerEntree(1000);
+
+        $this->expectException(MouvementCaisseImmuableException::class);
+
+        $mouvement->delete();
+    }
+
+    // === CONTRE-PASSATION ===
+
+    public function test_la_contrepassation_annule_sans_effacer(): void
+    {
+        $entree = $this->enregistrerEntree(5000);
+        $contrepassation = $this->service->contrepasser($entree, 'Erreur de saisie');
+
+        // Le mouvement d'origine est intact
+        $this->assertTrue($entree->fresh()->exists);
+
+        // La contre-passation est de sens inverse
+        $this->assertEquals(SensMouvementCaisse::SORTIE, $contrepassation->sens);
+        $this->assertEquals(5000, (float) $contrepassation->montant);
+        $this->assertEquals(NatureMouvementCaisse::CONTREPASSATION, $contrepassation->nature);
+        $this->assertEquals($entree->id, $contrepassation->mouvement_contrepasse_id);
+
+        // Le solde revient à zéro
+        $this->assertEquals(0, $this->service->solde($this->section));
+    }
+
+    public function test_un_mouvement_ne_se_contrepasse_pas_deux_fois(): void
+    {
+        $entree = $this->enregistrerEntree(5000);
+        $this->service->contrepasser($entree, 'Première correction');
+
+        $this->expectException(MouvementCaisseImmuableException::class);
+
+        $this->service->contrepasser($entree, 'Deuxième tentative');
+    }
+
+    public function test_une_contrepassation_ne_se_contrepasse_pas(): void
+    {
+        $entree = $this->enregistrerEntree(5000);
+        $contrepassation = $this->service->contrepasser($entree, 'Correction');
+
+        $this->expectException(MouvementCaisseImmuableException::class);
+
+        $this->service->contrepasser($contrepassation, 'Re-correction');
+    }
+
+    // === SECTION OUVERTE (RG-01, RG-03) ===
+
+    public function test_aucune_ecriture_hors_section_ouverte(): void
+    {
+        // Clôturer la section
+        $this->section->forceFill([
+            'etat' => EtatSectionCaisse::CLOTUREE,
+            'date_cloture' => now(),
+            'solde_cloture' => 0,
+            'cloturee_par' => auth()->id(),
+        ])->save();
+
+        $this->expectException(SectionCaisseException::class);
+
+        $this->service->enregistrer(
+            $this->section,
+            NatureMouvementCaisse::VENTE,
+            SensMouvementCaisse::ENTREE,
+            1000,
+            'Test interdit',
+        );
+    }
+
+    public function test_une_seule_section_ouverte_par_caisse(): void
+    {
+        // La première section (créée au setUp) est déjà ouverte : en
+        // ouvrir une deuxième sur la même caisse doit être refusé, pas
+        // seulement constaté.
+        $this->expectException(SectionCaisseException::class);
+
+        SectionCaisse::create([
+            'caisse_id' => $this->caisse->id,
+            'libelle' => 'Deuxième section',
+            'date_ouverture' => now(),
+            'solde_ouverture' => 0,
+            'etat' => EtatSectionCaisse::OUVERTE,
+            'ouverte_par' => auth()->id(),
+            'village_id' => $this->village->id,
+            'exercice_id' => $this->section->exercice_id,
+        ]);
+    }
+
+    public function test_une_section_ouverte_sur_une_autre_caisse_est_acceptee(): void
+    {
+        // La contrainte est par caisse, pas globale : une deuxième
+        // caisse peut avoir sa propre section ouverte.
+        $autreCaisse = Caisse::create([
+            'code' => 'CAISSE-DEUX',
+            'libelle' => 'Deuxième caisse',
+            'etat' => 'ACTIVE',
+            'village_id' => $this->village->id,
+        ]);
+
+        $section = SectionCaisse::create([
+            'caisse_id' => $autreCaisse->id,
+            'libelle' => 'Section de la deuxième caisse',
+            'date_ouverture' => now(),
+            'solde_ouverture' => 0,
+            'etat' => EtatSectionCaisse::OUVERTE,
+            'ouverte_par' => auth()->id(),
+            'village_id' => $this->village->id,
+            'exercice_id' => $this->section->exercice_id,
+        ]);
+
+        $this->assertTrue($section->exists);
+    }
+
+    // === CLÔTURE IRRÉVERSIBLE (RG-07) ===
+
+    public function test_la_cloture_est_irreversible(): void
+    {
+        $this->section->forceFill([
+            'etat' => EtatSectionCaisse::CLOTUREE,
+            'date_cloture' => now(),
+            'solde_cloture' => 0,
+            'cloturee_par' => auth()->id(),
+        ])->save();
+
+        $this->expectException(SectionCaisseException::class);
+
+        $this->section->update(['etat' => 'OUVERTE']);
+    }
+
+    // === MONTANT INVALIDE ===
+
+    public function test_un_montant_nul_ou_negatif_est_refuse(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->service->enregistrer(
+            $this->section,
+            NatureMouvementCaisse::DEPENSE,
+            SensMouvementCaisse::SORTIE,
+            0,
+            'Montant invalide',
+        );
+    }
+
+    // === PORT JOURNAL DE CAISSE ===
+
+    public function test_le_port_journal_de_caisse_est_operationnel(): void
+    {
+        $journal = app(JournalDeCaisse::class);
+
+        $this->assertTrue($journal->estOperationnel());
+        $this->assertInstanceOf(ServiceTresorerie::class, $journal);
+    }
+
+    // === HELPERS ===
+
+    protected function enregistrerEntree(float $montant, string $libelle = 'Test entrée'): MouvementCaisse
+    {
+        return $this->service->enregistrer(
+            $this->section,
+            NatureMouvementCaisse::VENTE,
+            SensMouvementCaisse::ENTREE,
+            $montant,
+            $libelle,
+        );
+    }
+
+    protected function enregistrerSortie(float $montant, string $libelle = 'Test sortie'): MouvementCaisse
+    {
+        return $this->service->enregistrer(
+            $this->section,
+            NatureMouvementCaisse::DEPENSE,
+            SensMouvementCaisse::SORTIE,
+            $montant,
+            $libelle,
+        );
+    }
+}

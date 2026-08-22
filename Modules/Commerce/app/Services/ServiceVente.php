@@ -122,14 +122,16 @@ class ServiceVente
                 $produit = $produits[(int) $ligne['produit_id']];
                 $quantite = (int) $ligne['quantite'];
 
+                $prixUnitaire = (int) round((float) $produit->prix_unitaire);
+
                 LigneVente::create([
                     'vente_id' => $vente->getKey(),
                     'produit_id' => $produit->getKey(),
                     'reference_produit' => $produit->reference,
                     'designation' => $produit->designation,
-                    'prix_unitaire' => $produit->prix_unitaire,
+                    'prix_unitaire' => $prixUnitaire,
                     'quantite' => $quantite,
-                    'montant_ligne' => round((float) $produit->prix_unitaire * $quantite),
+                    'montant_ligne' => $prixUnitaire * $quantite,
                 ]);
 
                 // 2. Le stock, par le service — jamais en direct. C'est
@@ -205,27 +207,26 @@ class ServiceVente
      * commission et `2 833` pour l'artisan, dont la somme fait
      * exactement `3 333`.
      *
-     * @return array{0: float, 1: float} commission, part artisan
+     * @return array{0: int, 1: int} commission, part artisan
      */
-    public function repartir(float|string $montantTotal, float|string $taux): array
+    public function repartir(int $montantTotal, float|string $taux): array
     {
-        $montant = (float) $montantTotal;
-        $commission = round($montant * (float) $taux / 100);
+        $commission = (int) round($montantTotal * (float) $taux / 100);
 
-        return [$commission, $montant - $commission];
+        return [$commission, $montantTotal - $commission];
     }
 
     /**
      * @param  array<int, array{produit_id: int|string, quantite: int}>  $lignes
      * @param  array<int, Produit>  $produits
      */
-    protected function calculerMontantTotal(array $lignes, array $produits): float
+    protected function calculerMontantTotal(array $lignes, array $produits): int
     {
-        $total = 0.0;
+        $total = 0;
 
         foreach ($lignes as $ligne) {
             $produit = $produits[(int) $ligne['produit_id']];
-            $total += round((float) $produit->prix_unitaire * (int) $ligne['quantite']);
+            $total += (int) round((float) $produit->prix_unitaire) * (int) $ligne['quantite'];
         }
 
         return $total;

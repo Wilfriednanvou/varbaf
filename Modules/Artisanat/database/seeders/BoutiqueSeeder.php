@@ -17,7 +17,7 @@ use Modules\Socle\Models\VillageArtisanal;
  * se retrouverait, multiplié par la surface, dans les échéanciers et
  * les statistiques, sans qu'on sache plus qu'il était faux.
  *
- * La redevance mensuelle n'est pas semée : depuis la règle 12 de
+ * La redevance mensuelle n'est pas semée : depuis la règle 13 de
  * CLAUDE.md, elle découle de la surface et du tarif, et le modèle la
  * calcule à chaque écriture.
  *

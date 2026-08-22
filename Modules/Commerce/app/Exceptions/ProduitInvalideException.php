@@ -34,4 +34,17 @@ class ProduitInvalideException extends RuntimeException
             .'et figure sur son étiquette physique, même s\'il change de boutique.'
         );
     }
+
+    /**
+     * Le contrôle d'habilitation vit dans le service, pas seulement dans
+     * le `->visible()` de l'écran : un appel direct au service par un
+     * compte non habilité doit échouer de la même façon qu'un clic sur
+     * un bouton qui n'aurait pas dû être visible.
+     */
+    public static function actionNonAutorisee(string $action): self
+    {
+        return new self(
+            "Vous n'êtes pas habilité à effectuer l'action « {$action} » sur ce produit."
+        );
+    }
 }
