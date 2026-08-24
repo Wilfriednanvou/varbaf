@@ -3,10 +3,11 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Artisanat\Enums\EtatBoutique;
+use Modules\Artisanat\Enums\EtatEspaceLocatif;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Artisanat\Models\CorpsMetier;
+use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Models\CategorieProduit;
 use Modules\Commerce\Models\Produit;
@@ -36,8 +37,8 @@ use Tests\TestCase;
  * pour que chaque assertion porte sur un nombre qu'on peut recalculer de
  * tête :
  *
- * - Kamdem, boutique B-12, panier à 4 000 F — une vente, le 10/07 ;
- * - Fotso, boutique B-13, statue à 10 000 F — une vente de 2 unités,
+ * - Kamdem, boutique B12, panier à 4 000 F — une vente, le 10/07 ;
+ * - Fotso, boutique B13, statue à 10 000 F — une vente de 2 unités,
  *   le 05/08 ;
  * - une troisième vente de 4 000 F, **annulée**, qui ne doit apparaître
  *   dans aucun indicateur.
@@ -105,11 +106,16 @@ class RapportServiceTest extends TestCase
             'village_id' => $this->village->id,
         ]);
 
-        $this->boutiqueA = Boutique::create(['numero' => 'B-12', 'village_id' => $this->village->id]);
-        $this->boutiqueB = Boutique::create(['numero' => 'B-13', 'village_id' => $this->village->id]);
+        $this->boutiqueA = Boutique::create(['numero' => 'B12', 'village_id' => $this->village->id]);
+        $this->boutiqueB = Boutique::create(['numero' => 'B13', 'village_id' => $this->village->id]);
 
-        // Une boutique occupée sur deux : le taux d'occupation vaut 50 %.
-        $this->boutiqueA->update(['etat' => EtatBoutique::OCCUPEE]);
+        $espaceA = EspaceLocatif::create(['boutique_id' => $this->boutiqueA->id]);
+        EspaceLocatif::create(['boutique_id' => $this->boutiqueB->id]);
+
+        // Un espace locatif occupé sur deux : le taux d'occupation vaut
+        // 50 %. Il se mesure sur les espaces et non sur les boutiques,
+        // puisqu'un local peut en abriter plusieurs.
+        $espaceA->update(['etat' => EtatEspaceLocatif::OCCUPE]);
 
         $this->panier = $this->creerProduit('Panier tressé', 4000, $categorie->id, $this->kamdem->id, $this->boutiqueA->id, null, 10);
         $this->statue = $this->creerProduit('Statue en bois', 10000, $categorie->id, $this->fotso->id, $this->boutiqueB->id, 20, 20);
@@ -238,16 +244,16 @@ class RapportServiceTest extends TestCase
 
         $this->assertCount(2, $lignes);
         // Trié par montant décroissant : la statue d'abord.
-        $this->assertSame('B-13', $lignes[0]['libelle']);
+        $this->assertSame('B13', $lignes[0]['libelle']);
         $this->assertSame(20000, $lignes[0]['total']);
         $this->assertSame(1, $lignes[0]['nombre']);
 
-        $this->assertSame('B-12', $lignes[1]['libelle']);
+        $this->assertSame('B12', $lignes[1]['libelle']);
         $this->assertSame(4000, $lignes[1]['total']);
         $this->assertSame(
             1,
             $lignes[1]['nombre'],
-            'La vente annulée de la boutique B-12 ne doit pas être comptée.',
+            'La vente annulée de la boutique B12 ne doit pas être comptée.',
         );
     }
 
@@ -290,11 +296,11 @@ class RapportServiceTest extends TestCase
 
     // === PARC ET CATALOGUE ===
 
-    public function test_le_taux_d_occupation_rapporte_les_boutiques_occupees_au_parc(): void
+    public function test_le_taux_d_occupation_rapporte_les_espaces_occupes_au_parc_locatif(): void
     {
-        $occupation = $this->rapport->tauxOccupationBoutiques();
+        $occupation = $this->rapport->tauxOccupationEspaces();
 
-        $this->assertSame(1, $occupation['occupees']);
+        $this->assertSame(1, $occupation['occupes']);
         $this->assertSame(2, $occupation['total']);
         $this->assertSame(50.0, $occupation['taux']);
     }
@@ -311,7 +317,7 @@ class RapportServiceTest extends TestCase
         $this->assertSame('Statue en bois', $produits[0]['designation']);
         $this->assertSame(18, $produits[0]['stock']);
         $this->assertSame(20, $produits[0]['seuil']);
-        $this->assertSame('B-13', $produits[0]['boutique']);
+        $this->assertSame('B13', $produits[0]['boutique']);
     }
 
     // === FILTRES ===
@@ -387,7 +393,7 @@ class RapportServiceTest extends TestCase
         $this->assertSame(2, $this->rapport->nombreDeVentes($filtre));
         $this->assertSame(20400, $this->rapport->dettesEnversLesArtisans());
 
-        $boutiqueA = collect($this->rapport->ventesParBoutique($filtre))->firstWhere('libelle', 'B-12');
+        $boutiqueA = collect($this->rapport->ventesParBoutique($filtre))->firstWhere('libelle', 'B12');
         $this->assertSame(4000, $boutiqueA['total']);
 
         $kamdem = collect($this->rapport->ventesParArtisan($filtre))->firstWhere('libelle', 'Kamdem');

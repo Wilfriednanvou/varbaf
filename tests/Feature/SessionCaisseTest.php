@@ -80,7 +80,7 @@ class SessionCaisseTest extends TestCase
             'corps_metier_id' => $corpsMetier->id,
             'village_id' => $this->village->id,
         ]);
-        $this->boutique = Boutique::query()->where('numero', 'B-12')->firstOrFail();
+        $this->boutique = Boutique::query()->where('numero', 'B12')->firstOrFail();
 
         $categorie = CategorieProduit::query()->where('code', 'VAN-PAN')->firstOrFail();
         $this->produit = Produit::create([

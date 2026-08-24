@@ -12,12 +12,19 @@ use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Validation\Rules\Unique;
-use Modules\Artisanat\Enums\EtatBoutique;
+use Modules\Artisanat\Enums\ZoneBoutique;
 use Modules\Artisanat\Filament\Resources\BoutiqueResource\Pages;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
 
+/**
+ * Le parc de locaux, et rien d'autre.
+ *
+ * L'occupant, l'état d'occupation et la redevance ont quitté cet écran
+ * en même temps qu'ils ont quitté le modèle : ils appartiennent à
+ * l'espace locatif. Ce qui se saisit ici est ce qui décrit le bâtiment.
+ */
 class BoutiqueResource extends Resource
 {
     protected static ?string $model = Boutique::class;
@@ -49,14 +56,13 @@ class BoutiqueResource extends Resource
             ->columns(1)
             ->schema([
                 Grid::make(2)->schema([
-                    // L'unicité est portée par le couple
-                    // (village, numéro) en base : la règle de
-                    // formulaire est restreinte de la même façon,
-                    // sinon deux villages ne pourraient pas avoir
-                    // chacun une boutique B-01.
+                    // L'unicité est portée par le couple (village,
+                    // numéro) en base : la règle de formulaire est
+                    // restreinte de la même façon, sinon deux villages ne
+                    // pourraient pas avoir chacun une boutique B01.
                     Forms\Components\TextInput::make('numero')
                         ->label('Numéro')
-                        ->placeholder('B-01')
+                        ->placeholder('B01')
                         ->required()
                         ->maxLength(20)
                         ->unique(
@@ -75,49 +81,13 @@ class BoutiqueResource extends Resource
                         ->label('Superficie (m²)')
                         ->placeholder('12')
                         ->numeric()
-                        ->minValue(0)
-                        ->live(onBlur: true),
-                    Forms\Components\TextInput::make('emplacement')
+                        ->minValue(0),
+                    Forms\Components\Select::make('emplacement')
                         ->label('Emplacement')
-                        ->placeholder('Rez-de-chaussée')
-                        ->datalist(['Sous-sol', 'Rez-de-chaussée', 'Étage'])
-                        ->maxLength(60),
+                        ->options(ZoneBoutique::options())
+                        ->placeholder('Sélectionnez une zone')
+                        ->native(false),
                 ]),
-                Grid::make(2)->schema([
-                    Forms\Components\TextInput::make('tarif_metre_carre')
-                        ->label('Tarif mensuel au mètre carré (FCFA)')
-                        ->placeholder('Tarif du barème en vigueur')
-                        ->numeric()
-                        ->minValue(0)
-                        ->live(onBlur: true),
-                    // La redevance n'est plus saisie : règle 13 de
-                    // CLAUDE.md, elle découle de la surface et du tarif.
-                    // Le champ n'est qu'un aperçu du calcul que le
-                    // modèle refera à l'enregistrement — il n'est donc
-                    // pas hydraté.
-                    Forms\Components\Placeholder::make('redevance_calculee')
-                        ->label('Redevance mensuelle de référence')
-                        ->content(function (Get $get): string {
-                            $superficie = $get('superficie');
-                            $tarif = $get('tarif_metre_carre');
-
-                            if (blank($superficie) || blank($tarif)) {
-                                return 'À calculer : renseignez la superficie et le tarif au mètre carré';
-                            }
-
-                            return number_format((float) $superficie * (float) $tarif, 0, ',', ' ').' FCFA';
-                        }),
-                ]),
-                // L'état n'est modifiable que pour poser ou lever
-                // INDISPONIBLE : DISPONIBLE et OCCUPEE sont recalculés
-                // par les attributions, et une saisie manuelle serait
-                // écrasée au premier mouvement.
-                Forms\Components\Select::make('etat')
-                    ->label('État')
-                    ->options(EtatBoutique::options())
-                    ->default(EtatBoutique::DISPONIBLE->value)
-                    ->native(false)
-                    ->required(),
             ]);
     }
 
@@ -132,6 +102,8 @@ class BoutiqueResource extends Resource
                     ->badge(),
                 Tables\Columns\TextColumn::make('emplacement')
                     ->label('Emplacement')
+                    ->formatStateUsing(fn (?string $state) => $state ? ZoneBoutique::from($state)->getLabel() : null)
+                    ->badge()
                     ->searchable()
                     ->sortable()
                     ->placeholder('—'),
@@ -141,26 +113,17 @@ class BoutiqueResource extends Resource
                     ->suffix(' m²')
                     ->sortable()
                     ->placeholder('—'),
-                Tables\Columns\TextColumn::make('tarif_metre_carre')
-                    ->label('Tarif au m²')
-                    ->money('XAF')
-                    ->sortable()
-                    ->placeholder('À renseigner')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('redevance_mensuelle')
-                    ->label('Redevance de référence')
-                    ->money('XAF')
-                    ->description('Superficie × tarif au m²')
-                    ->sortable()
-                    ->placeholder('À calculer'),
-                Tables\Columns\TextColumn::make('etat')
-                    ->label('État')
-                    ->badge()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('occupant')
-                    ->label('Occupant')
-                    ->state(fn (Boutique $record) => $record->getOccupantActuel()?->nom_complet)
-                    ->placeholder('Libre'),
+                Tables\Columns\TextColumn::make('nombre_espaces')
+                    ->label('Espaces')
+                    ->state(fn (Boutique $record) => $record->espacesLocatifs()->count())
+                    ->badge(),
+                Tables\Columns\TextColumn::make('occupants')
+                    ->label('Occupants')
+                    ->state(fn (Boutique $record) => collect($record->occupantsActuels())
+                        ->map(fn ($artisan) => $artisan->nom_complet)
+                        ->implode(', '))
+                    ->wrap()
+                    ->placeholder('Aucun'),
                 Tables\Columns\TextColumn::make('village.nom')
                     ->label('Village')
                     ->sortable()
@@ -171,9 +134,6 @@ class BoutiqueResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('etat')
-                    ->label('État')
-                    ->options(EtatBoutique::options()),
                 Tables\Filters\SelectFilter::make('village_id')
                     ->label('Village')
                     ->relationship('village', 'nom'),
@@ -196,14 +156,14 @@ class BoutiqueResource extends Resource
                         'ARTISANAT',
                         'Boutique',
                         $record->id,
-                        ['numero' => $record->numero, 'etat' => $record->etat?->value],
+                        ['numero' => $record->numero],
                     )),
                 Actions\DeleteAction::make()
                     ->iconButton()
                     ->tooltip('Supprimer')
                     ->visible(fn () => auth()->user()->can('supprimer_boutique'))
                     ->modalHeading('Supprimer la boutique')
-                    ->modalDescription('La suppression sera refusée si la boutique porte des attributions. Passez-la plutôt en indisponible.')
+                    ->modalDescription('La suppression sera refusée si la boutique abrite des espaces locatifs. Retirez d\'abord ses espaces du parc.')
                     ->modalWidth('lg')
                     ->modalSubmitActionLabel('Enregistrer')
                     ->modalCancelActionLabel('Fermer')
