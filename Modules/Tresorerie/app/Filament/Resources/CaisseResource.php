@@ -109,6 +109,21 @@ class CaisseResource extends Resource
                             ->value('id')
                             ?? $record->sections()->latest('id')->value('id'),
                     ])),
+                Actions\Action::make('brouillard')
+                    ->label('Brouillard')
+                    ->icon('heroicon-o-document-text')
+                    ->iconButton()
+                    ->color('gray')
+                    ->tooltip('Consulter le brouillard de caisse')
+                    ->visible(fn () => auth()->user()->can('lister_mouvements_caisse'))
+                    ->url(fn (Caisse $record) => ManageCaisseSession::getUrl([
+                        'caisse' => $record->getKey(),
+                        'section' => $record->sections()
+                            ->where('etat', EtatSectionCaisse::OUVERTE->value)
+                            ->value('id')
+                            ?? $record->sections()->latest('id')->value('id'),
+                        'tab' => 'brouillard',
+                    ])),
                 Actions\EditAction::make()
                     ->iconButton()
                     ->tooltip('Modifier')

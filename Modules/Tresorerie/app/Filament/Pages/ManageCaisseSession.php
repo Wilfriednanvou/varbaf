@@ -10,6 +10,7 @@ use Filament\Panel;
 use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Alignment;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
 use Modules\Tresorerie\Enums\EtatSectionCaisse;
@@ -54,6 +55,7 @@ class ManageCaisseSession extends Page
      * l'onglet affiché monte son composant Livewire (et n'interroge
      * donc la base que pour ce qu'on regarde réellement).
      */
+    #[Url(as: 'tab')]
     public string $activeTab = 'ventes';
 
     public static function getRoutePath(Panel $panel): string
