@@ -14,6 +14,7 @@ use Livewire\Attributes\Url;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
 use Modules\Tresorerie\Enums\EtatSectionCaisse;
+use Modules\Tresorerie\Filament\Pages\BrouillardCaissePage;
 use Modules\Tresorerie\Filament\Resources\CaisseResource;
 use Modules\Tresorerie\Models\Caisse;
 use Modules\Tresorerie\Models\SectionCaisse;
@@ -199,6 +200,13 @@ class ManageCaisseSession extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('brouillard')
+                ->label('Brouillard de caisse')
+                ->icon('heroicon-o-document-text')
+                ->color('gray')
+                ->visible(fn () => auth()->user()->can('lister_mouvements_caisse') && $this->selectedSectionId)
+                ->url(fn () => BrouillardCaissePage::getUrl(['caisse' => $this->caisseId, 'section' => $this->selectedSectionId])),
+            
             // Ouvrir une nouvelle section (si aucune n'est ouverte sur cette caisse)
             Actions\Action::make('ouvrir_section')
                 ->label('Ouvrir une section')

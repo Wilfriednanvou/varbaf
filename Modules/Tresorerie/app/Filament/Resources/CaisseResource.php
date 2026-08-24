@@ -13,6 +13,7 @@ use Filament\Forms;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
 use Modules\Tresorerie\Enums\EtatSectionCaisse;
+use Modules\Tresorerie\Filament\Pages\BrouillardCaissePage;
 use Modules\Tresorerie\Filament\Pages\ManageCaisseSession;
 use Modules\Tresorerie\Filament\Resources\CaisseResource\Pages;
 use Modules\Tresorerie\Models\Caisse;
@@ -116,13 +117,12 @@ class CaisseResource extends Resource
                     ->color('gray')
                     ->tooltip('Consulter le brouillard de caisse')
                     ->visible(fn () => auth()->user()->can('lister_mouvements_caisse'))
-                    ->url(fn (Caisse $record) => ManageCaisseSession::getUrl([
+                    ->url(fn (Caisse $record) => BrouillardCaissePage::getUrl([
                         'caisse' => $record->getKey(),
                         'section' => $record->sections()
                             ->where('etat', EtatSectionCaisse::OUVERTE->value)
                             ->value('id')
                             ?? $record->sections()->latest('id')->value('id'),
-                        'tab' => 'brouillard',
                     ])),
                 Actions\EditAction::make()
                     ->iconButton()

@@ -92,14 +92,6 @@
             </x-filament::tabs.item>
 
             <x-filament::tabs.item
-                icon="heroicon-o-document-text"
-                :active="$activeTab === 'brouillard'"
-                wire:click="$set('activeTab', 'brouillard')"
-            >
-                Brouillard
-            </x-filament::tabs.item>
-
-            <x-filament::tabs.item
                 icon="heroicon-o-clipboard-document-check"
                 :active="$activeTab === 'arretes'"
                 wire:click="$set('activeTab', 'arretes')"
@@ -119,11 +111,6 @@
             <livewire:tresorerie::mouvements-caisse-table
                 :section-id="$selectedSectionId"
                 :key="'mvt-' . $selectedSectionId"
-            />
-        @elseif ($activeTab === 'brouillard')
-            <livewire:tresorerie::brouillard-caisse-table
-                :section-id="$selectedSectionId"
-                :key="'brouillard-' . $selectedSectionId"
             />
         @elseif ($activeTab === 'arretes')
             <livewire:tresorerie::arretes-caisse-table
