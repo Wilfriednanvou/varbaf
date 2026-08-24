@@ -4,6 +4,7 @@ namespace Modules\Commerce\Filament\Resources;
 
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
@@ -156,6 +157,56 @@ class TauxCommissionResource extends Resource
                     ->stickyModalFooter()
                     ->after(fn (TauxCommission $record) => JournalAudit::enregistrer(
                         'Correction taux de commission',
+                        'COMMERCE',
+                        'TauxCommission',
+                        $record->id,
+                        ['taux' => $record->taux, 'date_effet' => $record->date_effet?->toDateString()],
+                    )),
+
+                // Activer maintenant : avance la date d'effet à aujourd'hui
+                // pour un taux encore à venir. Pratique pour corriger une
+                // date saisie trop loin dans le futur sans recréer de ligne.
+                Tables\Actions\Action::make('activer')
+                    ->iconButton()
+                    ->icon('heroicon-o-bolt')
+                    ->color('warning')
+                    ->tooltip('Activer dès aujourd\'hui')
+                    ->visible(fn (TauxCommission $record) => auth()->user()->can('modifier_taux_commission')
+                        && $record->estModifiable())
+                    ->requiresConfirmation()
+                    ->modalHeading('Activer ce taux dès aujourd\'hui ?')
+                    ->modalDescription(fn (TauxCommission $record) => "Le taux {$record->libelle()} verra sa date d'effet avancée à aujourd'hui. Il deviendra immédiatement le taux en vigueur pour toutes les nouvelles ventes.")
+                    ->modalSubmitActionLabel('Activer maintenant')
+                    ->modalCancelActionLabel('Annuler')
+                    ->action(function (TauxCommission $record): void {
+                        $record->update(['date_effet' => now()->toDateString()]);
+                        JournalAudit::enregistrer(
+                            'Activation immédiate taux de commission',
+                            'COMMERCE',
+                            'TauxCommission',
+                            $record->id,
+                            ['taux' => $record->taux, 'date_effet' => $record->date_effet?->toDateString()],
+                        );
+                        Notification::make()
+                            ->title("Taux {$record->libelle()} activé")
+                            ->success()
+                            ->send();
+                    }),
+
+                // Suppression : uniquement les taux non encore en vigueur.
+                // Un taux en vigueur — même s'il n'est plus l'actuel — doit
+                // rester pour permettre de rejouer des commissions anciennes.
+                Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->tooltip('Supprimer ce taux')
+                    ->visible(fn (TauxCommission $record) => auth()->user()->can('supprimer_taux_commission')
+                        && $record->estModifiable())
+                    ->modalHeading('Supprimer ce taux ?')
+                    ->modalDescription(fn (TauxCommission $record) => "Le taux {$record->libelle()} sera définitivement supprimé. Cette action est irréversible.")
+                    ->modalSubmitActionLabel('Supprimer')
+                    ->modalCancelActionLabel('Annuler')
+                    ->before(fn (TauxCommission $record) => JournalAudit::enregistrer(
+                        'Suppression taux de commission',
                         'COMMERCE',
                         'TauxCommission',
                         $record->id,

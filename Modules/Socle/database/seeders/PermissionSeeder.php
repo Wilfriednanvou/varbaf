@@ -129,14 +129,23 @@ class PermissionSeeder extends Seeder
             ['name' => 'modifier_espace', 'module' => 'ARTISANAT', 'description' => 'Modifier un espace'],
             ['name' => 'supprimer_espace', 'module' => 'ARTISANAT', 'description' => 'Supprimer un espace'],
 
-            // === ARTISANAT : attributions de boutiques ===
-            ['name' => 'lister_attributions', 'module' => 'ARTISANAT', 'description' => 'Consulter les attributions de boutiques'],
-            ['name' => 'ajouter_attribution', 'module' => 'ARTISANAT', 'description' => 'Attribuer une boutique à un artisan'],
-            ['name' => 'modifier_attribution', 'module' => 'ARTISANAT', 'description' => 'Modifier une attribution de boutique'],
+            // === ARTISANAT : espaces locatifs ===
+            // À ne pas confondre avec les « espaces » ci-dessus, qui
+            // sont les salles et le parking : ce sont ici les places de
+            // vente louées aux artisans à l'intérieur des boutiques.
+            ['name' => 'lister_espaces_locatifs', 'module' => 'ARTISANAT', 'description' => 'Consulter les espaces locatifs'],
+            ['name' => 'ajouter_espace_locatif', 'module' => 'ARTISANAT', 'description' => 'Découper une boutique en espaces locatifs'],
+            ['name' => 'modifier_espace_locatif', 'module' => 'ARTISANAT', 'description' => 'Modifier un espace locatif'],
+            ['name' => 'supprimer_espace_locatif', 'module' => 'ARTISANAT', 'description' => 'Retirer un espace locatif du parc'],
+
+            // === ARTISANAT : attributions d'espaces locatifs ===
+            ['name' => 'lister_attributions', 'module' => 'ARTISANAT', 'description' => 'Consulter les attributions d\'espaces locatifs'],
+            ['name' => 'ajouter_attribution', 'module' => 'ARTISANAT', 'description' => 'Attribuer un espace locatif à un artisan'],
+            ['name' => 'modifier_attribution', 'module' => 'ARTISANAT', 'description' => 'Modifier une attribution d\'espace locatif'],
             ['name' => 'valider_dossier_attribution', 'module' => 'ARTISANAT', 'description' => 'Constater la complétude du dossier administratif d\'une attribution'],
             ['name' => 'resilier_attribution', 'module' => 'ARTISANAT', 'description' => 'Résilier une attribution avant terme'],
             ['name' => 'terminer_attribution', 'module' => 'ARTISANAT', 'description' => 'Clore une attribution arrivée à échéance'],
-            ['name' => 'supprimer_attribution', 'module' => 'ARTISANAT', 'description' => 'Supprimer une attribution de boutique'],
+            ['name' => 'supprimer_attribution', 'module' => 'ARTISANAT', 'description' => 'Supprimer une attribution d\'espace locatif'],
 
             // === COMMERCE : catégories de produits ===
             ['name' => 'lister_categories_produits', 'module' => 'COMMERCE', 'description' => 'Consulter les catégories de produits'],
@@ -148,6 +157,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'lister_taux_commission', 'module' => 'COMMERCE', 'description' => 'Consulter l\'historique des taux de commission'],
             ['name' => 'ajouter_taux_commission', 'module' => 'COMMERCE', 'description' => 'Enregistrer un nouveau taux de commission'],
             ['name' => 'modifier_taux_commission', 'module' => 'COMMERCE', 'description' => 'Corriger un taux de commission non encore entré en vigueur'],
+            ['name' => 'supprimer_taux_commission', 'module' => 'COMMERCE', 'description' => 'Supprimer un taux non encore entré en vigueur'],
 
             // === COMMERCE : produits ===
             ['name' => 'lister_produits', 'module' => 'COMMERCE', 'description' => 'Consulter le catalogue des produits'],
@@ -223,6 +233,28 @@ class PermissionSeeder extends Seeder
             ['name' => 'consulter_indicateurs_financiers', 'module' => 'PILOTAGE', 'description' => 'Voir les soldes de caisse et les dettes envers les artisans'],
             ['name' => 'consulter_indicateurs_commerciaux', 'module' => 'PILOTAGE', 'description' => 'Voir la ventilation des ventes et la provenance des clients'],
             ['name' => 'consulter_alertes_stock', 'module' => 'PILOTAGE', 'description' => 'Voir les produits sous leur seuil d\'alerte'],
+
+            // === PORTAIL : publication des produits ===
+            ['name' => 'lister_publications_produit', 'module' => 'PORTAIL', 'description' => 'Consulter les fiches portail des produits'],
+            ['name' => 'publier_produit', 'module' => 'PORTAIL', 'description' => 'Préparer et mettre en ligne la fiche portail d\'un produit'],
+            ['name' => 'modifier_publication_produit', 'module' => 'PORTAIL', 'description' => 'Modifier une fiche portail'],
+            ['name' => 'supprimer_publication_produit', 'module' => 'PORTAIL', 'description' => 'Retirer une fiche portail'],
+
+            // === PORTAIL : artisans vedettes ===
+            ['name' => 'lister_artisans_vedettes', 'module' => 'PORTAIL', 'description' => 'Consulter les mises en avant d\'artisans'],
+            ['name' => 'ajouter_artisan_vedette', 'module' => 'PORTAIL', 'description' => 'Mettre un artisan en avant sur le portail'],
+            ['name' => 'modifier_artisan_vedette', 'module' => 'PORTAIL', 'description' => 'Modifier une mise en avant'],
+            ['name' => 'supprimer_artisan_vedette', 'module' => 'PORTAIL', 'description' => 'Retirer une mise en avant'],
+
+            // === PORTAIL : contenus de page ===
+            ['name' => 'lister_contenus_page', 'module' => 'PORTAIL', 'description' => 'Consulter les textes du site public'],
+            ['name' => 'ajouter_contenu_page', 'module' => 'PORTAIL', 'description' => 'Rédiger un texte du site public'],
+            ['name' => 'modifier_contenu_page', 'module' => 'PORTAIL', 'description' => 'Modifier un texte du site public'],
+            ['name' => 'supprimer_contenu_page', 'module' => 'PORTAIL', 'description' => 'Supprimer un texte du site public'],
+
+            // === PORTAIL : demandes de contact ===
+            ['name' => 'lister_demandes_contact', 'module' => 'PORTAIL', 'description' => 'Consulter les messages reçus par le formulaire public'],
+            ['name' => 'traiter_demande_contact', 'module' => 'PORTAIL', 'description' => 'Suivre et clore une demande de contact'],
         ];
     }
 
@@ -272,6 +304,7 @@ class PermissionSeeder extends Seeder
             'lister_entreprises',
             'lister_boutiques',
             'lister_espaces',
+            'lister_espaces_locatifs',
             'lister_attributions',
             'lister_categories_produits',
             'lister_produits',
@@ -305,6 +338,7 @@ class PermissionSeeder extends Seeder
                     'ajouter_artisan', 'modifier_artisan',
                     'ajouter_boutique', 'modifier_boutique',
                     'ajouter_espace', 'modifier_espace',
+                    'ajouter_espace_locatif', 'modifier_espace_locatif',
                     'ajouter_attribution', 'modifier_attribution',
                     'resilier_attribution', 'terminer_attribution',
                     // Le droit de produire la trace est distinct du
@@ -315,7 +349,7 @@ class PermissionSeeder extends Seeder
                     'ajouter_categorie_produit', 'modifier_categorie_produit', 'supprimer_categorie_produit',
                     // Le taux de commission engage la recette du
                     // village : sa décision revient à la direction.
-                    'lister_taux_commission', 'ajouter_taux_commission', 'modifier_taux_commission',
+                    'lister_taux_commission', 'ajouter_taux_commission', 'modifier_taux_commission', 'supprimer_taux_commission',
                     'ajouter_produit', 'modifier_produit', 'retirer_produit',
                     // Règle 14 amendée : la responsabilité de la
                     // validation reste au chef de section Production,
@@ -356,6 +390,15 @@ class PermissionSeeder extends Seeder
                     'consulter_indicateurs_financiers',
                     'consulter_indicateurs_commerciaux',
                     'consulter_alertes_stock',
+                    // Portail : ce qui est publié au nom du village
+                    // engage le village.
+                    'lister_publications_produit', 'publier_produit',
+                    'modifier_publication_produit', 'supprimer_publication_produit',
+                    'lister_artisans_vedettes', 'ajouter_artisan_vedette',
+                    'modifier_artisan_vedette', 'supprimer_artisan_vedette',
+                    'lister_contenus_page', 'ajouter_contenu_page',
+                    'modifier_contenu_page', 'supprimer_contenu_page',
+                    'lister_demandes_contact', 'traiter_demande_contact',
                 ],
             ],
 
@@ -370,6 +413,7 @@ class PermissionSeeder extends Seeder
                     'ajouter_artisan', 'modifier_artisan',
                     'ajouter_boutique', 'modifier_boutique',
                     'ajouter_espace', 'modifier_espace',
+                    'ajouter_espace_locatif', 'modifier_espace_locatif',
                     'ajouter_attribution', 'modifier_attribution',
                     'terminer_attribution',
                     'ajouter_categorie_produit', 'modifier_categorie_produit', 'supprimer_categorie_produit',
@@ -386,6 +430,13 @@ class PermissionSeeder extends Seeder
                     'consulter_indicateurs_financiers',
                     'consulter_indicateurs_commerciaux',
                     'consulter_alertes_stock',
+                    // Portail : il seconde la publication mais ne
+                    // supprime rien — retirer une fiche ou un texte du
+                    // site engage la coordination elle-même.
+                    'lister_publications_produit', 'publier_produit', 'modifier_publication_produit',
+                    'lister_artisans_vedettes', 'ajouter_artisan_vedette', 'modifier_artisan_vedette',
+                    'lister_contenus_page', 'ajouter_contenu_page', 'modifier_contenu_page',
+                    'lister_demandes_contact', 'traiter_demande_contact',
                     // Volontairement absents : cloturer_exercice et
                     // resilier_attribution. Clôturer un exercice est
                     // irréversible, résilier rompt un contrat : ces deux
@@ -433,13 +484,16 @@ class PermissionSeeder extends Seeder
             ],
 
             'chef_section_administrative_financiere' => [
-                'description' => 'Chef de section Administrative et Financière : tient le parc de boutiques, les attributions et les redevances',
+                'description' => 'Chef de section Administrative et Financière : tient le parc locatif, les attributions et les redevances',
                 'permissions' => [
                     ...$lectureReferentiel,
                     'lister_agents', 'ajouter_agent', 'modifier_agent',
                     'lister_journaux_audit',
                     'ajouter_entreprise', 'modifier_entreprise', 'supprimer_entreprise',
                     'ajouter_boutique', 'modifier_boutique',
+                    // C'est cette section qui découpe le parc en places
+                    // de vente : le contrat porte l'espace, pas le local.
+                    'ajouter_espace_locatif', 'modifier_espace_locatif',
                     'ajouter_attribution', 'modifier_attribution',
                     'resilier_attribution', 'terminer_attribution',
                     // Lecture seule sur le taux : la section suit la
@@ -499,6 +553,16 @@ class PermissionSeeder extends Seeder
                     // frontière que ci-dessus.
                     'consulter_tableau_bord',
                     'consulter_indicateurs_commerciaux',
+                    // Portail : la vitrine est le prolongement direct de
+                    // la mise en exposition, qui est son métier. Elle
+                    // publie, rédige et suit les demandes reçues.
+                    'lister_publications_produit', 'publier_produit',
+                    'modifier_publication_produit', 'supprimer_publication_produit',
+                    'lister_artisans_vedettes', 'ajouter_artisan_vedette',
+                    'modifier_artisan_vedette', 'supprimer_artisan_vedette',
+                    'lister_contenus_page', 'ajouter_contenu_page',
+                    'modifier_contenu_page', 'supprimer_contenu_page',
+                    'lister_demandes_contact', 'traiter_demande_contact',
                 ],
             ],
 
@@ -508,6 +572,11 @@ class PermissionSeeder extends Seeder
                     ...$lectureReferentiel,
                     'ajouter_artisan', 'modifier_artisan',
                     'ajouter_entreprise', 'modifier_entreprise', 'supprimer_entreprise',
+                    // Portail : elle accueille les visiteurs, c'est donc
+                    // elle qui reçoit et suit ce qu'ils écrivent. Elle
+                    // ne publie rien : la vitrine appartient à la
+                    // Promotion.
+                    'lister_demandes_contact', 'traiter_demande_contact',
                 ],
             ],
         ];
