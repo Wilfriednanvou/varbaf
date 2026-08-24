@@ -102,17 +102,20 @@ class TauxCommissionResource extends Resource
                     ->suffix(' %')
                     ->numeric(decimalPlaces: 2)
                     ->badge()
+                    ->color(fn (TauxCommission $record): string => $record->estLeTauxActuel() ? 'success' : 'gray')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date_effet')
                     ->label('Date d\'effet')
                     ->date('d/m/Y')
                     ->description(fn (TauxCommission $record) => $record->estEntreEnVigueur()
-                        ? 'En vigueur — figé'
+                        ? ($record->estLeTauxActuel() ? 'Taux actuel en vigueur' : 'Ancien taux (figé)')
                         : 'À venir — encore modifiable')
+                    ->color(fn (TauxCommission $record): ?string => $record->estLeTauxActuel() ? null : 'gray')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('reference_decision')
                     ->label('Décision')
                     ->placeholder('Non référencée')
+                    ->color(fn (TauxCommission $record): ?string => $record->estLeTauxActuel() ? null : 'gray')
                     ->wrap()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('saisiPar.name')

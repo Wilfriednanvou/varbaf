@@ -178,6 +178,22 @@ class TauxCommission extends Model
         return ! $this->estEntreEnVigueur();
     }
 
+    /**
+     * Vrai si ce taux est celui actuellement utilisé pour les nouvelles ventes du village.
+     */
+    public function estLeTauxActuel(): bool
+    {
+        if (! $this->estEntreEnVigueur()) {
+            return false;
+        }
+
+        try {
+            return static::enregistrementEnVigueur(null, $this->village_id)->id === $this->id;
+        } catch (AucunTauxCommissionException) {
+            return false;
+        }
+    }
+
     public function libelle(): string
     {
         $taux = rtrim(rtrim(number_format((float) $this->taux, 2, ',', ' '), '0'), ',');
