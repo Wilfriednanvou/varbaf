@@ -4,7 +4,6 @@ namespace Modules\Commerce\Filament\Resources;
 
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
@@ -166,7 +165,7 @@ class TauxCommissionResource extends Resource
                 // Activer maintenant : avance la date d'effet à aujourd'hui
                 // pour un taux encore à venir. Pratique pour corriger une
                 // date saisie trop loin dans le futur sans recréer de ligne.
-                Tables\Actions\Action::make('activer')
+                Actions\Action::make('activer')
                     ->iconButton()
                     ->icon('heroicon-o-bolt')
                     ->color('warning')
@@ -187,11 +186,40 @@ class TauxCommissionResource extends Resource
                             $record->id,
                             ['taux' => $record->taux, 'date_effet' => $record->date_effet?->toDateString()],
                         );
-                        Notification::make()
-                            ->title("Taux {$record->libelle()} activé")
-                            ->success()
-                            ->send();
-                    }),
+                    })
+                    ->successNotificationTitle('Taux activé avec succès'),
+
+                // Réappliquer : crée un nouveau taux identique daté d'aujourd'hui.
+                // Visible sur tous les taux, y compris les figés. C'est le seul
+                // moyen de "choisir" un ancien taux sans réécrire l'historique.
+                Actions\Action::make('reappliquer')
+                    ->iconButton()
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->tooltip('Réappliquer ce taux à partir d\'aujourd\'hui')
+                    ->visible(fn (TauxCommission $record) => auth()->user()->can('ajouter_taux_commission')
+                        && ! $record->estLeTauxActuel())
+                    ->requiresConfirmation()
+                    ->modalHeading('Réappliquer ce taux ?')
+                    ->modalDescription(fn (TauxCommission $record) => "Un nouveau taux de {$record->taux} % sera créé avec la date d'aujourd'hui. Il deviendra le taux actif pour toutes les nouvelles ventes.")
+                    ->modalSubmitActionLabel('Réappliquer maintenant')
+                    ->modalCancelActionLabel('Annuler')
+                    ->action(function (TauxCommission $record): void {
+                        $nouveau = TauxCommission::create([
+                            'taux'               => $record->taux,
+                            'date_effet'         => now()->toDateString(),
+                            'reference_decision' => $record->reference_decision,
+                            'village_id'         => $record->village_id,
+                        ]);
+                        JournalAudit::enregistrer(
+                            'Réapplication taux de commission',
+                            'COMMERCE',
+                            'TauxCommission',
+                            $nouveau->id,
+                            ['taux' => $nouveau->taux, 'date_effet' => $nouveau->date_effet?->toDateString(), 'source_id' => $record->id],
+                        );
+                    })
+                    ->successNotificationTitle('Taux réappliqué avec succès'),
 
                 // Suppression : uniquement les taux non encore en vigueur.
                 // Un taux en vigueur — même s'il n'est plus l'actuel — doit
