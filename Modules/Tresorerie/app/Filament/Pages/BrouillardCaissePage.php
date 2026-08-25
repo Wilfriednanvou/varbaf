@@ -72,8 +72,18 @@ class BrouillardCaissePage extends Page implements HasTable
             ->query(
                 MouvementCaisse::query()
                     ->where('section_id', $this->sectionRecord->id)
-                    ->when($this->date_debut, fn (Builder $query, $date) => $query->whereDate('date_mouvement', '>=', $date))
-                    ->when($this->date_fin, fn (Builder $query, $date) => $query->whereDate('date_mouvement', '<=', $date))
+                    // `date_operation` et non `date_mouvement` : c'est le
+                    // nom réel de la colonne, celui qu'écrit
+                    // `ServiceTresorerie::enregistrer()`. Les deux bornes
+                    // visaient jusqu'ici une colonne inexistante, ce qui
+                    // ne se voyait pas — la clause `when()` ne se
+                    // déclenche que si une date est saisie, et le filtre
+                    // partait alors en erreur SQL. Les totaux affichés
+                    // au-dessus du tableau, eux, filtraient déjà sur la
+                    // bonne colonne : le tableau et ses totaux ne
+                    // parlaient pas de la même chose.
+                    ->when($this->date_debut, fn (Builder $query, $date) => $query->whereDate('date_operation', '>=', $date))
+                    ->when($this->date_fin, fn (Builder $query, $date) => $query->whereDate('date_operation', '<=', $date))
             )
             ->columns([
                 Tables\Columns\TextColumn::make('numero_ordre')
@@ -107,7 +117,11 @@ class BrouillardCaissePage extends Page implements HasTable
                     ->money('XAF')
                     ->color('danger')
                     ->placeholder('—'),
-                Tables\Columns\TextColumn::make('solde_courant')
+                // `solde_apres`, la colonne réellement calculée à
+                // l'écriture. `solde_courant` n'existe ni en base ni sur
+                // le modèle : la colonne restait vide, et un brouillard
+                // dont la dernière colonne est vide ne sert à rien.
+                Tables\Columns\TextColumn::make('solde_apres')
                     ->label('SOLDE APRÈS')
                     ->money('XAF')
                     ->weight('bold'),
@@ -140,6 +154,6 @@ class BrouillardCaissePage extends Page implements HasTable
 
     public function filter(): void
     {
-        // Simply triggers a re-render so the computed properties and the table update
+        $this->resetTable();
     }
 }
