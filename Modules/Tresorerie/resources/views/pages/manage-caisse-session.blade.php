@@ -3,37 +3,40 @@
         :heading="$this->caisse?->libelle ?? '—'"
         :description="$this->caisse ? ('Code : ' . $this->caisse->code) : null"
     >
-        <x-filament::input.wrapper>
-            <x-filament::input.select wire:model.live="selectedSectionId">
-                <option value="">— Sélectionner —</option>
-                @foreach ($this->sections as $sec)
-                    <option value="{{ $sec['id'] }}">{{ $sec['label'] }}</option>
-                @endforeach
-            </x-filament::input.select>
-        </x-filament::input.wrapper>
-
+        <x-slot name="afterHeader">
+            <div style="width: 16rem;">
+                <x-filament::input.wrapper>
+                    <x-filament::input.select wire:model.live="selectedSectionId">
+                        <option value="">— Sélectionner —</option>
+                        @foreach ($this->sections as $sec)
+                            <option value="{{ $sec['id'] }}">{{ $sec['label'] }}</option>
+                        @endforeach
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
+            </div>
+        </x-slot>
         @if ($this->selectedSection)
-            <dl>
+            <dl style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
                 <div>
-                    <dt>Caissier responsable</dt>
-                    <dd>{{ $this->caisse?->caissierResponsable?->nom_complet ?? 'Non assigné' }}</dd>
+                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Caissier responsable</dt>
+                    <dd style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;">{{ $this->caisse?->caissierResponsable?->nom_complet ?? 'Non assigné' }}</dd>
                 </div>
                 <div>
-                    <dt>Exercice</dt>
-                    <dd>{{ $this->exercice?->libelle ?? '—' }}</dd>
+                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Exercice</dt>
+                    <dd style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;">{{ $this->exercice?->libelle ?? '—' }}</dd>
                 </div>
                 <div>
-                    <dt>Solde d'ouverture</dt>
-                    <dd>{{ number_format($this->selectedSection->solde_ouverture, 0, ',', ' ') }} FCFA</dd>
+                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Solde d'ouverture</dt>
+                    <dd style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;">{{ number_format($this->selectedSection->solde_ouverture, 0, ',', ' ') }} FCFA</dd>
                 </div>
                 <div>
-                    <dt>Solde actuel</dt>
-                    <dd>{{ number_format($this->selectedSection->soldeCourant(), 0, ',', ' ') }} FCFA</dd>
+                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Solde actuel</dt>
+                    <dd style="font-size: 1rem; font-weight: 700; margin-top: 0.25rem; color: rgba(var(--success-600), 1);">{{ number_format($this->selectedSection->soldeCourant(), 0, ',', ' ') }} FCFA</dd>
                 </div>
                 @if ($this->selectedSection->estCloturee())
                     <div>
-                        <dt>Solde de clôture</dt>
-                        <dd>{{ number_format((int) $this->selectedSection->solde_cloture, 0, ',', ' ') }} FCFA</dd>
+                        <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Solde de clôture</dt>
+                        <dd style="font-size: 1rem; font-weight: 700; margin-top: 0.25rem; color: rgba(var(--danger-600), 1);">{{ number_format((int) $this->selectedSection->solde_cloture, 0, ',', ' ') }} FCFA</dd>
                     </div>
                 @endif
             </dl>

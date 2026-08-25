@@ -13,7 +13,7 @@
 | AnneeScolaire | Exercice | Une seule active, clôture irréversible |
 | Personnel | Agent | Modèle allégé, sans héritage |
 | Apprenant | Artisan | Sans champs médicaux ni parents |
-| Inscription | AttributionBoutique | Liaison personne / période / ressource |
+| Inscription | AttributionEspace | Liaison personne / période / ressource |
 | SalleClasse | Espace | Salles de réunion, d'apprentissage, stands |
 | SeanceCours | ReservationEspace | Reprend `verifierConflit()` |
 | Caisse, SessionCaisse, MouvementCaisse | Caisse, SectionCaisse, MouvementCaisse | Transposition directe |
@@ -43,7 +43,7 @@ class VillageArtisanal {
 + email: String
 
 // === CAPACITE ===
-+ nombreBoutiques: Integer      // Ex: 24
++ nombreBoutiques: Integer      // 17 locaux de vente
 + superficie: Decimal           // En metres carres
 
 // === STATUT ===
@@ -109,11 +109,18 @@ getVentes(exercice: Exercice): List<Vente> {
 ```
 class CorpsMetier {
 + id: Long
-+ libelle: String               // Ex: vannerie, poterie, sculpture sur bois, tissage
++ libelle: String               // Un des 14 secteurs officiels du village
 + code: String
 + description: String
 }
 ```
+
+Les quatorze secteurs sont ceux sous lesquels la structure s'organise :
+Sculpture, Bronze, Agroalimentaire, Textile, Cosmétiques, Décoration,
+Peau et Cuir, Broderie traditionnelle, Arts plastiques, Produits
+médicinaux, Recyclage des objets, Menuiserie, Tissage, Vannerie. Le
+seeder en est la source et fait autorité : un secteur qui en disparaît
+est retiré, sauf s'il porte encore des artisans.
 
 ### Classe : Artisan
 ```
@@ -171,45 +178,79 @@ class EntrepriseArtisanale {
 ```
 class Boutique {
 + id: Long
-+ numero: String                // Ex: B-01 a B-24
++ numero: String                // B01 a B17
 + superficie: Decimal
-+ emplacement: String           // Sous-sol, rez-de-chaussee, etage
-+ tarifMetreCarre: Decimal      // Tarif mensuel applique au metre carre
-+ redevanceMensuelle: Decimal   // Calculee : superficie * tarifMetreCarre
-+ etat: Enum(DISPONIBLE, OCCUPEE, INDISPONIBLE)
++ emplacement: String           // Rez-de-chaussee, etage
 + village: VillageArtisanal     // (FK)
+
+// === METHODES ===
+occupantsActuels(): List<Artisan> {
+  // Les artisans installes dans ses espaces a la date du jour.
+  // Plusieurs, et non un seul : c est tout l objet de la correction.
+}
+}
+```
+
+**Un contenant, rien de plus.** La boutique portait un occupant, un état
+d'occupation, un tarif au mètre carré et une redevance calculée. Le
+relevé du parc réel a montré qu'aucune de ces quatre notions ne lui
+appartenait : dix-sept locaux abritent bien plus d'artisans, plusieurs se
+partageant le même. Un local n'a donc ni occupant unique ni redevance
+propre — ce sont ses espaces locatifs qui se louent.
+
+Le sous-sol et l'espace vert, qui portaient le décompte à vingt-quatre,
+sont hors périmètre : ni l'un ni l'autre n'est un local de vente attribué
+à un artisan.
+
+### Classe : EspaceLocatif
+```
+class EspaceLocatif {
++ id: Long
++ code: String                  // Derive de la boutique : B0101, B0102...
++ libelle: String               // Nom d usage, facultatif
++ etat: Enum(DISPONIBLE, OCCUPE, INDISPONIBLE)
++ boutique: Boutique            // (FK, obligatoire)
 
 // === METHODES ===
 getOccupantActuel(): Artisan {
   // Retourne l artisan attributaire a la date du jour
 }
 estDisponible(dateDebut: Date, dateFin: Date): Boolean {
-  // Verifie l absence d attribution sur la periode
+  // Verifie l absence d attribution active sur la periode
+}
+synchroniserEtat(): void {
+  // DISPONIBLE et OCCUPE sont derives des attributions.
+  // INDISPONIBLE est une decision administrative, jamais ecrasee.
 }
 }
 ```
 
-### Classe : AttributionBoutique
+L'unité réellement louée. Le code se compose à la création à partir du
+numéro de la boutique et d'un rang, puis il est figé : il figure sur les
+contrats signés.
+
+### Classe : AttributionEspace
 ```
-class AttributionBoutique {
+class AttributionEspace {
 + id: Long
 + dateDebut: Date
 + dateDebutFacturation: Date    // dateDebut + 1 mois : le premier mois est gratuit
 + periodicite: Enum(MENSUELLE, TRIMESTRIELLE)
 + dateFin: Date                 // Null si attribution en cours
-+ redevanceConvenue: Decimal    // Montant fige a l attribution
++ redevanceConvenue: Integer    // Montant mensuel convenu, de 2 000 a 60 000 FCFA,
+                                // fige a l attribution. Aucun calcul au metre carre.
 + dossierComplet: Boolean       // Demande timbree, attestation communale, images des oeuvres,
                                 // plan de localisation de l atelier, copie CNI
 + valideePar: Utilisateur       // Coordonnateur ayant valide le dossier (FK)
 + statut: Enum(ACTIVE, RESILIEE, TERMINEE)
 + motifResiliation: String
 + artisan: Artisan              // (FK)
-+ boutique: Boutique            // (FK)
++ espaceLocatif: EspaceLocatif  // (FK)
 + exercice: Exercice            // (FK)
 
 // === METHODES ===
 resilier(motif: String): Boolean {
-  // Cloture l attribution, libere la boutique
+  // Cloture l attribution, libere l espace
 }
 getEcheancesImpayees(): List<EcheanceRedevance> {
   // Retourne les redevances non reglees
@@ -217,7 +258,12 @@ getEcheancesImpayees(): List<EcheanceRedevance> {
 }
 ```
 
-### Classe : Espace
+La règle de non-chevauchement porte sur l'espace locatif et non sur la
+boutique : deux artisans installés dans deux espaces d'un même local sont
+la situation ordinaire du village, tandis que deux contrats actifs sur le
+même espace restent une faute.
+
+### Classe : Espace *(salles et parking, à ne pas confondre avec EspaceLocatif)*
 ```
 class Espace {
 + id: Long

@@ -3,23 +3,24 @@
 namespace Modules\Artisanat\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Artisanat\Enums\EtatBoutique;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Socle\Models\VillageArtisanal;
 
 /**
- * Parc de 24 boutiques du Village Artisanal Régional de Bafoussam.
+ * Parc de boutiques du Village Artisanal Régional de Bafoussam, repris
+ * du relevé réel.
  *
- * Seules les données structurelles connues sont posées : numéro et
- * emplacement. La superficie et le tarif au mètre carré restent nuls —
- * CLAUDE.md interdit les données fictives, et ces valeurs doivent être
- * reprises du barème réel détenu par la coordination. Un tarif inventé
- * se retrouverait, multiplié par la surface, dans les échéanciers et
- * les statistiques, sans qu'on sache plus qu'il était faux.
+ * **Dix-sept locaux, et non vingt-quatre.** Le chiffre de vingt-quatre
+ * venait d'un décompte qui incluait le sous-sol et l'espace vert. Ni
+ * l'un ni l'autre n'est un local de vente attribué à un artisan : ils
+ * sortent du périmètre, et l'import les écarte explicitement plutôt que
+ * de les laisser gonfler le parc — un taux d'occupation calculé sur
+ * vingt-quatre serait faux d'un tiers.
  *
- * La redevance mensuelle n'est pas semée : depuis la règle 13 de
- * CLAUDE.md, elle découle de la surface et du tarif, et le modèle la
- * calcule à chaque écriture.
+ * **Seul le numéro est posé.** L'emplacement dans le bâtiment et la
+ * superficie viennent du plan détenu par la coordination : CLAUDE.md
+ * interdit les données fictives, et une répartition inventée se
+ * retrouverait telle quelle dans les états de parc.
  *
  * Le seeder n'est pas lié à un village en dur : il alimente le village
  * de code VARBAF, et ne fait rien si le Socle n'a pas encore été semé.
@@ -27,12 +28,21 @@ use Modules\Socle\Models\VillageArtisanal;
 class BoutiqueSeeder extends Seeder
 {
     /**
-     * Répartition du parc dans le bâtiment.
+     * Nombre de locaux de vente du parc.
      */
-    protected const REPARTITION = [
-        'Rez-de-chaussée' => [1, 8],
-        'Étage' => [9, 16],
-        'Sous-sol' => [17, 24],
+    protected const NOMBRE_DE_BOUTIQUES = 17;
+
+    /**
+     * Ce que l'import écarte, et pourquoi.
+     *
+     * Consigné ici et affiché à chaque passage : une exclusion qu'on ne
+     * voit plus finit par se relire comme un oubli.
+     *
+     * @var array<string, string>
+     */
+    protected const EXCLUSIONS = [
+        'Sous-sol' => 'Réserve et locaux techniques : aucun espace locatif attribué à un artisan.',
+        'Espace vert' => 'Emprise extérieure du site : ni local de vente, ni surface louable.',
     ];
 
     public function run(): void
@@ -45,27 +55,30 @@ class BoutiqueSeeder extends Seeder
             return;
         }
 
-        foreach (self::REPARTITION as $emplacement => [$premier, $dernier]) {
-            for ($rang = $premier; $rang <= $dernier; $rang++) {
-                $numero = 'B-'.str_pad((string) $rang, 2, '0', STR_PAD_LEFT);
-
-                Boutique::updateOrCreate(
-                    ['village_id' => $village->id, 'numero' => $numero],
-                    [
-                        'emplacement' => $emplacement,
-                        // Laissés nuls à dessein : à renseigner depuis
-                        // le barème réel.
-                        'superficie' => null,
-                        'tarif_metre_carre' => null,
-                        'etat' => EtatBoutique::DISPONIBLE,
-                    ],
-                );
-            }
+        for ($rang = 1; $rang <= self::NOMBRE_DE_BOUTIQUES; $rang++) {
+            Boutique::updateOrCreate(
+                [
+                    'village_id' => $village->id,
+                    'numero' => 'B'.str_pad((string) $rang, 2, '0', STR_PAD_LEFT),
+                ],
+                [
+                    // Laissés nuls à dessein : à reprendre du plan réel.
+                    'emplacement' => null,
+                    'superficie' => null,
+                ],
+            );
         }
 
         $total = Boutique::where('village_id', $village->id)->count();
 
         $this->command?->info("{$total} boutiques en place pour {$village->nom}.");
-        $this->command?->comment('Superficies et tarifs au mètre carré à renseigner depuis le barème de la coordination : la redevance en découlera.');
+
+        $this->command?->comment('Exclusions volontaires du périmètre :');
+
+        foreach (self::EXCLUSIONS as $exclusion => $motif) {
+            $this->command?->comment("  — {$exclusion} : {$motif}");
+        }
+
+        $this->command?->comment('Emplacements et superficies à renseigner depuis le plan du bâtiment.');
     }
 }

@@ -104,9 +104,11 @@ class ProduitResource extends Resource
                 Grid::make(2)->schema([
                     // Choisir l'artisan renseigne la boutique : le
                     // produit est déposé là où son auteur est
-                    // attributaire. La valeur reste modifiable — un
-                    // produit peut être exposé ailleurs — mais le cas
-                    // courant ne demande aucune saisie.
+                    // attributaire — c'est-à-dire dans la boutique qui
+                    // abrite l'espace locatif qu'il occupe. La valeur
+                    // reste modifiable — un produit peut être exposé
+                    // ailleurs — mais le cas courant ne demande aucune
+                    // saisie.
                     Forms\Components\Select::make('artisan_id')
                         ->label('Artisan')
                         ->relationship('artisan', 'nom', fn (Builder $query) => $query->where('actif', true))
@@ -117,7 +119,7 @@ class ProduitResource extends Resource
                         ->live()
                         ->afterStateUpdated(function (mixed $state, Set $set): void {
                             $artisan = filled($state) ? Artisan::find($state) : null;
-                            $boutique = $artisan?->getAttributionActive()?->boutique_id;
+                            $boutique = $artisan?->getAttributionActive()?->espaceLocatif?->boutique_id;
 
                             if ($boutique) {
                                 $set('boutique_id', $boutique);

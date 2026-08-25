@@ -18,6 +18,7 @@ enum NavigationGroup: string implements HasLabel
     case COMMERCE = 'commerce';
     case TRESORERIE = 'tresorerie';
     case PILOTAGE = 'pilotage';
+    case PORTAIL = 'portail';
     case SECURITE = 'securite';
 
     public function getLabel(): string
@@ -28,6 +29,7 @@ enum NavigationGroup: string implements HasLabel
             self::COMMERCE => 'Commerce',
             self::TRESORERIE => 'Trésorerie',
             self::PILOTAGE => 'Pilotage',
+            self::PORTAIL => 'Portail public',
             self::SECURITE => 'Sécurité',
         };
     }

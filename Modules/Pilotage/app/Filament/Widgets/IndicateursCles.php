@@ -29,7 +29,7 @@ class IndicateursCles extends StatsOverviewWidget
         $rapport = app(RapportService::class);
         $filtre = FiltreRapport::depuisTableau($this->filtres);
 
-        $occupation = $rapport->tauxOccupationBoutiques();
+        $occupation = $rapport->tauxOccupationEspaces();
         $sousLeSeuil = $rapport->nombreDeProduitsSousLeSeuil();
         $derniere = $rapport->dernierReversement();
 
@@ -55,7 +55,7 @@ class IndicateursCles extends StatsOverviewWidget
                 ->color('success'),
 
             Stat::make("Taux d'occupation", $occupation['taux'].' %')
-                ->description($occupation['occupees'].' boutique(s) occupée(s) sur '.$occupation['total'])
+                ->description($occupation['occupes'].' espace(s) occupé(s) sur '.$occupation['total'])
                 ->descriptionIcon('heroicon-m-building-storefront')
                 ->color($occupation['taux'] >= 75 ? 'success' : 'warning'),
 

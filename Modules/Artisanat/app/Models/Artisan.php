@@ -113,7 +113,7 @@ class Artisan extends Model
 
     public function attributions(): HasMany
     {
-        return $this->hasMany(AttributionBoutique::class, 'artisan_id');
+        return $this->hasMany(AttributionEspace::class, 'artisan_id');
     }
 
     public function scopeActif(Builder $requete): Builder
@@ -127,9 +127,9 @@ class Artisan extends Model
     }
 
     /**
-     * Boutique occupée à la date du jour, s'il y en a une.
+     * Espace locatif occupé à la date du jour, s'il y en a un.
      */
-    public function getAttributionActive(): ?AttributionBoutique
+    public function getAttributionActive(): ?AttributionEspace
     {
         return $this->attributions()
             ->where('statut', StatutAttribution::ACTIVE->value)
@@ -144,7 +144,7 @@ class Artisan extends Model
     /**
      * Toutes les occupations, en cours et passées.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, AttributionBoutique>
+     * @return \Illuminate\Database\Eloquent\Collection<int, AttributionEspace>
      */
     public function getHistoriqueAttributions()
     {

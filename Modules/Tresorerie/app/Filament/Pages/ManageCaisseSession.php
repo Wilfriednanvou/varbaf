@@ -207,7 +207,6 @@ class ManageCaisseSession extends Page
                 ->visible(fn () => auth()->user()->can('lister_mouvements_caisse') && $this->selectedSectionId)
                 ->url(fn () => BrouillardCaissePage::getUrl(['caisse' => $this->caisseId, 'section' => $this->selectedSectionId])),
             
-            // Ouvrir une nouvelle section (si aucune n'est ouverte sur cette caisse)
             Actions\Action::make('ouvrir_section')
                 ->label('Ouvrir une section')
                 ->icon('heroicon-o-plus-circle')
@@ -226,6 +225,19 @@ class ManageCaisseSession extends Page
                             ->label('Libellé de la section')
                             ->placeholder('Section exercice 2026')
                             ->required(),
+                        Forms\Components\DateTimePicker::make('date_ouverture')
+                            ->label('Date d\'ouverture')
+                            ->default(now())
+                            ->required(),
+                        Forms\Components\DateTimePicker::make('date_cloture')
+                            ->label('Date de fin de la section')
+                            ->placeholder('Optionnelle'),
+                        Forms\Components\Select::make('caissier_id')
+                            ->label('Caissier assigné')
+                            ->options(fn () => \Modules\Socle\Models\Agent::all()->pluck('nom_complet', 'id'))
+                            ->default(fn () => auth()->user()->agent_id)
+                            ->searchable()
+                            ->preload(),
                         // RG-02 : le solde d'ouverture ne se saisit pas.
                         // Il est affiché pour information et calculé par
                         // le modèle à l'enregistrement — un champ, même
@@ -268,7 +280,8 @@ class ManageCaisseSession extends Page
                     $section = SectionCaisse::create([
                         'caisse_id' => $caisse->getKey(),
                         'libelle' => $data['libelle'],
-                        'date_ouverture' => now(),
+                        'date_ouverture' => $data['date_ouverture'] ?? now(),
+                        'date_cloture' => $data['date_cloture'] ?? null,
                         // `solde_ouverture` est absent : le crochet
                         // `creating` du modèle le calcule (RG-02).
                         'etat' => EtatSectionCaisse::OUVERTE,
@@ -278,6 +291,12 @@ class ManageCaisseSession extends Page
                         'village_id' => $caisse->village_id,
                         'exercice_id' => $exercice->getKey(),
                     ]);
+
+                    if (!empty($data['caissier_id'])) {
+                        $caisse->update([
+                            'caissier_responsable_id' => $data['caissier_id'],
+                        ]);
+                    }
 
                     JournalAudit::enregistrer(
                         'Ouverture section de caisse',

@@ -3,33 +3,44 @@
          sélecteurs d'exercice côte à côte finiraient par afficher trois
          périodes différentes sans que le lecteur s'en aperçoive. --}}
     <x-filament::section heading="Portée des indicateurs">
-        <div>
-            <x-filament::input.wrapper>
-                <x-filament::input.select wire:model.live="exerciceId">
-                    <option value="">Tous les exercices</option>
-                    @foreach ($this->exercices as $exercice)
-                        <option value="{{ $exercice['id'] }}">{{ $exercice['libelle'] }}</option>
-                    @endforeach
-                </x-filament::input.select>
-            </x-filament::input.wrapper>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; align-items: end; margin-bottom: 1rem;">
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Exercice</label>
+                <x-filament::input.wrapper>
+                    <x-filament::input.select wire:model.live="exerciceId">
+                        <option value="">Tous les exercices</option>
+                        @foreach ($this->exercices as $exercice)
+                            <option value="{{ $exercice['id'] }}">{{ $exercice['libelle'] }}</option>
+                        @endforeach
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
+            </div>
 
-            <x-filament::input.wrapper>
-                <x-filament::input type="date" wire:model.live="du" />
-            </x-filament::input.wrapper>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Du</label>
+                <x-filament::input.wrapper>
+                    <x-filament::input type="date" wire:model.live="du" />
+                </x-filament::input.wrapper>
+            </div>
 
-            <x-filament::input.wrapper>
-                <x-filament::input type="date" wire:model.live="au" />
-            </x-filament::input.wrapper>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Au</label>
+                <x-filament::input.wrapper>
+                    <x-filament::input type="date" wire:model.live="au" />
+                </x-filament::input.wrapper>
+            </div>
 
-            @if ($du || $au)
-                <x-filament::button
-                    color="gray"
-                    icon="heroicon-o-x-mark"
-                    wire:click="reinitialiserIntervalle"
-                >
-                    Retirer l'intervalle
-                </x-filament::button>
-            @endif
+            <div>
+                @if ($du || $au)
+                    <x-filament::button
+                        color="gray"
+                        icon="heroicon-o-x-mark"
+                        wire:click="reinitialiserIntervalle"
+                    >
+                        Retirer l'intervalle
+                    </x-filament::button>
+                @endif
+            </div>
         </div>
 
         <p>Indicateurs de vente {{ $this->filtre->libelleIntervalle() }}.</p>

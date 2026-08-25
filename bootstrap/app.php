@@ -10,6 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Les commandes de l'application sont déclarées explicitement.
+    // `nwidart/laravel-modules` enregistre celles des modules par leurs
+    // fournisseurs de services ; celles qui vivent à la racine — la
+    // reprise du registre traverse l'Artisanat et le Commerce, elle
+    // n'appartient donc à aucun des deux — ont besoin de cette ligne.
+    ->withCommands([__DIR__.'/../app/Console/Commands'])
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })

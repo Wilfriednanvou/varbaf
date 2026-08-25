@@ -6,12 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Corps de métier de l'artisanat : vannerie, poterie, sculpture sur
- * bois, tissage, fonderie du bronze, etc.
+ * Secteur d'activité artisanale : sculpture, bronze, textile, vannerie,
+ * agroalimentaire, etc.
  *
- * Référentiel commun au village, non rattaché à un village précis :
- * la nomenclature des métiers ne varie pas d'un village artisanal à
- * l'autre, contrairement au parc de boutiques.
+ * La nomenclature n'est pas une description libre des filières de
+ * l'Ouest : ce sont les quatorze secteurs sous lesquels la structure
+ * s'organise réellement, et sous lesquels la coordination lit ses états.
+ * Le seeder en est la source, et il fait autorité.
+ *
+ * Référentiel commun au village, non rattaché à un village précis : le
+ * découpage sectoriel ne varie pas d'un village artisanal à l'autre,
+ * contrairement au parc de boutiques.
  *
  * @property int $id
  * @property string $code

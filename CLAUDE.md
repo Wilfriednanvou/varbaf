@@ -23,11 +23,13 @@ Modules dans `Modules/<NomModule>/`, dans cet ordre de dépendance :
 | # | Module | Contenu |
 |---|---|---|
 | 1 | Socle | Village, exercice, utilisateurs, rôles, permissions, journal d'audit |
-| 2 | Artisanat | Artisans, corps de métier, entreprises, boutiques, espaces, attributions |
+| 2 | Artisanat | Artisans, secteurs d'activité, entreprises, boutiques, espaces locatifs, attributions |
 | 3 | Commerce | Catégories, produits, dépôts, journal de stock, ventes, taux de commission |
 | 4 | Tresorerie | Caisses, sections, brouillard, comptes artisans, campagnes de reversement |
 | 5 | Pilotage | Tableaux de bord, indicateurs, fonctionnalité IA |
 | 6 | Portail | Site vitrine public, publication des produits, artisans vedettes |
+
+**Boutique et espace locatif.** Une boutique est un contenant physique — dix-sept locaux, numérotés B01 à B17. Ce qui se loue n'est pas la boutique mais l'**espace locatif** qu'elle abrite : B01 contient B0101, B0102… Plusieurs artisans cohabitent couramment dans un même local, chacun sur son espace. L'attribution, la redevance et la règle de non-chevauchement portent donc sur l'espace, jamais sur la boutique. Le sous-sol et l'espace vert sont hors périmètre : ils ne comportent aucun espace locatif attribué.
 
 **Règle de dépendance descendante.** Un module ne référence que les modules dont il dépend. Le Commerce n'écrit jamais directement dans les tables de la Trésorerie : il appelle le service exposé. Aucune dépendance montante.
 
@@ -49,7 +51,7 @@ Ces règles priment sur toute considération de simplicité d'implémentation. N
 10. **Taux de commission.** Uniforme pour tous les artisans, historisé par date d'effet. Le taux appliqué est celui en vigueur à la date de la vente, puis figé sur la vente.
 11. **Reversements mensuels.** Une campagne sélectionne les ventes non rattachées à une campagne validée dont la date est antérieure à la date d'arrêté. Un décaissement par artisan. Solde négatif non payé et reporté.
 12. **Cloisonnement artisan.** Dans le panneau artisan, chaque requête est filtrée par l'artisan connecté, via un scope global. Un artisan ne voit jamais les données d'un autre.
-13. **Redevance au mètre carré.** La redevance mensuelle d'une boutique se calcule à partir de sa superficie et du tarif au mètre carré. Le premier mois suivant l'attribution est gratuit.
+13. **Redevance convenue.** La redevance mensuelle est un montant fixe négocié espace locatif par espace locatif, compris entre 2 000 et 60 000 FCFA, puis figé sur l'attribution. Elle ne se déduit d'aucune surface : une boutique n'a pas de redevance propre. Le premier mois suivant l'attribution est gratuit.
 14. **Validation des produits.** Un produit passe par les statuts soumis, validé, exposé, retiré. La validation relève du chef de section Production ; le coordonnateur peut suppléer en son absence, le journal d'audit conservant l'identité du validateur réel. Un produit non validé n'est ni vendable ni publiable sur le portail.
 15. **Alerte de rupture.** Quand le stock d'un produit atteint son seuil d'alerte, une notification est adressée à l'artisan et aux sections Production et Commercialisation.
 

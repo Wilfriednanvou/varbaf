@@ -256,77 +256,116 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
                     ->stickyModalHeader()
                     ->stickyModalFooter()
                     ->form([
-                        Forms\Components\Select::make('boutique_id')
-                            ->label('Boutique')
-                            ->options(
-                                Boutique::query()
-                                    ->orderBy('numero')
-                                    ->pluck('numero', 'id')
-                            )
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->live()
-                            ->dehydrated(false),
-                        Forms\Components\Repeater::make('lignes')
-                            ->label('Articles vendus')
-                            ->addActionLabel('Ajouter un article')
-                            ->reorderable(false)
-                            ->defaultItems(1)
-                            ->columns(2)
+                        \Filament\Schemas\Components\Section::make('Panier')
+                            ->description('Sélectionnez la boutique et les articles.')
                             ->schema([
-                                Forms\Components\Select::make('produit_id')
-                                    ->label('Produit')
-                                    ->options(fn (Get $get) => filled($get('../../boutique_id'))
-                                        ? Produit::query()
-                                            ->vendable()
-                                            ->where('boutique_id', $get('../../boutique_id'))
-                                            ->orderBy('designation')
-                                            ->get()
-                                            ->mapWithKeys(fn (Produit $p) => [
-                                                $p->id => "{$p->designation} — {$p->prix_unitaire} FCFA (stock : {$p->getQuantiteEnStock()})",
-                                            ])
-                                            ->all()
-                                        : [])
+                                Forms\Components\Select::make('boutique_id')
+                                    ->label('Boutique')
+                                    ->options(
+                                        Boutique::query()
+                                            ->orderBy('numero')
+                                            ->pluck('numero', 'id')
+                                    )
                                     ->searchable()
+                                    ->preload()
                                     ->required()
-                                    ->distinct()
-                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
-                                Forms\Components\TextInput::make('quantite')
-                                    ->label('Quantité')
-                                    ->placeholder('1')
-                                    ->numeric()
-                                    ->minValue(1)
-                                    ->default(1)
-                                    ->required(),
+                                    ->live()
+                                    ->dehydrated(false),
+                                Forms\Components\Repeater::make('lignes')
+                                    ->label('Articles vendus')
+                                    ->addActionLabel('Ajouter un article')
+                                    ->reorderable(false)
+                                    ->defaultItems(1)
+                                    ->columns(4)
+                                    ->schema([
+                                        Forms\Components\Select::make('produit_id')
+                                            ->label('Produit')
+                                            ->options(fn (\Filament\Schemas\Components\Utilities\Get $get) => filled($get('../../boutique_id'))
+                                                ? Produit::query()
+                                                    ->vendable()
+                                                    ->where('boutique_id', $get('../../boutique_id'))
+                                                    ->orderBy('designation')
+                                                    ->get()
+                                                    ->mapWithKeys(fn (Produit $p) => [
+                                                        $p->id => "{$p->designation} (stock : {$p->getQuantiteEnStock()})",
+                                                    ])
+                                                    ->all()
+                                                : [])
+                                            ->searchable()
+                                            ->required()
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                if ($state) {
+                                                    $produit = Produit::find($state);
+                                                    if ($produit) {
+                                                        $set('prix_unitaire', $produit->prix_unitaire);
+                                                        $set('montant', $produit->prix_unitaire * (int) ($get('quantite') ?: 1));
+                                                    }
+                                                } else {
+                                                    $set('prix_unitaire', null);
+                                                    $set('montant', null);
+                                                }
+                                            }),
+                                        Forms\Components\TextInput::make('prix_unitaire')
+                                            ->label('Prix unitaire')
+                                            ->numeric()
+                                            ->required()
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                $set('montant', (int) $state * (int) ($get('quantite') ?: 1));
+                                            }),
+                                        Forms\Components\TextInput::make('quantite')
+                                            ->label('Quantité')
+                                            ->placeholder('1')
+                                            ->numeric()
+                                            ->minValue(1)
+                                            ->default(1)
+                                            ->required()
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                $set('montant', (int) $state * (int) ($get('prix_unitaire') ?: 0));
+                                            }),
+                                        Forms\Components\TextInput::make('montant')
+                                            ->label('Total (FCFA)')
+                                            ->disabled()
+                                            ->dehydrated(false)
+                                            ->numeric(),
+                                    ]),
                             ]),
-                        \Filament\Schemas\Components\Grid::make(2)->schema([
-                            Forms\Components\Select::make('mode_reglement')
-                                ->label('Mode de règlement')
-                                ->options(ModeReglement::options())
-                                ->default(ModeReglement::ESPECES->value)
-                                ->native(false)
-                                ->required(),
-                            Forms\Components\Select::make('provenance_client')
-                                ->label('Provenance du client')
-                                ->options(ProvenanceClient::options())
-                                ->native(false)
-                                ->placeholder('Non renseignée'),
-                        ]),
-                        \Filament\Schemas\Components\Grid::make(2)->schema([
-                            Forms\Components\TextInput::make('nom_client')
-                                ->label('Nom du client')
-                                ->placeholder('Facultatif')
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('contact_client')
-                                ->label('Téléphone ou adresse électronique')
-                                ->placeholder('Facultatif')
-                                ->maxLength(255),
-                        ]),
-                        Forms\Components\Toggle::make('accepte_notifications')
-                            ->label('Le client accepte de recevoir les informations du village')
-                            ->default(false)
-                            ->helperText('Consentement recueilli oralement au comptoir'),
+                            
+                        \Filament\Schemas\Components\Section::make('Règlement & Client')
+                            ->description('Informations sur le paiement et le profil de l\'acheteur.')
+                            ->schema([
+                                \Filament\Schemas\Components\Grid::make(2)->schema([
+                                    Forms\Components\Select::make('mode_reglement')
+                                        ->label('Mode de règlement')
+                                        ->options(ModeReglement::options())
+                                        ->default(ModeReglement::ESPECES->value)
+                                        ->native(false)
+                                        ->required(),
+                                    Forms\Components\Select::make('provenance_client')
+                                        ->label('Provenance du client')
+                                        ->options(ProvenanceClient::options())
+                                        ->native(false)
+                                        ->placeholder('Non renseignée'),
+                                ]),
+                                \Filament\Schemas\Components\Grid::make(2)->schema([
+                                    Forms\Components\TextInput::make('nom_client')
+                                        ->label('Nom du client')
+                                        ->placeholder('Facultatif')
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('contact_client')
+                                        ->label('Téléphone ou e-mail')
+                                        ->placeholder('Facultatif')
+                                        ->maxLength(255),
+                                ]),
+                                Forms\Components\Toggle::make('accepte_notifications')
+                                    ->label('Le client accepte de recevoir les informations du village')
+                                    ->default(false)
+                                    ->helperText('Consentement recueilli oralement au comptoir'),
+                            ]),
                     ])
                     ->action(fn (array $data) => $this->creerVente($data)),
             ])

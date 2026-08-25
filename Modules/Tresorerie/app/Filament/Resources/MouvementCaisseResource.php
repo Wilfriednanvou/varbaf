@@ -27,6 +27,7 @@ class MouvementCaisseResource extends Resource
     protected static ?string $modelLabel = 'Mouvement de caisse';
     protected static ?string $pluralModelLabel = 'Mouvements de caisse';
     protected static ?int $navigationSort = 4;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canAccess(): bool
     {

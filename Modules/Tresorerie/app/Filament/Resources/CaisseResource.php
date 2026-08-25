@@ -98,10 +98,10 @@ class CaisseResource extends Resource
                 // l'URL, pour qu'un rafraîchissement de la session ne
                 // perde jamais le contexte.
                 Actions\Action::make('session')
-                    ->label('Session de caisse')
-                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->label('Consulter la caisse')
+                    ->icon('heroicon-o-eye')
                     ->iconButton()
-                    ->tooltip('Ouvrir la session de caisse')
+                    ->tooltip('Consulter la caisse')
                     ->visible(fn () => auth()->user()->can('lister_sections_caisse'))
                     ->url(fn (Caisse $record) => ManageCaisseSession::getUrl([
                         'caisse' => $record->getKey(),

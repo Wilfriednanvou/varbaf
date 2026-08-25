@@ -122,7 +122,9 @@ class ServiceVente
                 $produit = $produits[(int) $ligne['produit_id']];
                 $quantite = (int) $ligne['quantite'];
 
-                $prixUnitaire = (int) round((float) $produit->prix_unitaire);
+                $prixUnitaire = isset($ligne['prix_unitaire']) 
+                    ? (int) $ligne['prix_unitaire'] 
+                    : (int) round((float) $produit->prix_unitaire);
 
                 LigneVente::create([
                     'vente_id' => $vente->getKey(),
@@ -223,10 +225,12 @@ class ServiceVente
     protected function calculerMontantTotal(array $lignes, array $produits): int
     {
         $total = 0;
-
         foreach ($lignes as $ligne) {
             $produit = $produits[(int) $ligne['produit_id']];
-            $total += (int) round((float) $produit->prix_unitaire) * (int) $ligne['quantite'];
+            $prixUnitaire = isset($ligne['prix_unitaire']) 
+                ? (int) $ligne['prix_unitaire'] 
+                : (int) round((float) $produit->prix_unitaire);
+            $total += $prixUnitaire * (int) $ligne['quantite'];
         }
 
         return $total;

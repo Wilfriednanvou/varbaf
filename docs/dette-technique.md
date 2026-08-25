@@ -29,6 +29,10 @@
 | 20/08 | Attribution rattachable à un exercice clôturé | Contrôle ajouté au modèle |
 | 20/08 | `FileUpload` de la photo sans disque explicite | `->disk('public')` sur le champ **et** sur la colonne, plus `storage:link` |
 | 20/08 | Checklist « test avec un utilisateur non super-utilisateur » jamais exécutée sur trois commits | `tests/Feature/HabilitationArtisanTest.php` |
+| 23/08 | Attribution portée par la boutique : deux artisans d'un même local refusés comme chevauchement | `AttributionEspace` porte l'espace locatif ; la règle de non-chevauchement suit |
+| 23/08 | Redevance calculée `superficie × tarif au m²`, jamais renseignée faute de barème | Montant convenu par espace, de 2 000 à 60 000 FCFA, contrôlé par le modèle |
+| 23/08 | Taux d'occupation rapporté au parc de boutiques | Rapporté au parc d'espaces locatifs : un local partagé comptait pour une seule occupation |
+| 23/08 | Nomenclature des corps de métier composée plutôt que reprise de la structure | Les 14 secteurs officiels, le seeder faisant autorité |
 
 ---
 
@@ -40,19 +44,25 @@ Deux fois, la relecture a montré que le code avait raison contre le document. D
 
 **L'immuabilité du brouillard n'a pas de fenêtre.** RG-05 et la règle 4 de `CLAUDE.md` annonçaient une correction directe possible jusqu'à l'arrêté de la journée. `MouvementCaisse` n'a jamais rien implémenté de tel : ses crochets `updating` et `deleting` refusent toute écriture, sans condition de date, et la contre-passation est la seule voie de correction depuis l'origine. Les deux documents ont été alignés le 22/08.
 
+**Le parc ne comptait pas vingt-quatre boutiques, et la boutique n'était pas la maille de location.** Le relevé du village a établi dix-sept locaux de vente, numérotés B01 à B17, dont chacun abrite un ou plusieurs **espaces locatifs** — c'est l'espace qui se loue, et plusieurs artisans cohabitent couramment dans un même local. Le modèle initial attribuait la boutique : il refusait donc la cohabitation, qui est la situation ordinaire, et ne protégeait pas le partage d'un même espace, qui est la vraie faute. `CLAUDE.md` et `docs/modele-classes.md` ont été alignés le 23/08.
+
 Le choix se défend en deux points. Une fenêtre de correction ferait dépendre l'immuabilité d'une donnée extérieure au mouvement — l'existence d'un arrêté sur sa journée — de sorte que la même ligne serait modifiable ou non selon le moment où on la regarde ; c'est une règle qu'on ne peut pas énoncer sans dire « ça dépend ». Et une correction directe, même parfaitement légitime, ne laisse aucune trace : le brouillard afficherait un chiffre juste sans montrer qu'il a été faux, alors qu'un journal de caisse existe précisément pour montrer les deux.
 
 ---
 
 ## Arbitrages à défendre
 
-Sept décisions qui ne sont pas des dettes mais des choix, et qu'on demandera d'expliquer.
+Huit décisions qui ne sont pas des dettes mais des choix, et qu'on demandera d'expliquer.
 
-### A-01 — Redevance dérivée mais matérialisée
+### A-01 — Redevance convenue, et non dérivée *(remplace l'arbitrage du 20/08)*
 
-`boutiques.redevance_mensuelle` découle de `superficie × tarif_metre_carre` (règle 13). Elle est **recalculée par le modèle à chaque écriture et jamais saisie**, mais reste stockée en colonne plutôt que réduite à un accesseur : l'écran du parc trie dessus et les futurs échéanciers la requêteront en SQL. Dérivée sur le plan métier, matérialisée sur le plan technique.
+Cet arbitrage défendait l'inverse : `boutiques.redevance_mensuelle` était dérivée de `superficie × tarif_metre_carre`, recalculée par le modèle et matérialisée en colonne pour rester triable. Il est caduc depuis le 23/08, et il vaut d'être conservé sous cette forme parce que la façon dont il est tombé est instructive.
 
-Corollaire assumé : tant que la superficie **ou** le tarif manque, la redevance vaut **`null`, jamais `0`**. Une boutique dont on ignore la surface n'est pas une boutique gratuite, et l'écran affiche « À calculer » au lieu d'un montant faux qui se propagerait dans les états.
+Le calcul n'était pas mal implémenté : il n'a **jamais produit un seul montant**. Le barème au mètre carré n'existe pas au village — la coordination négocie un forfait, local par local, entre 2 000 et 60 000 FCFA. Les deux colonnes sont restées nulles depuis l'origine, et le seeder disait déjà, en toutes lettres, qu'elles étaient « à renseigner depuis le barème de la coordination ». Une règle métier inventée par symétrie avec un modèle de référence, que rien dans les données ne venait démentir puisque rien ne venait la remplir non plus.
+
+La redevance est désormais un montant convenu, porté par `attributions_espaces.redevance_convenue` en entier, figé sur le contrat, et borné par le modèle. Les bornes ne sont pas décoratives : rien ne rattraperait une faute de frappe après le figement.
+
+Ce qui survit de l'arbitrage initial : le refus du `0` par défaut. `redevance_convenue` est obligatoire, il n'existe pas d'attribution gratuite implicite.
 
 ### A-02 — Le coordonnateur n'est pas le super-utilisateur
 
@@ -74,6 +84,16 @@ Ce qui porte une histoire ne se supprime pas, ce qui n'est qu'un libellé se cor
 
 - **Verrouillé pour tous les rôles métier :** artisan, attribution, boutique, exercice, village. On désactive, on résilie, on clôture.
 - **Ouvert à qui peut créer :** corps de métier, entreprise artisanale. Sans cela, un chef de section ayant saisi un doublon devrait appeler l'administrateur pour corriger sa propre erreur — et en pratique il contournerait, laissant traîner une ligne « à supprimer » qui pourrit le référentiel.
+
+### A-05 bis — Le sous-sol et l'espace vert sont exclus du périmètre, et l'import le dit
+
+Le décompte de vingt-quatre « boutiques » qui circulait incluait le sous-sol et l'espace vert. Ni l'un ni l'autre n'est un local de vente attribué à un artisan : le sous-sol tient de la réserve et des locaux techniques, l'espace vert est une emprise extérieure. Ni l'un ni l'autre ne comporte d'espace locatif.
+
+`BoutiqueSeeder` les écarte donc explicitement et les **affiche à chaque passage** comme exclusions volontaires, avec leur motif. Une exclusion muette se relit six mois plus tard comme un oubli d'import, et quelqu'un finit par « corriger » le parc en les rajoutant.
+
+L'enjeu n'est pas cosmétique : le taux d'occupation se calcule sur le parc. Laisser sept emprises non louables gonfler le dénominateur donnait un village structurellement sous-occupé d'un tiers, sur un indicateur que la coordination présente à sa tutelle.
+
+**À renseigner :** l'emplacement dans le bâtiment et la superficie des dix-sept locaux, ainsi que le découpage réel de chacun en espaces. Le seeder pose un espace par boutique — la seule chose qu'on sache avec certitude — et laisse le reste nul plutôt que d'inventer une répartition.
 
 ### A-05 — `solde_apres` est un solde d'ordre de saisie, pas un solde à la date
 

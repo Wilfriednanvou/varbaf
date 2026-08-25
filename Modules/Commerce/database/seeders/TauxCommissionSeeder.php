@@ -30,6 +30,27 @@ class TauxCommissionSeeder extends Seeder
 
     protected const REFERENCE_PROVISOIRE = 'TAUX PROVISOIRE — à remplacer par la référence de l\'acte en vigueur';
 
+    /**
+     * Date d'effet du taux provisoire : l'ouverture de l'exercice
+     * pendant lequel s'ouvre le registre transcrit.
+     *
+     * **Pourquoi remonter aussi loin.** Le taux appliqué à une vente est
+     * celui en vigueur **à sa date** (règle 10), et `getTauxEnVigueur()`
+     * lève une exception quand aucun acte ne couvre cette date — c'est
+     * son intérêt, une vente qu'on ne sait pas commissionner ne
+     * s'enregistre pas. Or le registre du village ouvre le 5 juillet
+     * 2023. Un taux provisoire prenant effet à l'ouverture de l'exercice
+     * courant laisserait donc mille lignes incommissionnables et
+     * rendrait la reprise impossible : il ne remplirait pas l'office
+     * pour lequel il existe.
+     *
+     * La constante est datée et non calculée : elle désigne un fait —
+     * l'ouverture du registre — et non une variable d'environnement.
+     * Elle disparaîtra avec le taux provisoire lui-même, le jour où la
+     * coordination saisira ses actes réels et leurs dates d'effet.
+     */
+    protected const DATE_EFFET_PROVISOIRE = '2023-01-01';
+
     public function run(): void
     {
         $village = VillageArtisanal::where('code', 'VARBAF')->first();
@@ -40,12 +61,15 @@ class TauxCommissionSeeder extends Seeder
             return;
         }
 
-        // La date d'effet est celle de l'ouverture de l'exercice en
-        // cours, à défaut le premier jour de l'année : un taux dont la
-        // date d'effet serait postérieure à des ventes déjà saisies
-        // rendrait ces ventes incommissionnables.
-        $dateEffet = $village->exerciceEnCours()?->date_debut?->toDateString()
+        // Un taux dont la date d'effet serait postérieure à des ventes
+        // déjà saisies rendrait ces ventes incommissionnables. La date
+        // retenue est donc la plus ancienne des deux : l'ouverture du
+        // registre transcrit, ou celle de l'exercice en cours si le
+        // village venait à en ouvrir un antérieur.
+        $ouvertureExercice = $village->exerciceEnCours()?->date_debut?->toDateString()
             ?? now()->startOfYear()->toDateString();
+
+        $dateEffet = min(self::DATE_EFFET_PROVISOIRE, $ouvertureExercice);
 
         $taux = TauxCommission::firstOrCreate(
             ['village_id' => $village->id, 'date_effet' => $dateEffet],

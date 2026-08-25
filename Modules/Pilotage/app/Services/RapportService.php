@@ -4,8 +4,8 @@ namespace Modules\Pilotage\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Modules\Artisanat\Enums\EtatBoutique;
-use Modules\Artisanat\Models\Boutique;
+use Modules\Artisanat\Enums\EtatEspaceLocatif;
+use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Commerce\Enums\EtatVente;
 use Modules\Commerce\Enums\ProvenanceClient;
 use Modules\Commerce\Models\Produit;
@@ -26,7 +26,7 @@ use Modules\Tresorerie\Models\CampagneReversement;
  *
  * **Uniquement des agrégats.** Aucune méthode ne charge de collection
  * complète. Les totaux sont calculés par la base, les ventilations
- * rendent une ligne par axe — vingt-quatre boutiques, quelques dizaines
+ * rendent une ligne par axe — dix-sept boutiques, quelques dizaines
  * d'artisans — jamais la liste des ventes qui les composent. Le
  * registre transcrit laisse attendre plusieurs milliers de ventes par
  * exercice : un `sum()` en PHP sur une collection hydratée deviendrait
@@ -227,17 +227,25 @@ class RapportService
     // =================================================================
 
     /**
-     * @return array{occupees: int, total: int, taux: float}
+     * Taux d'occupation du parc locatif.
+     *
+     * Le dénominateur est le nombre d'espaces locatifs, non celui des
+     * boutiques. Une boutique abritant plusieurs artisans, la rapporter
+     * au parc de locaux donnait un taux structurellement faux : deux
+     * artisans installés dans le même local comptaient pour une seule
+     * occupation, et le village se croyait moins rempli qu'il ne l'est.
+     *
+     * @return array{occupes: int, total: int, taux: float}
      */
-    public function tauxOccupationBoutiques(): array
+    public function tauxOccupationEspaces(): array
     {
-        $total = Boutique::query()->count();
-        $occupees = Boutique::query()->where('etat', EtatBoutique::OCCUPEE->value)->count();
+        $total = EspaceLocatif::query()->count();
+        $occupes = EspaceLocatif::query()->where('etat', EtatEspaceLocatif::OCCUPE->value)->count();
 
         return [
-            'occupees' => $occupees,
+            'occupes' => $occupes,
             'total' => $total,
-            'taux' => $total > 0 ? round($occupees * 100 / $total, 1) : 0.0,
+            'taux' => $total > 0 ? round($occupes * 100 / $total, 1) : 0.0,
         ];
     }
 

@@ -31,8 +31,8 @@ class BrouillardCaissePage extends Page implements HasTable
 
     protected static ?string $slug = 'caisses-brouillard';
 
-    public ?Caisse $caisse = null;
-    public ?SectionCaisse $section = null;
+    public ?Caisse $caisseRecord = null;
+    public ?SectionCaisse $sectionRecord = null;
 
     #[Url]
     public ?string $date_debut = null;
@@ -54,15 +54,15 @@ class BrouillardCaissePage extends Page implements HasTable
     {
         abort_unless(auth()->user()->can('lister_mouvements_caisse'), 403);
 
-        $this->caisse = Caisse::findOrFail((int) $caisse);
-        $this->section = SectionCaisse::where('caisse_id', $this->caisse->id)
+        $this->caisseRecord = Caisse::findOrFail((int) $caisse);
+        $this->sectionRecord = SectionCaisse::where('caisse_id', $this->caisseRecord->id)
             ->findOrFail((int) $section);
 
         JournalAudit::enregistrer(
             'Consultation brouillard de caisse',
             'TRESORERIE',
             'SectionCaisse',
-            $this->section->id,
+            $this->sectionRecord->id,
         );
     }
 
@@ -71,9 +71,9 @@ class BrouillardCaissePage extends Page implements HasTable
         return $table
             ->query(
                 MouvementCaisse::query()
-                    ->where('section_id', $this->section->id)
-                    ->when($this->date_debut, fn (Builder $query, $date) => $query->whereDate('date_operation', '>=', $date))
-                    ->when($this->date_fin, fn (Builder $query, $date) => $query->whereDate('date_operation', '<=', $date))
+                    ->where('section_id', $this->sectionRecord->id)
+                    ->when($this->date_debut, fn (Builder $query, $date) => $query->whereDate('date_mouvement', '>=', $date))
+                    ->when($this->date_fin, fn (Builder $query, $date) => $query->whereDate('date_mouvement', '<=', $date))
             )
             ->columns([
                 Tables\Columns\TextColumn::make('numero_ordre')
@@ -103,7 +103,7 @@ class BrouillardCaissePage extends Page implements HasTable
                     ->placeholder('—'),
                 Tables\Columns\TextColumn::make('montant_sortie')
                     ->label('SORTIE')
-                    ->state(fn ($record) => $record->sens === SensMouvementCaisse::DECAISSEMENT ? $record->montant : null)
+                    ->state(fn ($record) => $record->sens === SensMouvementCaisse::SORTIE ? $record->montant : null)
                     ->money('XAF')
                     ->color('danger')
                     ->placeholder('—'),
@@ -121,7 +121,7 @@ class BrouillardCaissePage extends Page implements HasTable
     public function getTotalEntreesProperty(): int
     {
         return MouvementCaisse::query()
-            ->where('section_id', $this->section?->id)
+            ->where('section_id', $this->sectionRecord?->id)
             ->where('sens', SensMouvementCaisse::ENTREE)
             ->when($this->date_debut, fn (Builder $query, $date) => $query->whereDate('date_operation', '>=', $date))
             ->when($this->date_fin, fn (Builder $query, $date) => $query->whereDate('date_operation', '<=', $date))
@@ -131,8 +131,8 @@ class BrouillardCaissePage extends Page implements HasTable
     public function getTotalSortiesProperty(): int
     {
         return MouvementCaisse::query()
-            ->where('section_id', $this->section?->id)
-            ->where('sens', SensMouvementCaisse::DECAISSEMENT)
+            ->where('section_id', $this->sectionRecord?->id)
+            ->where('sens', SensMouvementCaisse::SORTIE)
             ->when($this->date_debut, fn (Builder $query, $date) => $query->whereDate('date_operation', '>=', $date))
             ->when($this->date_fin, fn (Builder $query, $date) => $query->whereDate('date_operation', '<=', $date))
             ->sum('montant');

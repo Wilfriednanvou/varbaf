@@ -26,6 +26,7 @@ class SectionCaisseResource extends Resource
     protected static ?string $modelLabel = 'Section de caisse';
     protected static ?string $pluralModelLabel = 'Sections de caisse';
     protected static ?int $navigationSort = 2;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canAccess(): bool
     {
