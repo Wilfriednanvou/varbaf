@@ -1,0 +1,28 @@
+﻿Rubrique;Indicateur;Valeur;Part
+Lignes;"Lignes traitées";1149;"100,0 %"
+Lignes;"Lignes importées";1120;"97,5 %"
+Lignes;"Lignes signalées";734;"63,9 %"
+Lignes;"Lignes non importées";29;"2,5 %"
+Lignes;"Lignes déjà reprises lors d'un import antérieur";0;"0,0 %"
+Transcription;"Lignes en écart de calcul";51;"4,4 %"
+Transcription;"Lignes marquées ECART à la source";50;"4,4 %"
+Transcription;"Lignes sans artisan identifiable";315;"27,4 %"
+Transcription;"Lignes dont la date a dû être reprise ou déduite";334;"29,1 %"
+Transcription;"Lignes dont une valeur a été déduite des deux autres";40;"3,5 %"
+Artisans;"Écritures distinctes dans le registre";324;—
+Artisans;"Écritures regroupées automatiquement";84;"25,9 %"
+Artisans;"Écritures restées distinctes";240;"74,1 %"
+Artisans;"Rapprochements écartés (sous le seuil de 85,0 %)";42;—
+Boutiques;"Écritures distinctes dans le registre";117;—
+Boutiques;"Écritures regroupées";70;"59,8 %"
+Boutiques;"Emplacements retenus";47;—
+Créations;"Artisans créés";232;—
+Créations;"Espaces locatifs créés";327;—
+Créations;"dont espaces hors parc (boutique technique)";108;—
+Créations;"Attributions créées";343;—
+Créations;"Produits créés";837;—
+Créations;"Dépôts créés";1120;—
+Créations;"Ventes créées";1120;—
+"À compléter";"Artisans sans secteur d'activité";232;—
+"À compléter";"Produits sans catégorie";837;—
+"À compléter";"Attributions sans redevance convenue";343;—
