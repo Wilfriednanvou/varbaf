@@ -2,7 +2,10 @@
 
 namespace Modules\Commerce\Providers;
 
+use Illuminate\Support\Facades\Event;
 use Modules\Commerce\Contracts\JournalDeCaisse;
+use Modules\Commerce\Events\SeuilAlerteFranchi;
+use Modules\Commerce\Listeners\NotifierSeuilAlerte;
 use Modules\Commerce\Services\JournalDeCaisseEnAttente;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
@@ -16,6 +19,13 @@ class CommerceServiceProvider extends ModuleServiceProvider
     {
         parent::register();
 
+        // Fusion explicite, comme dans le Pilotage : `config('commerce.*')`
+        // répond alors quelle que soit la version de
+        // `nwidart/laravel-modules`. Les destinataires de l'alerte de
+        // rupture s'y lisent, et un `config()` qui rendrait null
+        // laisserait une alerte sans destinataire, en silence.
+        $this->mergeConfigFrom(module_path($this->name, 'config/config.php'), $this->nameLower);
+
         // Liaison provisoire du port vers le brouillard de caisse. Le
         // module Trésorerie remplacera cette implémentation par la
         // sienne ; ni ServiceVente ni les écrans n'auront à changer.
@@ -27,5 +37,17 @@ class CommerceServiceProvider extends ModuleServiceProvider
         // à un test de résoudre la même instance que le service de
         // vente et d'y observer les encaissements déposés.
         $this->app->singletonIf(JournalDeCaisse::class, JournalDeCaisseEnAttente::class);
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        // Règle 15. L'événement était émis depuis la première tranche du
+        // module ; c'est l'écoute qui manquait. Le branchement est
+        // déclaré ici plutôt que découvert automatiquement : un module
+        // doit dire ce qu'il écoute, et cette ligne est la seule à lire
+        // pour savoir que l'alerte de rupture part effectivement.
+        Event::listen(SeuilAlerteFranchi::class, NotifierSeuilAlerte::class);
     }
 }

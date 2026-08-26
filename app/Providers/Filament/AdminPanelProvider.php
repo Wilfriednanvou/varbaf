@@ -54,6 +54,11 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
             ])
+            // La cloche de notifications. Sans cette ligne, l'alerte de
+            // rupture de la règle 15 s'écrirait en base sans que
+            // personne ne puisse la lire : c'est ici que le canal
+            // « database » devient un écran.
+            ->databaseNotifications()
             // Un greffon par module, dans l'ordre de dépendance du
             // tableau de CLAUDE.md. C'est la seule ligne à ajouter ici
             // lorsqu'un module arrive : le module apporte lui-même ses

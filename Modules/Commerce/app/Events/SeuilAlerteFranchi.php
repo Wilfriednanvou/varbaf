@@ -16,10 +16,17 @@ use Modules\Commerce\Models\Produit;
  * bout d'une semaine. L'événement ne repart qu'après que le stock est
  * remonté au-dessus du seuil.
  *
- * Aucun auditeur n'est branché à ce stade : la tranche en cours livre
- * l'indicateur — colonne, filtre et compteur de navigation — qui reste
- * utile même si personne ne consulte ses notifications. La couche de
- * notification viendra s'abonner ici sans que le service ait à changer.
+ * L'auditeur est `NotifierSeuilAlerte`, branché par le fournisseur de
+ * services du module. Il a été ajouté le 26/08, après que l'événement a
+ * vécu plusieurs semaines sans personne à l'autre bout : la tranche
+ * initiale livrait l'indicateur — colonne, filtre et compteur de
+ * navigation — qui reste utile même sans notification, et la promesse
+ * était que la couche de notification viendrait s'abonner ici sans que
+ * le service ait à changer. Elle l'a fait, et le service n'a pas changé.
+ *
+ * L'événement ne connaît toujours pas ses destinataires, et c'est ce qui
+ * permet d'en ajouter — l'artisan, le jour où il aura un compte (A-09) —
+ * sans rouvrir le journal de stock.
  */
 class SeuilAlerteFranchi
 {
