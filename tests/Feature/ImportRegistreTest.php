@@ -12,6 +12,7 @@ use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\AttributionEspace;
 use Modules\Artisanat\Models\Boutique;
+use Modules\Artisanat\Models\CorpsMetier;
 use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Commerce\Models\Depot;
 use Modules\Commerce\Models\Produit;
@@ -78,6 +79,23 @@ class ImportRegistreTest extends TestCase
             'date_effet' => '2026-01-01',
             'reference_decision' => 'Note de service de test',
             'village_id' => $this->village->id,
+        ]);
+
+        // Le référentiel des corps de métier appartient au seeder du
+        // module Artisanat, qui ne tourne pas ici : ce test construit
+        // ses fixtures à la main. Les deux secteurs que le jeu d'essai
+        // désigne sont donc posés explicitement, avec les codes du
+        // seeder — c'est par le code que la reprise les retrouve.
+        CorpsMetier::create([
+            'code' => 'AGR',
+            'libelle' => 'Agroalimentaire',
+            'description' => 'Transformation des produits du terroir',
+        ]);
+
+        CorpsMetier::create([
+            'code' => 'MED',
+            'libelle' => 'Produits médicinaux',
+            'description' => 'Préparations de la pharmacopée traditionnelle',
         ]);
 
         // Deux locaux du parc, et rien de plus : tout le reste de ce que
@@ -153,27 +171,27 @@ class ImportRegistreTest extends TestCase
 
     protected function ecrireLeRegistre(): string
     {
-        // `espace_locatif` et `redevance_convenue` sont les colonnes que
-        // la coordination remplit depuis la table de correspondance et
-        // l'état de recouvrement : le cahier de ventes, lui, ne note ni
-        // emplacement ni loyer. Elles sont facultatives, et les lignes
-        // hors parc les laissent vides.
+        // Les quatre dernières colonnes ne viennent pas du cahier mais
+        // du travail de rattachement de la coordination : l'espace, le
+        // loyer convenu, le corps de métier. Le cahier de ventes, lui,
+        // ne note ni emplacement, ni redevance, ni secteur. Elles sont
+        // facultatives, et les lignes hors parc les laissent vides.
         $lignes = <<<'CSV'
-        date,code_boutique_source,code_boutique_normalise,nom_artisan_source,designation,conditionnement,quantite,prix_unitaire,montant,coherence,vendeur_reference,espace_locatif,redevance_convenue
-        2026-02-03,No 1,B01,Bassi,Miel,Bouteille,2,2500,5000,OK,Marie,B0101,3000
-        2026-02-04,B-01,B01,BASSIE,Miel,Bouteille,1,2500,2500,OK,Marie,B0101,3000
-        2026-02-05,B 2,B02,,Curcuma,Sachet,1,1000,1000,OK,,,
-        2026-02-06,Hall,HALL,Gabrielle,Vin d'Avocat,Bouteille,3,3000,9000,OK,Payé,,
-        2026-02-07,B19,B19,Doriane,Chapeau,,1,5000,5000,OK,,,
-        2026-02-08,b 01,B01,Bassi,Miel,Bouteille,2,3000,6000,OK,Marie,B0101,3000
-        2026-02-09,B 2,B02,Crousti delice,Croquette,Sachet,3,500,1500,OK,,B0201,2500
-        2026-02-10,B 2,B02,Crousti Delice NGASSAM,Croquette,Sachet,1,500,500,OK,,B0201,2500
-        2026-02-11,B-01,B01,Bassi,Savon,,1,7500,1500,ECART,,B0101,3000
-        12/02,B 2,B02,Bassi,Fève,,1,1000,1000,OK,,B0202,2500
-        "-""-","-""-","-""-","-""-","-""-","-""-",2,1000,2000,OK,,B0202,2500
-        2026-02-13,B-01,B01,Bassi,,,1,1000,1000,OK,,B0101,3000
-        2026-02-14,B-01,B01,Bassi,Beurre,,,,,,,B0101,3000
-        2026-02-15,B-01,B01,Bassi,Chocolat,Boite,,1000,3000,OK,,B0299,
+        date,code_boutique_source,code_boutique_normalise,nom_artisan_source,designation,conditionnement,quantite,prix_unitaire,montant,coherence,vendeur_reference,espace_locatif,redevance_convenue,corps_metier
+        2026-02-03,No 1,B01,Bassi,Miel,Bouteille,2,2500,5000,OK,Marie,B0101,3000,AGR
+        2026-02-04,B-01,B01,BASSIE,Miel,Bouteille,1,2500,2500,OK,Marie,B0101,3000,AGR
+        2026-02-05,B 2,B02,,Curcuma,Sachet,1,1000,1000,OK,,,,
+        2026-02-06,Hall,HALL,Gabrielle,Vin d'Avocat,Bouteille,3,3000,9000,OK,Payé,,,
+        2026-02-07,B19,B19,Doriane,Chapeau,,1,5000,5000,OK,,,,
+        2026-02-08,b 01,B01,Bassi,Miel,Bouteille,2,3000,6000,OK,Marie,B0101,3000,AGR
+        2026-02-09,B 2,B02,Crousti delice,Croquette,Sachet,3,500,1500,OK,,B0201,2500,MED
+        2026-02-10,B 2,B02,Crousti Delice NGASSAM,Croquette,Sachet,1,500,500,OK,,B0201,2500,MED
+        2026-02-11,B-01,B01,Bassi,Savon,,1,7500,1500,ECART,,B0101,3000,AGR
+        12/02,B 2,B02,Bassi,Fève,,1,1000,1000,OK,,B0202,2500,MED
+        "-""-","-""-","-""-","-""-","-""-","-""-",2,1000,2000,OK,,B0202,2500,MED
+        2026-02-13,B-01,B01,Bassi,,,1,1000,1000,OK,,B0101,3000,AGR
+        2026-02-14,B-01,B01,Bassi,Beurre,,,,,,,B0101,3000,AGR
+        2026-02-15,B-01,B01,Bassi,Chocolat,Boite,,1000,3000,OK,,B0299,,
         CSV;
 
         $chemin = storage_path('framework/testing/registre-'.uniqid().'.csv');
@@ -374,6 +392,30 @@ class ImportRegistreTest extends TestCase
         // Et le compte des ventes est intact : le refus d'un contrat
         // d'occupation n'a coûté aucune recette.
         $this->assertSame(12, Vente::count());
+    }
+
+    public function test_le_corps_de_metier_vient_du_releve_et_non_du_cahier(): void
+    {
+        $rapport = $this->importer();
+
+        $bassi = Artisan::where('nom', 'Bassi')->firstOrFail();
+        $agro = CorpsMetier::where('code', 'AGR')->firstOrFail();
+
+        // Le cahier de ventes ne dit jamais de quel métier relève un
+        // artisan ; c'est la colonne « métier » du relevé des redevances
+        // qui le porte, rangée sous les quatorze secteurs du seeder.
+        $this->assertSame($agro->id, $bassi->corps_metier_id);
+
+        // Un artisan sans rattachement reste sans secteur : le
+        // référentiel appartient au seeder, une reprise n'y ajoute rien.
+        $anonyme = Artisan::where('nom', ServiceImportRegistre::ARTISAN_NON_IDENTIFIE)->firstOrFail();
+        $this->assertNull($anonyme->corps_metier_id);
+
+        $this->assertLessThan(
+            $rapport->valeur(RapportImport::ARTISANS_CREES),
+            $rapport->valeur(RapportImport::ARTISANS_SANS_SECTEUR),
+            'Le relevé doit renseigner le secteur d\'au moins un artisan.',
+        );
     }
 
     public function test_la_redevance_relevee_est_figee_sur_l_attribution(): void

@@ -120,6 +120,15 @@ class LigneRegistre
          * transporter jusque-là.
          */
         public readonly ?int $redevanceConvenue = null,
+        /**
+         * Code du corps de métier de l'artisan — `AGR`, `MED`, `SCU`…
+         *
+         * Il vient de la colonne « métier » de l'état de recouvrement,
+         * rangée sous les quatorze secteurs officiels dont
+         * `CorpsMetierSeeder` fait autorité. Le cahier de ventes, lui,
+         * ne dit pas de quel métier relève un artisan.
+         */
+        public readonly string $corpsMetier = '',
     ) {}
 
     public function signaler(string $anomalie): void

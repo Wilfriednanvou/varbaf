@@ -11,6 +11,7 @@ use Modules\Artisanat\Exceptions\AttributionInvalideException;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\AttributionEspace;
 use Modules\Artisanat\Models\Boutique;
+use Modules\Artisanat\Models\CorpsMetier;
 use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Commerce\Enums\ModeReglement;
 use Modules\Commerce\Models\Depot;
@@ -126,6 +127,13 @@ class ServiceImportRegistre
 
     /** @var array<string, Artisan> */
     protected array $artisans = [];
+
+    /**
+     * Corps de métier par code, relus une seule fois.
+     *
+     * @var array<string, int|null>
+     */
+    protected array $corpsMetiers = [];
 
     /** @var array<string, array{boutique: Boutique, libelle: ?string}> */
     protected array $emplacements = [];
@@ -578,7 +586,7 @@ class ServiceImportRegistre
         array $profils,
         array $entrees,
     ): void {
-        $artisan = $this->resoudreArtisan($this->nomRetenu($ligne, $rapprochement), $rapport);
+        $artisan = $this->resoudreArtisan($this->nomRetenu($ligne, $rapprochement), $ligne->corpsMetier, $rapport);
         [$boutique] = $this->resoudreBoutique($ligne->codeBoutique);
 
         $espace = $this->resoudreEspace($boutique, $ligne, $rapport);
@@ -683,7 +691,7 @@ class ServiceImportRegistre
         $depot->valider();
     }
 
-    protected function resoudreArtisan(string $nom, RapportImport $rapport): Artisan
+    protected function resoudreArtisan(string $nom, string $codeCorpsMetier, RapportImport $rapport): Artisan
     {
         if (isset($this->artisans[$nom])) {
             return $this->artisans[$nom];
@@ -693,11 +701,13 @@ class ServiceImportRegistre
             ['village_id' => $this->village->getKey(), 'nom' => $nom],
             [
                 'actif' => true,
-                // Le registre ne porte pas le secteur d'activité, et
-                // l'inventer polluerait un référentiel dont le seeder
-                // fait autorité. Voir la migration
-                // « rendre_facultatives_les_donnees_absentes_du_registre ».
-                'corps_metier_id' => null,
+                // Le cahier de ventes ne porte pas le secteur : celui-ci
+                // vient du métier déclaré au relevé des redevances,
+                // rangé sous les quatorze secteurs officiels. Il reste
+                // nul quand ce métier est absent ou trop vague — six
+                // occupants sur trente-cinq — plutôt qu'inventé, car le
+                // seeder fait autorité sur ce référentiel.
+                'corps_metier_id' => $this->corpsMetierId($codeCorpsMetier),
                 'autorisation_publication' => false,
             ],
         );
@@ -711,6 +721,24 @@ class ServiceImportRegistre
         }
 
         return $this->artisans[$nom] = $artisan;
+    }
+
+    /**
+     * Identifiant du corps de métier désigné par son code, ou null.
+     *
+     * Un code que le référentiel ne porte pas ne crée rien : le seeder
+     * fait autorité sur les quatorze secteurs, et une reprise n'a pas à
+     * en ajouter un quinzième.
+     */
+    protected function corpsMetierId(string $code): ?int
+    {
+        if ($code === '') {
+            return null;
+        }
+
+        return $this->corpsMetiers[$code] ??= CorpsMetier::query()
+            ->where('code', $code)
+            ->value('id');
     }
 
     /**

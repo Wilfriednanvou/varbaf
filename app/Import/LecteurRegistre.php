@@ -73,10 +73,11 @@ class LecteurRegistre
      *
      * Elles ne viennent pas du cahier mais du travail de rattachement
      * de la coordination : l'espace locatif de l'artisan, son nom
-     * officiel au parc, et la redevance convenue pour cet espace. Les
-     * exiger ferait échouer la lecture d'un registre transcrit avant
-     * que ce rattachement n'existe — or l'ordre des travaux est bien
-     * celui-là : on transcrit, puis on rattache.
+     * officiel au parc, la redevance convenue pour cet espace et son
+     * corps de métier. Les exiger ferait échouer la lecture d'un
+     * registre transcrit avant que ce rattachement n'existe — or
+     * l'ordre des travaux est bien celui-là : on transcrit, puis on
+     * rattache.
      *
      * @var array<int, string>
      */
@@ -84,6 +85,7 @@ class LecteurRegistre
         'espace_locatif',
         'nom_artisan_officiel',
         'redevance_convenue',
+        'corps_metier',
     ];
 
     /**
@@ -311,6 +313,7 @@ class LecteurRegistre
             espaceLocatif: Normalisation::codeBoutique($brut['espace_locatif'] ?? ''),
             nomArtisanOfficiel: Normalisation::lisible($brut['nom_artisan_officiel'] ?? ''),
             redevanceConvenue: Normalisation::entier($brut['redevance_convenue'] ?? ''),
+            corpsMetier: Normalisation::codeBoutique($brut['corps_metier'] ?? ''),
         );
 
         // L'écart de calcul est constaté sur les valeurs retenues, et non
