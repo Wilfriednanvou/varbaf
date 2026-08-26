@@ -104,4 +104,32 @@
             </div>
         </section>
     @endif
+
+    {{-- Produits similaires. Le bloc ne s'affiche que s'il a quelque
+         chose à montrer : une section vide dirait au visiteur que le
+         village n'a rien d'approchant, ce qui est faux — elle dirait
+         seulement que rien n'a franchi le seuil. --}}
+    @if (($similaires ?? collect())->isNotEmpty())
+        <section class="mt-12">
+            <h2 class="text-lg font-semibold text-stone-900">
+                Dans le même esprit
+            </h2>
+
+            <p class="mt-1 text-sm text-stone-500">
+                Rapprochements établis à partir des désignations, catégories et corps de métier du catalogue.
+                @if (! empty($moteurSimilarite))
+                    <span class="text-stone-400">({{ $moteurSimilarite }})</span>
+                @endif
+            </p>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach ($similaires as $proche)
+                    <x-portail::vignette-produit
+                        :publication="$proche"
+                        :disponibilite="$disponibilites[$proche->getKey()]"
+                    />
+                @endforeach
+            </div>
+        </section>
+    @endif
 @endsection

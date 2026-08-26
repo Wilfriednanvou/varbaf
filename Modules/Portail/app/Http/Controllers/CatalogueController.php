@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Portail\Enums\DisponibilitePortail;
 use Modules\Portail\Models\PublicationProduit;
 use Modules\Portail\Services\ServicePortail;
+use Modules\Portail\Services\ServiceRecommandationPortail;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -21,7 +22,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class CatalogueController extends Controller
 {
-    public function __construct(protected ServicePortail $portail) {}
+    public function __construct(
+        protected ServicePortail $portail,
+        protected ServiceRecommandationPortail $recommandation,
+    ) {}
 
     public function index(Request $requete): View
     {
@@ -49,12 +53,27 @@ class CatalogueController extends Controller
         }
 
         $autres = $this->portail->autresProduitsDeLArtisan($publication);
+        $similaires = $this->recommandation->produitsSimilaires($publication);
+
+        // Les deux blocs se recoupent parfois : un artisan qui décline
+        // une gamme apparaît dans « ses autres produits » et parmi les
+        // similaires. On retire le doublon du second, jamais du premier :
+        // « les autres produits de cet artisan » est une promesse
+        // explicite faite au visiteur, « produits similaires » une
+        // suggestion. Une suggestion cède le pas à une promesse.
+        $similaires = $similaires->reject(
+            fn (PublicationProduit $proche): bool => $autres->contains('id', $proche->getKey()),
+        )->values();
 
         return view('portail::catalogue.produit', [
             'publication' => $publication,
             'disponibilite' => $this->portail->disponibilite($publication),
             'autres' => $autres,
-            'disponibilites' => $this->disponibilites($autres->all()),
+            'similaires' => $similaires,
+            'moteurSimilarite' => $similaires->isEmpty() ? null : $this->recommandation->nomDuMoteur(),
+            'disponibilites' => $this->disponibilites(
+                array_merge($autres->all(), $similaires->all()),
+            ),
         ]);
     }
 

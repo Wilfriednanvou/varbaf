@@ -311,6 +311,21 @@ class ServicePortail
      * catalogue afficherait moins de catégories qu'il n'y a de produits
      * visibles, et une catégorie manquerait sans raison apparente.
      */
+    /**
+     * La même requête, ouverte aux autres services du module.
+     *
+     * Elle ne rend que la colonne `produits.id`, de quoi contraindre une
+     * requête tierce sans lui donner à connaître la règle. Le module
+     * Pilotage l'applique ainsi à sa recherche de voisins : une seule
+     * définition de « visible », prêtée plutôt que recopiée. Recopier la
+     * règle ailleurs, c'est accepter qu'elle diverge le jour où l'une
+     * des deux copies change.
+     */
+    public function identifiantsVisibles(): RequeteBrute
+    {
+        return $this->identifiantsProduitsVisibles()->select('produits.id');
+    }
+
     protected function identifiantsProduitsVisibles(): RequeteBrute
     {
         return DB::table('publications_produit')
