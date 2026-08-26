@@ -28,7 +28,19 @@
         <env name="DB_PORT" value="5432"/>
         <env name="DB_DATABASE" value="varbaf_test"/>
         <env name="DB_USERNAME" value="postgres"/>
-        <env name="DB_PASSWORD" value="taty2026"/>
+        <!--
+            DB_PASSWORD est volontairement absent : ce fichier est suivi
+            par Git, et un mot de passe versionné le reste dans tout
+            l'historique du dépôt. Il vit dans « .env.testing », ignoré
+            par Git, que Laravel charge à la place de « .env » dès que
+            APP_ENV vaut testing.
+
+            Ne pas le remettre ici avec une valeur vide : PHPUnit pose
+            ses variables avant le démarrage de Laravel, et Dotenv
+            n'écrase jamais une variable déjà définie. Un « value="" »
+            gagnerait donc sur « .env.testing » et la connexion
+            échouerait.
+        -->
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

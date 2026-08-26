@@ -436,23 +436,8 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
                     ->iconButton()
                     ->tooltip('Éditer le reçu de vente')
                     ->visible(fn () => auth()->user()->can('imprimer_recu_vente'))
-                    ->action(function (Vente $record) {
-                        $record->loadMissing(['lignes', 'artisan', 'boutique.village', 'vendeur']);
-
-                        JournalAudit::enregistrer(
-                            'Édition reçu de vente (session caisse)',
-                            'COMMERCE',
-                            'Vente',
-                            $record->id,
-                            ['numero' => $record->numero],
-                        );
-
-                        return Pdf::loadView('commerce::ventes.recu', [
-                            'vente' => $record,
-                            'village' => $record->boutique?->village,
-                            'genereLe' => now()->format('d/m/Y à H:i'),
-                        ])->download("recu-{$record->numero}.pdf");
-                    }),
+                    ->url(fn (Vente $record) => route('ventes.recu', $record->id))
+                    ->openUrlInNewTab(),
                 Actions\Action::make('annuler')
                     ->label('Annuler')
                     ->icon('heroicon-o-x-circle')

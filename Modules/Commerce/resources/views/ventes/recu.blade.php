@@ -95,23 +95,6 @@
     </tbody>
 </table>
 
-<div class="intitule">Répartition</div>
-<table class="repartition">
-    <tr>
-        <td>Commission du village ({{ rtrim(rtrim(number_format((float) $vente->taux_commission, 2, ',', ' '), '0'), ',') }} %)</td>
-        <td class="nombre">{{ number_format((float) $vente->montant_commission, 0, ',', ' ') }} FCFA</td>
-    </tr>
-    <tr>
-        <td>Part revenant à l'artisan</td>
-        <td class="nombre">{{ number_format((float) $vente->part_artisan, 0, ',', ' ') }} FCFA</td>
-    </tr>
-</table>
-
-<div class="mention">
-    Le taux de commission appliqué est celui en vigueur à la date de la vente, figé sur celle-ci.
-    La part revenant à l'artisan constitue une dette du Village Artisanal jusqu'à son reversement,
-    effectué mensuellement selon le calendrier arrêté par la coordination.
-</div>
 
 <div class="pied">
     Reçu édité le {{ $genereLe }} — {{ $vente->numero }} — document sans valeur fiscale.

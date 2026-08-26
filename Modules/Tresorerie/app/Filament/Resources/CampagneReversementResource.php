@@ -224,28 +224,8 @@ class CampagneReversementResource extends Resource
                     ->iconButton()
                     ->tooltip('Éditer l\'état récapitulatif')
                     ->visible(fn () => auth()->user()->can('imprimer_etat_reversement'))
-                    ->action(function (CampagneReversement $record) {
-                        $record->loadMissing([
-                            'exercice.village',
-                            'reversements.artisan',
-                            'genereePar',
-                            'valideePar',
-                        ]);
-
-                        JournalAudit::enregistrer(
-                            'Édition état de reversement',
-                            'TRESORERIE',
-                            'CampagneReversement',
-                            $record->id,
-                            ['periode' => $record->libellePeriode()],
-                        );
-
-                        return Pdf::loadView('tresorerie::reversements.etat', [
-                            'campagne' => $record,
-                            'village' => $record->exercice?->village,
-                            'genereLe' => now()->format('d/m/Y à H:i'),
-                        ])->download('etat-reversement-'.$record->periode?->format('Y-m').'.pdf');
-                    }),
+                    ->url(fn (CampagneReversement $record) => route('campagnes.etat', $record->id))
+                    ->openUrlInNewTab(),
 
                 Actions\Action::make('recu')
                     ->label('Reçu artisan')
@@ -291,21 +271,7 @@ class CampagneReversementResource extends Resource
                             return;
                         }
 
-                        JournalAudit::enregistrer(
-                            'Édition reçu de reversement',
-                            'TRESORERIE',
-                            'Reversement',
-                            $reversement->id,
-                            ['periode' => $record->libellePeriode(), 'artisan_id' => $reversement->artisan_id],
-                        );
-
-                        return Pdf::loadView('tresorerie::reversements.recu', [
-                            'reversement' => $reversement,
-                            'campagne' => $record,
-                            'village' => $record->exercice?->village,
-                            'genereLe' => now()->format('d/m/Y à H:i'),
-                        ])->download('recu-reversement-'.$record->periode?->format('Y-m')
-                            .'-'.($reversement->artisan?->matricule ?? $reversement->artisan_id).'.pdf');
+                        return redirect()->route('campagnes.recu', ['campagne' => $record->id, 'reversement' => $data['reversement_id']]);
                     }),
 
                 Actions\DeleteAction::make()

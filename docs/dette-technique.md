@@ -33,6 +33,9 @@
 | 23/08 | Redevance calculée `superficie × tarif au m²`, jamais renseignée faute de barème | Montant convenu par espace, de 2 000 à 60 000 FCFA, contrôlé par le modèle |
 | 23/08 | Taux d'occupation rapporté au parc de boutiques | Rapporté au parc d'espaces locatifs : un local partagé comptait pour une seule occupation |
 | 23/08 | Nomenclature des corps de métier composée plutôt que reprise de la structure | Les 14 secteurs officiels, le seeder faisant autorité |
+| 22-23/08 | Les quatorze points de `docs/audit-tresorerie.md` | Onze corrigés : B1 (ouverture de section, `Exercice::courant()`), M2 (`#[Locked]` sur les quatre composants Livewire et filtrage des `find()`), M3 (RG-27 comparé au dernier jour arrêté), M4 (RG-07, `journeesNonArretees()`), M5 (RG-02, solde d'ouverture dérivé dans `creating`), M6 (verrou porté sur la ligne de section, réessai restreint à l'unicité), Y8 (`ecart` recalculé et retiré de `$fillable`), Y9, Y10 (agrégat SQL), Y12 (montants en entiers de bout en bout), Y14 (captures restreintes aux exceptions métier). Y11 et Y13 sont consignés en A-06 et A-07. **Y7 reste ouvert** : `ServiceTresorerie::$sectionCible` est un état statique dont la propreté dépend du `finally` de l'appelant |
+| 26/08 | `valider()` ne décaissait plus, `payerReversement()` n'avait aucun appelant, la chaîne de reversement était coupée | Décaissement rétabli dans la transaction de validation, voir l'arbitrage A-08 |
+| 26/08 | `DB_PASSWORD` en clair dans `phpunit.xml`, fichier suivi par Git | Déplacé dans `.env.testing`, ignoré par Git. Le champ n'est pas laissé vide dans `phpunit.xml` mais retiré : PHPUnit pose ses variables avant Laravel et Dotenv n'écrase pas une variable déjà définie |
 
 ---
 
@@ -52,7 +55,7 @@ Le choix se défend en deux points. Une fenêtre de correction ferait dépendre 
 
 ## Arbitrages à défendre
 
-Huit décisions qui ne sont pas des dettes mais des choix, et qu'on demandera d'expliquer.
+Neuf décisions qui ne sont pas des dettes mais des choix, et qu'on demandera d'expliquer.
 
 ### A-01 — Redevance convenue, et non dérivée *(remplace l'arbitrage du 20/08)*
 
@@ -114,3 +117,19 @@ Les deux ne divergent que si une caisse voit deux sections se succéder le même
 `MouvementCaisse.origine_type` reçoit `class_basename()` — `Vente`, `Reversement` — et non le nom qualifié d'une relation `morphTo`. Deux modèles homonymes dans deux modules deviendraient indiscernables.
 
 Le choix tient à la règle de dépendance descendante : une relation polymorphe classique suppose que la Trésorerie connaisse les classes qu'elle référence, or elle reçoit ses origines de modules qui, eux, la connaissent. Un nom court suffit à identifier l'origine dans le brouillard et à la retrouver, sans que la Trésorerie ait à importer quoi que ce soit. La forme canonique — `morphTo` avec `Relation::enforceMorphMap()` — reste ouverte si le nombre d'origines augmente.
+
+### A-08 — Le décaissement a lieu à la validation de la campagne, pas au passage de l'artisan
+
+La variante a été écrite, essayée, puis retirée le 26/08. Elle mérite d'être racontée parce que ce qui l'a fait tomber n'est pas une difficulté technique mais une garantie qu'elle coûtait.
+
+**Ce qui a été tenté.** `valider()` ne faisait plus que rattacher les ventes et refermer la campagne ; le décaissement passait dans une méthode `payerReversement()`, appelée artisan par artisan au moment où il se présente au guichet. L'argument est réel : RG-18 exige « un reçu signé par l'artisan », donc une présence physique, et la date portée en caisse devenait la date effective du paiement au lieu de la date administrative de validation. Sur ce seul point, la variante est plus juste.
+
+**Ce qu'elle coûtait.** Le décaissement sortait de la transaction qui rattache les ventes. Or c'est exactement la garantie que la classe annonce en tête : le rattachement est posé *avant* les décaissements, dans la même transaction, pour que l'échec d'une écriture en caisse emporte le rattachement avec lui. Sans cela le scénario redouté redevient possible — des ventes marquées « reversées » sans que l'argent soit sorti, qui ne réapparaissent dans aucune campagne suivante puisque `preparer()` ne retient que les ventes non rattachées.
+
+Deux conséquences en découlaient, qui n'ont pas été vues sur le moment. `ServiceCompteArtisan::totalReverse()` somme `montant_paye` sur toutes les campagnes validées, sans regarder le statut du reversement : un reversement resté `A_PAYER` faisait donc tomber le solde dû de l'artisan à zéro alors que l'argent était encore en caisse — précisément le piège que le commentaire de la méthode décrit un cran plus tôt, pour les campagnes en préparation. Et `payerReversement()` n'a jamais reçu d'écran : la chaîne vente → reversement → argent sorti était coupée, aucun artisan n'étant payable par l'interface.
+
+**Ce qui a été retenu.** La validation atomique. Un décaissement par bénéficiaire, à l'intérieur de la transaction, `montant_total` conservé depuis la préparation — ce que la validation décaisse est exactement ce que l'état récapitulatif signé annonçait. Le défaut de `totalReverse()` disparaît de lui-même : tout reversement d'une campagne validée est payé.
+
+`payerReversement()` reste dans le fichier, non branchée et documentée comme telle. Sa garde de statut la rend inerte après une validation normale, un double décaissement est donc impossible. C'est la perspective : un village qui paierait ses artisans au fil de leurs passages plutôt qu'en une séance mensuelle demanderait ce mode, et il faudrait alors sortir le rattachement de la validation pour le porter, artisan par artisan, sur le paiement — c'est-à-dire déplacer la garantie, pas la supprimer.
+
+**La leçon de méthode.** Ce changement de contrat métier a vécu vingt-quatre heures sur le disque sans commit et sans que la suite de tests soit relancée. C'est elle qui l'a rattrapé, le 26/08, par cinq échecs dont quatre dans `CampagneReversementTest` — les tests décrivaient encore le contrat que le code venait d'abandonner. La règle 5 du rétroplanning (commiter et pousser chaque soir) n'est pas une précaution de sauvegarde : c'est le moment où l'on relance les tests.

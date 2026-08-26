@@ -194,17 +194,24 @@ class ServiceCampagneReversement
     // =================================================================
 
     /**
-     * Rattache définitivement les ventes et décaisse (RG-18, RG-21).
+     * Rattache les ventes, décaisse et fige la campagne (RG-18, RG-21).
      *
-     * Irréversible. Un décaissement par artisan dont le solde est
-     * positif ; rien pour les autres, dont la dette est reportée.
+     * Irréversible. Un décaissement par artisan bénéficiaire, écrit au
+     * brouillard par `ServiceTresorerie` (RG-06). Les soldes négatifs ou
+     * nuls ne produisent aucun mouvement et passent en report (RG-20).
      *
-     * @param  SectionCaisse|null  $section  section de caisse à débiter ;
-     *                                       à défaut, la section ouverte
-     *                                       résolue par le journal.
+     * **Pourquoi le décaissement a lieu ici.** Une variante a été
+     * explorée le 25/08 : ne rattacher qu'ici et payer chaque artisan
+     * séparément à son passage au guichet, pour que la date en caisse
+     * soit la date réelle du paiement. Elle est plus juste sur ce seul
+     * point et se défend, mais elle déplace le décaissement hors de la
+     * transaction de validation — c'est-à-dire hors de la garantie
+     * décrite en tête de cette classe. Le choix retenu est la
+     * validation atomique ; `payerReversement()` reste dans le code,
+     * non branchée, et la variante est portée en perspective.
      *
      * @throws CampagneReversementException
-     * @throws \Modules\Tresorerie\Exceptions\SectionCaisseException si aucune section n'est ouverte
+     * @throws \Modules\Tresorerie\Exceptions\SectionCaisseException si la section visée n'est pas ouverte
      */
     public function valider(CampagneReversement $campagne, ?SectionCaisse $section = null): CampagneReversement
     {
@@ -218,10 +225,10 @@ class ServiceCampagneReversement
             throw CampagneReversementException::aucunReversementAValider($campagne->libellePeriode());
         }
 
-        // Résolue avant la transaction : si aucune section n'est
-        // ouverte, autant le dire tout de suite (RG-03).
         $section ??= $this->tresorerie->resoudreSectionOuverte();
 
+        // Une seule lecture du libellé pour toute la campagne : il est
+        // le même sur les N décaissements.
         $libelleReversement = LibelleMouvement::query()
             ->where('code', NatureMouvementCaisse::REVERSEMENT->value)
             ->first();
@@ -229,15 +236,11 @@ class ServiceCampagneReversement
         return DB::transaction(function () use ($campagne, $reversements, $section, $libelleReversement): CampagneReversement {
             // --- 1. Rattachement des ventes (RG-21) -------------------
             //
-            // Posé **avant** les décaissements, à dessein : si une
-            // écriture en caisse échoue, la transaction emporte le
-            // rattachement avec elle. L'ordre inverse laisserait, en cas
-            // de panne, des ventes marquées comme reversées sans que
-            // l'argent soit sorti.
-            //
-            // Les lignes de reprise sont exclues : elles désignent des
-            // ventes déjà rattachées à la campagne qui les avait payées,
-            // et cette trace-là ne se réécrit pas.
+            // Posé avant les décaissements, dans la même transaction :
+            // si une écriture en caisse échoue, le rattachement part
+            // avec elle. Les lignes de reprise sont exclues — elles
+            // désignent des ventes déjà rattachées à la campagne qui
+            // les avait payées, et cette trace-là ne se réécrit pas.
             $ventesARattacher = $reversements
                 ->flatMap(fn (Reversement $reversement) => $reversement->lignes)
                 ->reject(fn (LigneReversement $ligne) => $ligne->estUneReprise())
@@ -246,22 +249,17 @@ class ServiceCampagneReversement
                 ->all();
 
             if ($ventesARattacher !== []) {
-                // Requête directe : le rattachement est un marquage de
-                // masse, et le crochet `updating` de `Vente` autorise
-                // déjà cette colonne. Même procédé que pour
-                // `section_caisse_id`.
                 Vente::query()
                     ->whereIn('id', $ventesARattacher)
                     ->update(['campagne_reversement_id' => $campagne->getKey()]);
             }
 
-            // --- 2. Les décaissements (RG-18) -------------------------
-            $montantTotal = 0;
-            $beneficiaires = 0;
-
+            // --- 2. Un décaissement par bénéficiaire (RG-18, RG-20) ---
             foreach ($reversements as $reversement) {
                 if ($reversement->montant_paye <= 0) {
-                    // RG-20 : aucun décaissement, la dette est reportée.
+                    // RG-20 : on ne réclame rien au guichet. Le solde
+                    // négatif est reporté sur la campagne suivante et
+                    // ne produit aucun mouvement de caisse.
                     $reversement->forceFill([
                         'statut' => StatutReversement::REPORTE,
                     ])->save();
@@ -285,25 +283,83 @@ class ServiceCampagneReversement
                     'date_paiement' => now(),
                     'statut' => StatutReversement::PAYE,
                 ])->save();
-
-                $montantTotal += $reversement->montant_paye;
-                $beneficiaires++;
             }
 
-            // --- 3. Fermeture de la campagne --------------------------
+            // --- 3. Fermeture de la campagne (RG-21) ------------------
             //
-            // En dernier : les totaux constatent ce qui vient
-            // réellement de sortir, et le passage à VALIDEE arme les
-            // crochets qui figent la campagne et ses reversements.
+            // `montant_total` et `nombre_beneficiaires` viennent de la
+            // préparation et ne sont pas recalculés : ce que la
+            // validation décaisse est exactement ce que la préparation
+            // avait annoncé, sans quoi l'état récapitulatif signé par
+            // l'artisan ne vaudrait rien.
             $campagne->forceFill([
                 'statut' => StatutCampagneReversement::VALIDEE,
                 'validee_par' => Auth::id(),
                 'date_validation' => now(),
-                'montant_total' => $montantTotal,
-                'nombre_beneficiaires' => $beneficiaires,
             ])->save();
 
             return $campagne->refresh();
+        });
+    }
+
+    /**
+     * Décaisse le reversement d'un seul artisan (RG-18).
+     *
+     * **Non branchée — conservée comme perspective.** Elle porte la
+     * variante « paiement au guichet » décrite dans `valider()` : la
+     * campagne ne ferait que rattacher, et chaque artisan serait payé
+     * au moment réel de son passage. Aucun écran ne l'appelle
+     * aujourd'hui, et `valider()` marquant tout de suite les
+     * reversements PAYÉ, la garde de statut ci-dessous la rend inerte
+     * sur une campagne validée par le chemin normal — un double
+     * décaissement est donc impossible.
+     *
+     * Voir `docs/dette-technique.md`, arbitrage A-08.
+     *
+     * @throws \RuntimeException si la campagne n'est pas validée ou si le reversement n'est pas à payer
+     * @throws \Modules\Tresorerie\Exceptions\SectionCaisseException si aucune section n'est ouverte
+     */
+    public function payerReversement(Reversement $reversement, ?SectionCaisse $section = null): Reversement
+    {
+        $campagne = $reversement->campagne;
+
+        if (! $campagne->estValidee()) {
+            throw new \RuntimeException("La campagne {$campagne->libellePeriode()} n'est pas encore validée.");
+        }
+
+        if ($reversement->statut !== StatutReversement::A_PAYER) {
+            throw new \RuntimeException("Ce reversement n'est pas en attente de paiement.");
+        }
+
+        $section ??= $this->tresorerie->resoudreSectionOuverte();
+
+        $libelleReversement = LibelleMouvement::query()
+            ->where('code', NatureMouvementCaisse::REVERSEMENT->value)
+            ->first();
+
+        return DB::transaction(function () use ($reversement, $campagne, $section, $libelleReversement): Reversement {
+            $mouvement = $this->tresorerie->enregistrer(
+                section: $section,
+                nature: NatureMouvementCaisse::REVERSEMENT,
+                sens: SensMouvementCaisse::SORTIE,
+                montant: (int) $reversement->montant_paye,
+                libelle: "Reversement {$campagne->libellePeriode()} — "
+                    .($reversement->artisan?->identite ?? "artisan #{$reversement->artisan_id}"),
+                origine: $reversement,
+                libelleMouvement: $libelleReversement,
+            );
+
+            $reversement->forceFill([
+                'mouvement_caisse_id' => $mouvement->getKey(),
+                'date_paiement' => now(),
+                'statut' => StatutReversement::PAYE,
+            ])->save();
+
+            // `montant_total` n'est pas touché : il porte le total
+            // annoncé par la préparation, qui est celui de l'état
+            // récapitulatif. L'incrémenter ici le doublerait.
+
+            return $reversement->refresh();
         });
     }
 
