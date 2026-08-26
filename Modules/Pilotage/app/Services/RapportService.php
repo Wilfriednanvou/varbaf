@@ -5,6 +5,7 @@ namespace Modules\Pilotage\Services;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Modules\Artisanat\Enums\EtatEspaceLocatif;
+use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Commerce\Enums\EtatVente;
 use Modules\Commerce\Enums\ProvenanceClient;
@@ -235,12 +236,27 @@ class RapportService
      * artisans installés dans le même local comptaient pour une seule
      * occupation, et le village se croyait moins rempli qu'il ne l'est.
      *
+     * **Deux périmètres, et ils ne disent pas la même chose.** Sans
+     * argument, la méthode couvre tout ce qui se loue — y compris les
+     * deux espaces du sous-sol et celui de l'espace vert, entrés au parc
+     * le 26/08. En passant `NatureContenant::BOUTIQUE`, elle se restreint
+     * aux locaux de vente : c'est le périmètre du taux d'occupation que
+     * la coordination présente à sa tutelle, et le mélanger avec le
+     * locatif entier ferait varier l'indicateur sans que rien n'ait
+     * changé sur le terrain.
+     *
      * @return array{occupes: int, total: int, taux: float}
      */
-    public function tauxOccupationEspaces(): array
+    public function tauxOccupationEspaces(?NatureContenant $nature = null): array
     {
-        $total = EspaceLocatif::query()->count();
-        $occupes = EspaceLocatif::query()->where('etat', EtatEspaceLocatif::OCCUPE->value)->count();
+        $requete = fn (): Builder => EspaceLocatif::query()
+            ->when($nature, fn (Builder $q) => $q->whereHas(
+                'boutique',
+                fn (Builder $b) => $b->where('nature', $nature->value),
+            ));
+
+        $total = $requete()->count();
+        $occupes = $requete()->where('etat', EtatEspaceLocatif::OCCUPE->value)->count();
 
         return [
             'occupes' => $occupes,

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Artisanat\Enums\EtatEspaceLocatif;
+use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Artisanat\Models\CorpsMetier;
@@ -303,6 +304,73 @@ class RapportServiceTest extends TestCase
         $this->assertSame(1, $occupation['occupes']);
         $this->assertSame(2, $occupation['total']);
         $this->assertSame(50.0, $occupation['taux']);
+    }
+
+    public function test_le_taux_d_occupation_se_restreint_aux_locaux_de_vente(): void
+    {
+        // Le sous-sol se loue — la CNTC y occupe le plus cher des
+        // espaces du parc — mais on n'y vend pas. Il compte dans le
+        // locatif, jamais dans le taux d'occupation des boutiques que
+        // la coordination présente à sa tutelle.
+        $sousSol = Boutique::create([
+            'numero' => 'SS01',
+            'nature' => NatureContenant::SOUS_SOL,
+            'village_id' => $this->village->id,
+        ]);
+
+        EspaceLocatif::create(['boutique_id' => $sousSol->id])
+            ->update(['etat' => EtatEspaceLocatif::OCCUPE]);
+
+        $locatif = $this->rapport->tauxOccupationEspaces();
+
+        $this->assertSame(2, $locatif['occupes']);
+        $this->assertSame(3, $locatif['total'], 'Le parc locatif compte l\'espace du sous-sol.');
+
+        $boutiques = $this->rapport->tauxOccupationEspaces(NatureContenant::BOUTIQUE);
+
+        $this->assertSame(1, $boutiques['occupes']);
+        $this->assertSame(2, $boutiques['total'], 'Le parc de vente ignore l\'espace du sous-sol.');
+        $this->assertSame(50.0, $boutiques['taux']);
+    }
+
+    public function test_le_code_d_espace_ne_confond_pas_le_sous_sol_avec_la_boutique_01(): void
+    {
+        // genererCode() ne gardait que les chiffres du numéro : SS01 et
+        // EV01 se réduisaient tous deux à B01 et fabriquaient les codes
+        // de la boutique B01.
+        $b01 = Boutique::create(['numero' => 'B01', 'village_id' => $this->village->id]);
+        $ss01 = Boutique::create([
+            'numero' => 'SS01',
+            'nature' => NatureContenant::SOUS_SOL,
+            'village_id' => $this->village->id,
+        ]);
+
+        $this->assertSame('B0101', EspaceLocatif::create(['boutique_id' => $b01->id])->code);
+        $this->assertSame('SS0101', EspaceLocatif::create(['boutique_id' => $ss01->id])->code);
+    }
+
+    public function test_un_code_releve_sur_le_terrain_survit_a_la_derivation(): void
+    {
+        // Le sous-sol SS01 abrite G0201 au relevé de recouvrement. Ce
+        // code figure sur un contrat signé : le crochet ne doit le
+        // remplacer par aucun code dérivé.
+        $ss01 = Boutique::create([
+            'numero' => 'SS01',
+            'nature' => NatureContenant::SOUS_SOL,
+            'village_id' => $this->village->id,
+        ]);
+
+        $espace = new EspaceLocatif(['boutique_id' => $ss01->id]);
+        $espace->code = 'G0201';
+        $espace->save();
+
+        $this->assertSame('G0201', $espace->fresh()->code);
+
+        // Et l'espace suivant reprend la règle sans se laisser décaler
+        // par le rang du code relevé.
+        $suivant = EspaceLocatif::create(['boutique_id' => $ss01->id]);
+
+        $this->assertSame('SS0101', $suivant->code);
     }
 
     public function test_les_produits_sous_le_seuil_sont_comptes_et_listes(): void

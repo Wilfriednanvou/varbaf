@@ -2,9 +2,11 @@
 
 namespace Modules\Artisanat\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Enums\ZoneBoutique;
 use Modules\Socle\Models\VillageArtisanal;
 
@@ -23,8 +25,15 @@ use Modules\Socle\Models\VillageArtisanal;
  * sa place dans le bâtiment, sa surface, et la liste des espaces
  * qu'elle abrite.
  *
+ * **Ce que la classe abrite en plus depuis le 26/08.** Le sous-sol et
+ * l'espace vert, qu'on croyait dépourvus d'espace locatif, en portent
+ * trois : la table devient celle des contenants et `nature` dit lequel
+ * est un local de vente. Le nom `Boutique` ne bouge pas — le renommer à
+ * huit jours du gel coûterait plus que la gêne de lecture.
+ *
  * @property int $id
  * @property string $numero
+ * @property NatureContenant $nature
  * @property int $village_id
  */
 class Boutique extends Model
@@ -33,9 +42,14 @@ class Boutique extends Model
 
     protected $fillable = [
         'numero',
+        'nature',
         'superficie',
         'emplacement',
         'village_id',
+    ];
+
+    protected $attributes = [
+        'nature' => 'BOUTIQUE',
     ];
 
     protected function casts(): array
@@ -43,7 +57,19 @@ class Boutique extends Model
         return [
             'superficie' => 'decimal:2',
             'emplacement' => ZoneBoutique::class,
+            'nature' => NatureContenant::class,
         ];
+    }
+
+    /**
+     * Les seuls locaux de vente.
+     *
+     * C'est le périmètre du taux d'occupation présenté à la tutelle :
+     * le sous-sol et l'espace vert se louent, mais on n'y vend pas.
+     */
+    public function scopeLocauxDeVente(Builder $requete): Builder
+    {
+        return $requete->where('nature', NatureContenant::BOUTIQUE->value);
     }
 
     public function village(): BelongsTo

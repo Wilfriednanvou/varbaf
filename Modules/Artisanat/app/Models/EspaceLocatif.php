@@ -29,6 +29,14 @@ use Modules\Artisanat\Exceptions\EspaceLocatifException;
  * la création à partir du numéro de la boutique et d'un rang, et ne
  * bouge plus : il figure sur les contrats signés.
  *
+ * **Dérivé par défaut, pas par obligation.** Un code posé explicitement
+ * à la création survit au crochet : le relevé du village porte des
+ * espaces dont le code ne suit pas la règle — le sous-sol SS01 abrite
+ * G0201 — et ces codes-là figurent sur des contrats. Les renommer pour
+ * les faire rentrer dans la règle romprait le lien avec le papier.
+ * `code` reste hors de `$fillable` : il se pose depuis un seeder ou une
+ * reprise, jamais depuis un formulaire.
+ *
  * @property int $id
  * @property string $code
  * @property string|null $libelle
@@ -93,20 +101,51 @@ class EspaceLocatif extends Model
     }
 
     /**
-     * Produit le code suivant pour une boutique : B01 donne B0101, puis
-     * B0102.
+     * Compose le préfixe de code d'un contenant.
      *
-     * Le préfixe est tiré du numéro de la boutique — « B01 », « B-01 »
-     * ou « 1 » produisent tous « B01 » — et le rang est propre à la
-     * boutique, ce qui rend le code lisible à l'œil sur un plan du
-     * bâtiment.
+     * **Pourquoi la partie alphabétique compte.** La première version ne
+     * gardait que les chiffres : « B01 », « B-01 » et « 1 » donnaient
+     * tous « B01 », ce qui suffisait tant que le parc n'était fait que
+     * de boutiques numérotées. Depuis que le sous-sol et l'espace vert
+     * sont entrés dans le parc, « SS01 » et « EV01 » se réduisaient eux
+     * aussi à « B01 » — trois contenants distincts fabriquant les mêmes
+     * codes, et le rang de l'un décalant celui des autres. Les lettres
+     * sont donc conservées telles quelles ; un numéro purement
+     * numérique reçoit toujours le « B » historique, pour que les codes
+     * déjà émis ne bougent pas.
+     */
+    public static function genererPrefixe(int|string|null $numero): string
+    {
+        $propre = strtoupper((string) preg_replace('/[^A-Za-z0-9]/', '', (string) $numero));
+
+        if (! preg_match('/^([A-Z]*)(\d*)$/', $propre, $parties)) {
+            // Numéro composite du type « B1A » : rien à décomposer, il
+            // sert de préfixe tel quel plutôt que d'être mutilé.
+            return $propre !== '' ? $propre : 'B00';
+        }
+
+        $lettres = $parties[1] !== '' ? $parties[1] : 'B';
+        $chiffres = $parties[2];
+
+        // Un numéro sans chiffres — « HALL » — se suffit à lui-même : lui
+        // coller un « 00 » n'ajouterait qu'un rang qui n'existe pas.
+        return $chiffres === ''
+            ? $lettres
+            : $lettres.str_pad($chiffres, 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Produit le code suivant pour un contenant : B01 donne B0101, puis
+     * B0102 ; SS01 donne SS0101.
+     *
+     * Le rang est propre au contenant, ce qui rend le code lisible à
+     * l'œil sur un plan du bâtiment.
      */
     public static function genererCode(int $boutiqueId): string
     {
-        $numero = Boutique::query()->whereKey($boutiqueId)->value('numero');
-
-        $chiffres = preg_replace('/\D/', '', (string) $numero) ?: '00';
-        $prefixe = 'B'.str_pad($chiffres, 2, '0', STR_PAD_LEFT);
+        $prefixe = static::genererPrefixe(
+            Boutique::query()->whereKey($boutiqueId)->value('numero'),
+        );
 
         return DB::transaction(function () use ($boutiqueId, $prefixe): string {
             // Le rang se cherche numériquement, et non par tri du code.
@@ -121,10 +160,18 @@ class EspaceLocatif extends Model
             // Le cas n'est pas théorique : la reprise du registre
             // transcrit rattache plus de cent emplacements hors parc à
             // une même boutique technique.
+            //
+            // Seuls les codes qui suivent la règle entrent dans le
+            // calcul du rang. Un code posé au relevé — G0201 sous SS01 —
+            // ne dit rien du rang suivant : lui appliquer `substr` sur
+            // la longueur du préfixe découperait une position
+            // arbitraire de sa numérotation. L'unicité du couple
+            // (boutique, code) reste la garantie contre la collision.
             $rangs = static::query()
                 ->where('boutique_id', $boutiqueId)
                 ->lockForUpdate()
                 ->pluck('code')
+                ->filter(fn (string $code) => str_starts_with($code, $prefixe))
                 ->map(fn (string $code) => (int) substr($code, strlen($prefixe)))
                 ->all();
 

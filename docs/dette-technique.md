@@ -12,7 +12,7 @@
 | DT-04 | `EcheanceRedevance` et `PaiementRedevance` non implémentées | Retirées du périmètre par arbitrage de charge ; les redevances restent encaissables comme mouvement de caisse ordinaire | Version 2 |
 | DT-05 | Méthodes de modèle écrites mais non appelées (`estDisponible()`, `getAttributionActive()`, `getHistoriqueAttributions()`, etc.) | Écrites pour les modules suivants qui les consommeront | À couvrir par les modules Commerce, Trésorerie et Pilotage |
 | DT-06 | Requête N+1 sur la colonne « occupant » de la table des boutiques | Parc de 24 boutiques : impact nul à cette échelle | À optimiser si le parc s'étend |
-| DT-07 | Panneau artisan et couche de notification classés « maquetté » | Contrainte de délai — remise au 5 septembre | Version 2 |
+| DT-07 | Panneau artisan classé « maquetté » | Contrainte de délai — remise au 5 septembre | Version 2. **La couche de notification est sortie de cette ligne le 26/08** : le canal `database` et la cloche du panneau sont en service pour la règle 15. Ce qui reste attaché au panneau artisan, c'est le destinataire *artisan* de cette même règle — voir A-09 |
 | DT-08 | Aucune Policy déclarée : la couche d'autorisation de Filament autorise tout compte du panneau. La sécurité repose entièrement sur le `->visible()` porté par chaque action | Les `->visible()` sont exhaustifs et vérifiés ; ajouter sept Policies avant le gel du code coûterait plus qu'il ne protégerait | Le comportement est figé à deux niveaux : `tests/Feature/HabilitationArtisanTest.php` l'éprouve en exécution sur `ArtisanResource` seule (accès forgé à l'action `create` compris) ; `tests/Feature/ConventionsFilamentTest.php` est le garde-fou transversal — il parcourt statiquement toutes les ressources et pages de tous les modules et échoue si une action est déclarée sans `->visible()` interrogeant une permission. Les deux échoueront si une Policy vient un jour changer ce comportement — signal explicite pour reprendre ce point |
 | DT-09 | `date_debut_facturation` est recalculée à chaque écriture. Corriger la date d'entrée d'une attribution déplace donc le mois offert, y compris si une redevance a déjà été encaissée sur la période | Le recalcul est le comportement juste tant qu'aucun encaissement n'existe — cas de tous les contrats saisis à ce jour | Garde-fou à poser côté Trésorerie : refuser la modification de `date_debut` dès qu'un paiement de redevance est rattaché à l'attribution |
 | DT-10 | Le journal d'audit est immuable au niveau du modèle, mais une suppression de masse par le constructeur de requêtes (`JournalAudit::query()->delete()`) ou un `DELETE` SQL direct passe outre | Fermer la porte demanderait un déclencheur PostgreSQL ou le retrait du droit `DELETE` au rôle applicatif | À poser au déploiement, avec la configuration de la base de production |
@@ -36,6 +36,10 @@
 | 22-23/08 | Les quatorze points de `docs/audit-tresorerie.md` | Onze corrigés : B1 (ouverture de section, `Exercice::courant()`), M2 (`#[Locked]` sur les quatre composants Livewire et filtrage des `find()`), M3 (RG-27 comparé au dernier jour arrêté), M4 (RG-07, `journeesNonArretees()`), M5 (RG-02, solde d'ouverture dérivé dans `creating`), M6 (verrou porté sur la ligne de section, réessai restreint à l'unicité), Y8 (`ecart` recalculé et retiré de `$fillable`), Y9, Y10 (agrégat SQL), Y12 (montants en entiers de bout en bout), Y14 (captures restreintes aux exceptions métier). Y11 et Y13 sont consignés en A-06 et A-07. **Y7 reste ouvert** : `ServiceTresorerie::$sectionCible` est un état statique dont la propreté dépend du `finally` de l'appelant |
 | 26/08 | `valider()` ne décaissait plus, `payerReversement()` n'avait aucun appelant, la chaîne de reversement était coupée | Décaissement rétabli dans la transaction de validation, voir l'arbitrage A-08 |
 | 26/08 | `DB_PASSWORD` en clair dans `phpunit.xml`, fichier suivi par Git | Déplacé dans `.env.testing`, ignoré par Git. Le champ n'est pas laissé vide dans `phpunit.xml` mais retiré : PHPUnit pose ses variables avant Laravel et Dotenv n'écrase pas une variable déjà définie |
+| 26/08 | Règle 15 déclarée dans `CLAUDE.md` et sans effet : `SeuilAlerteFranchi` était émis au bon moment, aucun auditeur ne l'écoutait | `NotifierSeuilAlerte` branché par le fournisseur du module Commerce, table `notifications`, cloche activée sur le panneau. Portée réelle et écart résiduel en A-09 |
+| 26/08 | Le sous-sol et l'espace vert écartés du parc alors qu'ils portent trois espaces loués, dont le plus cher du village | Entrés au parc, colonne `nature` sur les contenants, taux d'occupation calculable sur les boutiques seules. Voir l'arbitrage A-05 bis |
+| 26/08 | `EspaceLocatif::genererCode()` ne gardait que les chiffres du numéro : `SS01` et `EV01` se réduisaient à `B01` et fabriquaient les codes de la boutique B01 | Préfixe alphanumérique, rang calculé sur les seuls codes qui suivent la règle, et un code relevé sur le terrain — `G0201` sous `SS01` — survit désormais à la dérivation |
+| 26/08 | `notifications.data` posé en `text` par la migration standard de Laravel : la cloche de Filament compte les non-lues avec `data->>'format'`, que PostgreSQL refuse sur du texte. **Toute page du panneau plantait dans le navigateur** | Colonne passée en `json`. Le défaut était masqué parce que les tests montent les composants Livewire directement : seuls les deux qui font une vraie requête HTTP rendent la barre supérieure, et ils vivent dans un module sans rapport |
 
 ---
 
@@ -55,7 +59,7 @@ Le choix se défend en deux points. Une fenêtre de correction ferait dépendre 
 
 ## Arbitrages à défendre
 
-Neuf décisions qui ne sont pas des dettes mais des choix, et qu'on demandera d'expliquer.
+Dix décisions qui ne sont pas des dettes mais des choix, et qu'on demandera d'expliquer.
 
 ### A-01 — Redevance convenue, et non dérivée *(remplace l'arbitrage du 20/08)*
 
@@ -88,15 +92,21 @@ Ce qui porte une histoire ne se supprime pas, ce qui n'est qu'un libellé se cor
 - **Verrouillé pour tous les rôles métier :** artisan, attribution, boutique, exercice, village. On désactive, on résilie, on clôture.
 - **Ouvert à qui peut créer :** corps de métier, entreprise artisanale. Sans cela, un chef de section ayant saisi un doublon devrait appeler l'administrateur pour corriger sa propre erreur — et en pratique il contournerait, laissant traîner une ligne « à supprimer » qui pourrit le référentiel.
 
-### A-05 bis — Le sous-sol et l'espace vert sont exclus du périmètre, et l'import le dit
+### A-05 bis — Le sous-sol et l'espace vert sont dans le parc *(remplace l'arbitrage du 23/08)*
 
-Le décompte de vingt-quatre « boutiques » qui circulait incluait le sous-sol et l'espace vert. Ni l'un ni l'autre n'est un local de vente attribué à un artisan : le sous-sol tient de la réserve et des locaux techniques, l'espace vert est une emprise extérieure. Ni l'un ni l'autre ne comporte d'espace locatif.
+Cet arbitrage défendait l'inverse, et il est conservé sous cette forme parce que la façon dont il est tombé se répète.
 
-`BoutiqueSeeder` les écarte donc explicitement et les **affiche à chaque passage** comme exclusions volontaires, avec leur motif. Une exclusion muette se relit six mois plus tard comme un oubli d'import, et quelqu'un finit par « corriger » le parc en les rajoutant.
+**Ce qu'il disait.** Le décompte de vingt-quatre « boutiques » qui circulait incluait le sous-sol et l'espace vert. Ni l'un ni l'autre n'est un local de vente : le sous-sol tient de la réserve et des locaux techniques, l'espace vert est une emprise extérieure. On en concluait qu'aucun des deux ne comportait d'espace locatif, et `BoutiqueSeeder` les écartait en affichant l'exclusion à chaque passage. L'enjeu n'était pas cosmétique : laisser sept emprises non louables gonfler le dénominateur donnait un village structurellement sous-occupé d'un tiers.
 
-L'enjeu n'est pas cosmétique : le taux d'occupation se calcule sur le parc. Laisser sept emprises non louables gonfler le dénominateur donnait un village structurellement sous-occupé d'un tiers, sur un indicateur que la coordination présente à sa tutelle.
+**Ce qui l'a renversé.** L'état de recouvrement des redevances 2026, transmis le 26/08, nomme trois espaces loués hors du bâtiment de vente : G0201 au sous-sol, occupé par la CNTC pour 60 000 FCFA par mois — la redevance la plus élevée de tout le parc — G0202 au sous-sol pour SCOOPS AAMRO à 10 000, et EV0101 sur l'espace vert à 5 000. Soit 75 000 FCFA de redevance mensuelle que le système ne voyait pas, et trois attributions qu'il aurait refusé d'enregistrer.
 
-**À renseigner :** l'emplacement dans le bâtiment et la superficie des dix-sept locaux, ainsi que le découpage réel de chacun en espaces. Le seeder pose un espace par boutique — la seule chose qu'on sache avec certitude — et laisse le reste nul plutôt que d'inventer une répartition.
+**Ce que la conclusion doit à sa prémisse.** Le raisonnement sur le dénominateur était juste et le reste. Ce qui était faux, c'est le fait sur lequel il s'appuyait — « ni l'un ni l'autre ne comporte d'espace locatif » — qui n'a jamais été vérifié contre une donnée du village, seulement déduit de ce que le sous-sol *est*. C'est la même mécanique que l'arbitrage A-01, où une redevance au mètre carré cohérente sur le papier n'a jamais produit un seul montant : une règle inventée par déduction, que rien ne venait démentir puisque rien ne venait la remplir.
+
+**Ce qui a été retenu.** Les trois espaces entrent au parc. La table `boutiques` devient celle des contenants et porte une colonne `nature` — `BOUTIQUE`, `SOUS_SOL`, `ESPACE_VERT` — qui distingue les locaux de vente du reste du locatif. `RapportService::tauxOccupationEspaces()` accepte ce périmètre en argument : sans lui, il couvre tout ce qui se loue ; avec `NatureContenant::BOUTIQUE`, il retrouve exactement l'indicateur que la coordination présente à sa tutelle. Les deux chiffres existent, et aucun ne se déguise en l'autre.
+
+**Ce que le nom ne dit plus.** `Boutique` désigne désormais un contenant qui peut ne pas être une boutique. Renommer le modèle, la table et leurs sept références à huit jours du gel coûterait plus que la gêne de lecture : c'est consigné plutôt que corrigé.
+
+**À renseigner :** l'emplacement dans le bâtiment et la superficie des locaux, ainsi que le découpage de B13 et B17 — absents de l'état de recouvrement, qui ne mentionne que ce qui se facture. Le seeder les pose comme locaux sans espace connu, ce qui n'est pas la même chose que des locaux inexistants, plutôt que d'inventer un espace par local comme le faisait la version précédente.
 
 ### A-05 — `solde_apres` est un solde d'ordre de saisie, pas un solde à la date
 
@@ -133,3 +143,15 @@ Deux conséquences en découlaient, qui n'ont pas été vues sur le moment. `Ser
 `payerReversement()` reste dans le fichier, non branchée et documentée comme telle. Sa garde de statut la rend inerte après une validation normale, un double décaissement est donc impossible. C'est la perspective : un village qui paierait ses artisans au fil de leurs passages plutôt qu'en une séance mensuelle demanderait ce mode, et il faudrait alors sortir le rattachement de la validation pour le porter, artisan par artisan, sur le paiement — c'est-à-dire déplacer la garantie, pas la supprimer.
 
 **La leçon de méthode.** Ce changement de contrat métier a vécu vingt-quatre heures sur le disque sans commit et sans que la suite de tests soit relancée. C'est elle qui l'a rattrapé, le 26/08, par cinq échecs dont quatre dans `CampagneReversementTest` — les tests décrivaient encore le contrat que le code venait d'abandonner. La règle 5 du rétroplanning (commiter et pousser chaque soir) n'est pas une précaution de sauvegarde : c'est le moment où l'on relance les tests.
+
+### A-09 — L'alerte de rupture part aux deux sections, pas à l'artisan
+
+La règle 15 nomme trois destinataires : l'artisan, la section Production, la section Commercialisation. Le branchement du 26/08 en sert deux.
+
+**Ce n'est pas un oubli, c'est une absence de canal.** Un artisan n'a pas de compte dans le système : `artisans` ne porte aucun lien vers `users`, et le panneau artisan de la règle 12 n'est pas construit (DT-07). Il n'existe donc aucun endroit où une notification lui serait remise. Les deux substituts imaginables ont été écartés. Le courriel suppose une adresse : le registre importé en renseigne une fraction, et le village n'a pas de service d'envoi configuré — une alerte qui échoue silencieusement est pire qu'une alerte absente, parce qu'on croit l'avoir envoyée. Le SMS suppose un fournisseur, donc un abonnement et une dépendance externe, à huit jours du gel.
+
+**Ce qui a été fait à la place.** Le nom de l'artisan et le numéro de sa boutique sont portés dans le corps du message, avec la quantité restante et le seuil. La section qui lit l'alerte sait qui appeler et où aller. C'est la forme que prend l'information dans un village où l'artisan est joignable de vive voix et vient chercher lui-même ses ventes — et c'est, en pratique, ce qui se passait déjà, sans que le système le déclenche.
+
+**Ce qu'il faudrait pour fermer la règle.** Un compte par artisan et un panneau où le lire, c'est-à-dire DT-07. Le jour où ils existent, le seul changement est la méthode `destinataires()` de l'écouteur : le reste de la chaîne — émission au franchissement, format, canal — est déjà en place et déjà éprouvé.
+
+**Le point de méthode.** L'événement `SeuilAlerteFranchi` était écrit, correctement émis, et couvert par cinq tests d'émission depuis la première tranche du module Commerce. Aucun ne pouvait révéler que personne ne l'écoutait : ils vérifiaient qu'il partait, pas qu'il arrivait. Une règle métier n'est tenue que lorsqu'un test décrit son effet observable — ici, une ligne dans `notifications` pour un compte identifié.

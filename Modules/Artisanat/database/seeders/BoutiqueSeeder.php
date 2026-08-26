@@ -3,24 +3,42 @@
 namespace Modules\Artisanat\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Socle\Models\VillageArtisanal;
 
 /**
- * Parc de boutiques du Village Artisanal Régional de Bafoussam, repris
- * du relevé réel.
+ * Parc locatif du Village Artisanal Régional de Bafoussam, repris du
+ * relevé réel.
  *
- * **Dix-sept locaux, et non vingt-quatre.** Le chiffre de vingt-quatre
- * venait d'un décompte qui incluait le sous-sol et l'espace vert. Ni
- * l'un ni l'autre n'est un local de vente attribué à un artisan : ils
- * sortent du périmètre, et l'import les écarte explicitement plutôt que
- * de les laisser gonfler le parc — un taux d'occupation calculé sur
- * vingt-quatre serait faux d'un tiers.
+ * **Dix-sept locaux de vente, plus trois emprises louées.** Le chiffre
+ * de vingt-quatre qui circulait venait d'un décompte confus. La
+ * correction du 23/08 l'avait ramené à dix-sept en écartant le sous-sol
+ * et l'espace vert, au motif qu'aucun des deux n'abritait d'espace
+ * locatif attribué.
  *
- * **Seul le numéro est posé.** L'emplacement dans le bâtiment et la
- * superficie viennent du plan détenu par la coordination : CLAUDE.md
- * interdit les données fictives, et une répartition inventée se
- * retrouverait telle quelle dans les états de parc.
+ * **Ce motif était faux, et l'état de recouvrement des redevances 2026
+ * le dit.** Le sous-sol abrite deux espaces loués — G0201 à la CNTC
+ * pour 60 000 FCFA par mois, la redevance la plus élevée du parc, et
+ * G0202 à SCOOPS AAMRO pour 10 000 — et l'espace vert un troisième,
+ * EV0101, à 5 000. Soit 75 000 FCFA de redevance mensuelle que le
+ * système ne voyait pas. Ils entrent donc dans le parc, et `nature` les
+ * distingue des locaux de vente : c'est ce qui permet au taux
+ * d'occupation présenté à la tutelle de rester calculé sur les
+ * boutiques seules, sans que le locatif réel disparaisse pour autant.
+ *
+ * **B13 et B17 n'apparaissent pas au relevé de recouvrement.** Ils sont
+ * néanmoins posés : le décompte des dix-sept locaux vient du relevé
+ * physique du bâtiment, pas de la feuille de redevances, et une feuille
+ * de recouvrement ne mentionne que ce qui se facture. Ils sont donc des
+ * locaux sans espace locatif connu — ce qui n'est pas la même chose que
+ * des locaux inexistants, et se corrige depuis l'écran dédié.
+ *
+ * **Seuls le numéro et la nature sont posés.** L'emplacement dans le
+ * bâtiment et la superficie viennent du plan détenu par la
+ * coordination : CLAUDE.md interdit les données fictives, et une
+ * répartition inventée se retrouverait telle quelle dans les états de
+ * parc.
  *
  * Le seeder n'est pas lié à un village en dur : il alimente le village
  * de code VARBAF, et ne fait rien si le Socle n'a pas encore été semé.
@@ -28,21 +46,20 @@ use Modules\Socle\Models\VillageArtisanal;
 class BoutiqueSeeder extends Seeder
 {
     /**
-     * Nombre de locaux de vente du parc.
+     * Nombre de locaux de vente du parc, numérotés B01 à B17.
      */
     protected const NOMBRE_DE_BOUTIQUES = 17;
 
     /**
-     * Ce que l'import écarte, et pourquoi.
+     * Emprises louées hors du bâtiment de vente, telles que les nomme
+     * l'état de recouvrement des redevances.
      *
-     * Consigné ici et affiché à chaque passage : une exclusion qu'on ne
-     * voit plus finit par se relire comme un oubli.
-     *
-     * @var array<string, string>
+     * @var array<string, NatureContenant>
      */
-    protected const EXCLUSIONS = [
-        'Sous-sol' => 'Réserve et locaux techniques : aucun espace locatif attribué à un artisan.',
-        'Espace vert' => 'Emprise extérieure du site : ni local de vente, ni surface louable.',
+    protected const CONTENANTS_HORS_VENTE = [
+        'SS01' => NatureContenant::SOUS_SOL,
+        'SS02' => NatureContenant::SOUS_SOL,
+        'EV01' => NatureContenant::ESPACE_VERT,
     ];
 
     public function run(): void
@@ -56,29 +73,35 @@ class BoutiqueSeeder extends Seeder
         }
 
         for ($rang = 1; $rang <= self::NOMBRE_DE_BOUTIQUES; $rang++) {
-            Boutique::updateOrCreate(
-                [
-                    'village_id' => $village->id,
-                    'numero' => 'B'.str_pad((string) $rang, 2, '0', STR_PAD_LEFT),
-                ],
-                [
-                    // Laissés nuls à dessein : à reprendre du plan réel.
-                    'emplacement' => null,
-                    'superficie' => null,
-                ],
-            );
+            $this->poser($village->id, 'B'.str_pad((string) $rang, 2, '0', STR_PAD_LEFT), NatureContenant::BOUTIQUE);
         }
 
-        $total = Boutique::where('village_id', $village->id)->count();
+        foreach (self::CONTENANTS_HORS_VENTE as $numero => $nature) {
+            $this->poser($village->id, $numero, $nature);
+        }
 
-        $this->command?->info("{$total} boutiques en place pour {$village->nom}.");
+        $parc = Boutique::where('village_id', $village->id)->get();
+        $vente = $parc->where('nature', NatureContenant::BOUTIQUE)->count();
 
-        $this->command?->comment('Exclusions volontaires du périmètre :');
+        $this->command?->info("{$parc->count()} contenants en place pour {$village->nom}, dont {$vente} locaux de vente.");
 
-        foreach (self::EXCLUSIONS as $exclusion => $motif) {
-            $this->command?->comment("  — {$exclusion} : {$motif}");
+        foreach (self::CONTENANTS_HORS_VENTE as $numero => $nature) {
+            $this->command?->comment("  — {$numero} : {$nature->getLabel()}, loué mais hors du taux d'occupation des boutiques.");
         }
 
         $this->command?->comment('Emplacements et superficies à renseigner depuis le plan du bâtiment.');
+    }
+
+    protected function poser(int $villageId, string $numero, NatureContenant $nature): void
+    {
+        Boutique::updateOrCreate(
+            ['village_id' => $villageId, 'numero' => $numero],
+            [
+                'nature' => $nature,
+                // Laissés nuls à dessein : à reprendre du plan réel.
+                'emplacement' => null,
+                'superficie' => null,
+            ],
+        );
     }
 }

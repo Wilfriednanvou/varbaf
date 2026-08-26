@@ -8,23 +8,67 @@ use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Socle\Models\VillageArtisanal;
 
 /**
- * Découpage initial du parc en espaces locatifs.
+ * Découpage du parc en espaces locatifs, repris de l'état de
+ * recouvrement des redevances 2026.
  *
- * **Un espace par boutique, et pas davantage.** C'est la seule chose que
- * l'on sache avec certitude : tout local abrite au moins une place de
- * vente. Le nombre réel d'espaces par boutique varie — c'est même ce qui
- * a motivé toute la correction — mais il n'est pas dans les données
- * transcrites. Inventer un découpage produirait des B0102 qui
- * n'existent pas et fausserait le taux d'occupation dans l'autre sens.
+ * **Ce que la version précédente posait, et pourquoi c'était faux.**
+ * Elle créait un espace par boutique, faute de mieux : le registre de
+ * ventes transcrit ne portait pas le découpage réel, et inventer une
+ * répartition aurait produit des B0102 inexistants. Le raisonnement
+ * était juste, la donnée manquait simplement. Elle existe désormais —
+ * l'état de recouvrement nomme trente-six espaces, code par code, avec
+ * leur occupant et leur redevance.
  *
- * La coordination ajoute les espaces manquants depuis l'écran dédié : le
- * code se compose tout seul à partir de la boutique.
+ * **Les codes viennent du relevé, ils ne sont pas dérivés.** La règle
+ * reste que le code se compose du numéro du contenant et d'un rang, et
+ * `EspaceLocatif::genererCode()` continue de l'appliquer aux espaces
+ * créés depuis l'écran. Mais le sous-sol SS01 abrite G0201 et SS02
+ * abrite G0202 : ces codes-là figurent sur des contrats signés, et les
+ * renommer pour les faire rentrer dans la règle romprait le lien avec
+ * le papier. Le seeder les pose donc explicitement — le crochet
+ * `creating` ne dérive un code que lorsqu'il en manque un.
  *
- * Idempotent : rejouable après ajout d'espaces sans en recréer ni en
- * écraser aucun.
+ * **B02 saute B0205, B12 saute B1202.** Ce ne sont pas des oublis de
+ * transcription : la feuille numérote ainsi. Un espace peut avoir été
+ * fusionné avec son voisin ou retiré de la location ; le rang reste
+ * porté par le code, qui est figé.
+ *
+ * **B13 et B17 n'ont aucun espace ici.** Une feuille de recouvrement ne
+ * mentionne que ce qui se facture. Les deux locaux existent au relevé
+ * physique du bâtiment, leur découpage est simplement inconnu : mieux
+ * vaut un local sans espace, visible comme tel, qu'un espace inventé
+ * qui fausserait le taux d'occupation dans l'autre sens.
+ *
+ * Idempotent : rejouable sans recréer ni écraser aucun espace.
  */
 class EspaceLocatifSeeder extends Seeder
 {
+    /**
+     * Le parc réel, contenant par contenant.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected const PARC = [
+        'B01' => ['B0101', 'B0102', 'B0103', 'B0104', 'B0105', 'B0106', 'B0107'],
+        'B02' => ['B0201', 'B0202', 'B0203', 'B0204', 'B0206'],
+        'B03' => ['B0301'],
+        'B04' => ['B0401', 'B0402'],
+        'B05' => ['B0501'],
+        'B06' => ['B0601', 'B0602', 'B0603', 'B0604', 'B0605'],
+        'B07' => ['B0701', 'B0702'],
+        'B08' => ['B0801'],
+        'B09' => ['B0901'],
+        'B10' => ['B1001'],
+        'B11' => ['B1101'],
+        'B12' => ['B1201', 'B1203', 'B1204'],
+        'B14' => ['B1401'],
+        'B15' => ['B1501'],
+        'B16' => ['B1601'],
+        'SS01' => ['G0201'],
+        'SS02' => ['G0202'],
+        'EV01' => ['EV0101'],
+    ];
+
     public function run(): void
     {
         $village = VillageArtisanal::where('code', 'VARBAF')->first();
@@ -35,24 +79,61 @@ class EspaceLocatifSeeder extends Seeder
             return;
         }
 
-        $boutiques = Boutique::query()
+        $contenants = Boutique::query()
             ->where('village_id', $village->id)
-            ->orderBy('numero')
-            ->get();
+            ->pluck('id', 'numero');
 
-        foreach ($boutiques as $boutique) {
-            if ($boutique->espacesLocatifs()->exists()) {
+        $poses = 0;
+        $inconnus = [];
+
+        foreach (self::PARC as $numero => $codes) {
+            $contenantId = $contenants[$numero] ?? null;
+
+            if ($contenantId === null) {
+                $inconnus[] = $numero;
+
                 continue;
             }
 
-            EspaceLocatif::create(['boutique_id' => $boutique->getKey()]);
+            foreach ($codes as $code) {
+                $existe = EspaceLocatif::query()
+                    ->where('boutique_id', $contenantId)
+                    ->where('code', $code)
+                    ->exists();
+
+                if ($existe) {
+                    continue;
+                }
+
+                // `code` est hors de `$fillable` : il se pose comme
+                // attribut, jamais par affectation de masse.
+                $espace = new EspaceLocatif(['boutique_id' => $contenantId]);
+                $espace->code = $code;
+                $espace->save();
+
+                $poses++;
+            }
         }
 
         $total = EspaceLocatif::query()
-            ->whereIn('boutique_id', $boutiques->modelKeys())
+            ->whereIn('boutique_id', $contenants->values())
             ->count();
 
-        $this->command?->info("{$total} espaces locatifs en place.");
-        $this->command?->comment('Un espace par boutique : ajoutez les subdivisions réelles depuis l\'écran « Espaces locatifs ».');
+        $this->command?->info("{$total} espaces locatifs en place ({$poses} posés à ce passage).");
+
+        if ($inconnus !== []) {
+            $this->command?->warn('Contenants absents du parc : '.implode(', ', $inconnus).'. Le seeder des boutiques doit passer avant.');
+        }
+
+        $sansEspace = $contenants->keys()
+            ->reject(fn (string $numero) => array_key_exists($numero, self::PARC))
+            ->values();
+
+        if ($sansEspace->isNotEmpty()) {
+            $this->command?->comment(
+                'Sans espace locatif connu : '.$sansEspace->implode(', ')
+                .'. Absents de l\'état de recouvrement, découpage à relever sur place.'
+            );
+        }
     }
 }

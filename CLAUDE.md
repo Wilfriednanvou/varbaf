@@ -29,7 +29,9 @@ Modules dans `Modules/<NomModule>/`, dans cet ordre de dépendance :
 | 5 | Pilotage | Tableaux de bord, indicateurs, fonctionnalité IA |
 | 6 | Portail | Site vitrine public, publication des produits, artisans vedettes |
 
-**Boutique et espace locatif.** Une boutique est un contenant physique — dix-sept locaux, numérotés B01 à B17. Ce qui se loue n'est pas la boutique mais l'**espace locatif** qu'elle abrite : B01 contient B0101, B0102… Plusieurs artisans cohabitent couramment dans un même local, chacun sur son espace. L'attribution, la redevance et la règle de non-chevauchement portent donc sur l'espace, jamais sur la boutique. Le sous-sol et l'espace vert sont hors périmètre : ils ne comportent aucun espace locatif attribué.
+**Boutique et espace locatif.** Une boutique est un contenant physique — dix-sept locaux, numérotés B01 à B17. Ce qui se loue n'est pas la boutique mais l'**espace locatif** qu'elle abrite : B01 contient B0101, B0102… Plusieurs artisans cohabitent couramment dans un même local, chacun sur son espace. L'attribution, la redevance et la règle de non-chevauchement portent donc sur l'espace, jamais sur la boutique.
+
+**Le sous-sol et l'espace vert font partie du parc locatif.** Ils en avaient été écartés le 23/08 au motif qu'ils ne comportaient aucun espace attribué ; l'état de recouvrement des redevances 2026 le dément — SS01 abrite G0201, loué à la CNTC pour 60 000 FCFA par mois, soit la redevance la plus élevée du parc, SS02 abrite G0202, et l'espace vert EV0101. Ce sont des espaces locatifs à part entière. Ils ne sont simplement pas des **locaux de vente** : la colonne `nature` de la table `boutiques`, devenue de fait la table des contenants, porte cette distinction, et le taux d'occupation présenté à la tutelle se calcule sur les seules boutiques.
 
 **Règle de dépendance descendante.** Un module ne référence que les modules dont il dépend. Le Commerce n'écrit jamais directement dans les tables de la Trésorerie : il appelle le service exposé. Aucune dépendance montante.
 
