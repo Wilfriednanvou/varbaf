@@ -34,6 +34,13 @@ class LigneRegistre
     // === Anomalies de boutique ===
     public const BOUTIQUE_ABSENTE = 'Code de boutique absent';
 
+    // === Anomalies d'espace locatif ===
+    public const ESPACE_ABSENT = 'Aucun espace locatif rattaché à cet artisan';
+
+    public const ESPACE_INTROUVABLE = 'Espace locatif nommé au registre mais absent du parc';
+
+    public const OCCUPATION_REFUSEE = 'Occupation refusée : l\'espace est déjà attribué sur la période';
+
     public const BOUTIQUE_REPRISE = 'Code de boutique repris de la ligne précédente';
 
     public const BOUTIQUE_HORS_PARC = 'Code hors du parc des dix-sept boutiques';
@@ -82,6 +89,37 @@ class LigneRegistre
         public readonly ?int $montantTranscrit,
         public readonly bool $ecartSignaleALaSource,
         public array $anomalies = [],
+        /**
+         * Code de l'espace locatif où l'artisan est installé, quand la
+         * coordination l'a établi.
+         *
+         * Il ne vient pas du cahier de ventes — celui-ci ne note aucun
+         * emplacement — mais de la table de correspondance que la
+         * coordination remplit à partir de l'état de recouvrement des
+         * redevances. C'est une décision de gestion recopiée dans le
+         * registre, pas une donnée relevée, et l'import ne s'en sert que
+         * pour retrouver un espace déjà semé : il n'en crée jamais.
+         */
+        public readonly string $espaceLocatif = '',
+        /**
+         * Nom de l'occupant tel qu'il figure au parc, quand le
+         * rapprochement a été tranché à la main.
+         *
+         * Renseigné, il fait autorité sur le rapprochement automatique :
+         * une personne a lu les deux noms et décidé qu'il s'agissait du
+         * même artisan.
+         */
+        public readonly string $nomArtisanOfficiel = '',
+        /**
+         * Redevance mensuelle convenue pour l'espace, en francs.
+         *
+         * Elle ne se déduit d'aucune surface : c'est un forfait négocié
+         * local par local par la coordination, relevé sur l'état de
+         * recouvrement des redevances (arbitrage A-01). L'attribution la
+         * fige à sa création ; le registre de ventes ne fait que la
+         * transporter jusque-là.
+         */
+        public readonly ?int $redevanceConvenue = null,
     ) {}
 
     public function signaler(string $anomalie): void

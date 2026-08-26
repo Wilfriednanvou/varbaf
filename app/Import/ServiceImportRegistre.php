@@ -6,6 +6,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Artisanat\Enums\StatutAttribution;
+use Modules\Artisanat\Exceptions\AttributionChevauchanteException;
+use Modules\Artisanat\Exceptions\AttributionInvalideException;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\AttributionEspace;
 use Modules\Artisanat\Models\Boutique;
@@ -128,7 +130,15 @@ class ServiceImportRegistre
     /** @var array<string, array{boutique: Boutique, libelle: ?string}> */
     protected array $emplacements = [];
 
-    /** @var array<string, EspaceLocatif> */
+    /**
+     * Espaces retrouvés au parc, par boutique et par code.
+     *
+     * La valeur peut être `null` : c'est le cas d'un code que le parc ne
+     * porte pas, mémorisé pour ne pas relancer la même requête
+     * infructueuse à chaque ligne de l'artisan.
+     *
+     * @var array<string, EspaceLocatif|null>
+     */
     protected array $espaces = [];
 
     /** @var array<string, true> */
@@ -475,8 +485,22 @@ class ServiceImportRegistre
         return $entrees;
     }
 
+    /**
+     * Nom sous lequel l'artisan sera enregistré.
+     *
+     * **Le nom officiel prime sur le rapprochement automatique.** Quand
+     * la table de correspondance porte un nom d'occupant, c'est qu'une
+     * personne a lu les deux écritures et tranché ; aucune mesure de
+     * similarité n'a d'autorité contre cela. Le rapprochement par
+     * distance de chaînes reste ce qu'il a toujours été — une
+     * proposition pour les noms que personne n'a encore regardés.
+     */
     protected function nomRetenu(LigneRegistre $ligne, ResultatRapprochement $rapprochement): string
     {
+        if ($ligne->nomArtisanOfficiel !== '') {
+            return $ligne->nomArtisanOfficiel;
+        }
+
         return $rapprochement->canonique($ligne->nomArtisan) ?? self::ARTISAN_NON_IDENTIFIE;
     }
 
@@ -555,17 +579,38 @@ class ServiceImportRegistre
         array $entrees,
     ): void {
         $artisan = $this->resoudreArtisan($this->nomRetenu($ligne, $rapprochement), $rapport);
-        [$boutique, $libelleEspace] = $this->resoudreBoutique($ligne->codeBoutique);
+        [$boutique] = $this->resoudreBoutique($ligne->codeBoutique);
 
-        $espace = $this->resoudreEspace($boutique, $artisan, $libelleEspace, $rapport);
+        $espace = $this->resoudreEspace($boutique, $ligne, $rapport);
 
-        $cleOccupation = $this->cleOccupation($ligne, $rapprochement);
-        $this->resoudreAttribution(
-            $artisan,
-            $espace,
-            $entrees[$cleOccupation] ?? $ligne->date ?? Carbon::now(),
-            $rapport,
-        );
+        // Sans espace, pas d'attribution : une occupation se constate
+        // sur un emplacement nommé, elle ne se déduit pas d'une vente.
+        //
+        // **Et une occupation refusée ne fait pas tomber la vente.** Deux
+        // artisans que la table de correspondance envoie sur le même
+        // espace produisent un chevauchement, et le modèle a raison de
+        // le refuser — c'est la règle qui protège le parc. Mais laisser
+        // l'exception remonter jusqu'ici ferait perdre une recette
+        // réellement encaissée à cause d'une ligne mal remplie dans un
+        // fichier de rattachement. L'argent est entré en caisse ; c'est
+        // le contrat d'occupation qui est douteux, et c'est lui qu'on
+        // signale.
+        if ($espace !== null) {
+            $cleOccupation = $this->cleOccupation($ligne, $rapprochement);
+
+            try {
+                $this->resoudreAttribution(
+                    $artisan,
+                    $espace,
+                    $entrees[$cleOccupation] ?? $ligne->date ?? Carbon::now(),
+                    $ligne->redevanceConvenue,
+                    $rapport,
+                );
+            } catch (AttributionChevauchanteException|AttributionInvalideException) {
+                $ligne->signaler(LigneRegistre::OCCUPATION_REFUSEE);
+                $rapport->incrementer(RapportImport::OCCUPATIONS_REFUSEES);
+            }
+        }
 
         $profil = $profils[$this->cleProduit($ligne, $rapprochement)] ?? [
             'designation' => $ligne->designation,
@@ -601,7 +646,7 @@ class ServiceImportRegistre
                 'vente_id' => $vente->getKey(),
                 'produit_id' => $produit->getKey(),
                 'artisan_id' => $artisan->getKey(),
-                'espace_locatif_id' => $espace->getKey(),
+                'espace_locatif_id' => $espace?->getKey(),
             ]);
         });
 
@@ -710,66 +755,58 @@ class ServiceImportRegistre
     }
 
     /**
-     * Un espace locatif par couple artisan / emplacement.
+     * L'espace locatif nommé au registre, ou rien.
      *
-     * C'est la maille réelle du village : plusieurs artisans se
-     * partagent le même local, chacun sur son espace, et c'est
-     * précisément ce que la correction structurelle de l'attribution a
-     * rendu représentable. Un seul espace par boutique ferait échouer la
-     * deuxième attribution sur un chevauchement — c'est-à-dire refuser
-     * la situation normale du parc.
+     * **L'import ne crée plus d'espace, et c'est le changement du
+     * 26/08.** La version précédente en fabriquait un par couple
+     * artisan / emplacement, faute de connaître le découpage réel : la
+     * reprise du 25/08 a produit trois cent vingt-sept espaces pour un
+     * parc qui en compte trente-six, et `tauxOccupationEspaces()`, qui
+     * compte sans filtrer, a déclaré le village plein. C'est le défaut
+     * n°2 de `docs/donnees/README.md`, et c'est le miroir exact de
+     * l'arbitrage A-05 bis : là où sept emprises non louables
+     * sous-évaluaient le parc d'un tiers, trois cent vingt-sept espaces
+     * fictifs le saturaient.
      *
-     * L'espace déjà semé pour chaque boutique est réutilisé par le
-     * premier artisan rencontré, plutôt que doublé : la coordination
-     * n'a pas à voir apparaître un B0601 vide à côté d'un B0602 occupé.
+     * Le parc réel est désormais semé depuis l'état de recouvrement des
+     * redevances. Il n'y a donc plus rien à deviner : soit la ligne
+     * nomme un espace, et on le retrouve ; soit elle n'en nomme pas, et
+     * la vente s'enregistre quand même — sur la boutique — sans qu'une
+     * occupation soit inventée pour la porter. Une vente sans
+     * emplacement connu est une lacune du cahier, pas un contrat.
      */
     protected function resoudreEspace(
         Boutique $boutique,
-        Artisan $artisan,
-        ?string $libelle,
+        LigneRegistre $ligne,
         RapportImport $rapport,
-    ): EspaceLocatif {
-        $cle = $boutique->getKey().'|'.$artisan->getKey().'|'.($libelle ?? '');
+    ): ?EspaceLocatif {
+        if ($ligne->espaceLocatif === '') {
+            $ligne->signaler(LigneRegistre::ESPACE_ABSENT);
 
-        if (isset($this->espaces[$cle])) {
+            return null;
+        }
+
+        $cle = $boutique->getKey().'|'.$ligne->espaceLocatif;
+
+        if (array_key_exists($cle, $this->espaces)) {
             return $this->espaces[$cle];
         }
 
-        $requete = fn () => EspaceLocatif::query()
+        $espace = EspaceLocatif::query()
             ->where('boutique_id', $boutique->getKey())
-            ->when(
-                $libelle === null,
-                fn ($sousRequete) => $sousRequete->whereNull('libelle'),
-                fn ($sousRequete) => $sousRequete->where('libelle', $libelle),
-            );
-
-        // Déjà attribué à cet artisan : c'est le cas d'une relance.
-        $espace = $requete()
-            ->whereHas('attributions', fn ($sousRequete) => $sousRequete
-                ->where('artisan_id', $artisan->getKey())
-                ->where('statut', StatutAttribution::ACTIVE->value))
-            ->orderBy('code')
-            ->first();
-
-        // Sinon, un espace encore libre du même emplacement.
-        $espace ??= $requete()
-            ->whereDoesntHave('attributions', fn ($sousRequete) => $sousRequete
-                ->where('statut', StatutAttribution::ACTIVE->value))
-            ->orderBy('code')
+            ->where('code', $ligne->espaceLocatif)
             ->first();
 
         if (! $espace) {
-            $espace = EspaceLocatif::create([
-                'boutique_id' => $boutique->getKey(),
-                'libelle' => $libelle,
-            ]);
-
-            $rapport->incrementer(RapportImport::ESPACES_CREES);
-
-            if ($libelle !== null) {
-                $rapport->incrementer(RapportImport::ESPACES_HORS_PARC);
-                $rapport->signalerEspaceHorsParc($libelle, (string) $espace->code);
-            }
+            // Le registre nomme un espace que le parc ne porte pas.
+            // L'ancienne version l'aurait créé ; celle-ci le signale et
+            // rattache la vente à la seule boutique. Créer ici
+            // reviendrait à laisser une table de correspondance mal
+            // remplie modifier le parc — exactement ce qu'on vient de
+            // fermer.
+            $ligne->signaler(LigneRegistre::ESPACE_INTROUVABLE);
+            $rapport->signalerEspaceHorsParc($ligne->espaceLocatif, (string) $boutique->numero);
+            $rapport->incrementer(RapportImport::ESPACES_HORS_PARC);
         }
 
         return $this->espaces[$cle] = $espace;
@@ -779,6 +816,7 @@ class ServiceImportRegistre
         Artisan $artisan,
         EspaceLocatif $espace,
         Carbon $dateDebut,
+        ?int $redevance,
         RapportImport $rapport,
     ): void {
         $cle = $artisan->getKey().'|'.$espace->getKey();
@@ -799,9 +837,13 @@ class ServiceImportRegistre
                 // celle de la plus ancienne vente relevée.
                 'date_debut' => $dateDebut->toDateString(),
                 'date_fin' => null,
-                // Le registre ne porte pas la redevance négociée, et un
-                // montant inventé serait figé puis facturé.
-                'redevance_convenue' => null,
+                // Le forfait relevé sur l'état de recouvrement des
+                // redevances, figé ici comme sur tout contrat (A-01).
+                // Il reste nul quand la coordination n'a pas encore
+                // établi le rattachement : mieux vaut une redevance
+                // absente, visible au rapport, qu'un montant inventé
+                // qui serait figé puis facturé.
+                'redevance_convenue' => $redevance,
                 'dossier_complet' => false,
                 'statut' => StatutAttribution::ACTIVE,
                 'artisan_id' => $artisan->getKey(),
@@ -810,7 +852,10 @@ class ServiceImportRegistre
             ]);
 
             $rapport->incrementer(RapportImport::ATTRIBUTIONS_CREEES);
-            $rapport->incrementer(RapportImport::ATTRIBUTIONS_SANS_REDEVANCE);
+
+            if ($redevance === null) {
+                $rapport->incrementer(RapportImport::ATTRIBUTIONS_SANS_REDEVANCE);
+            }
         }
 
         $this->attributions[$cle] = true;

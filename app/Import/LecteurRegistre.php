@@ -69,6 +69,24 @@ class LecteurRegistre
     ];
 
     /**
+     * Colonnes lues si elles sont là, ignorées sinon.
+     *
+     * Elles ne viennent pas du cahier mais du travail de rattachement
+     * de la coordination : l'espace locatif de l'artisan, son nom
+     * officiel au parc, et la redevance convenue pour cet espace. Les
+     * exiger ferait échouer la lecture d'un registre transcrit avant
+     * que ce rattachement n'existe — or l'ordre des travaux est bien
+     * celui-là : on transcrit, puis on rattache.
+     *
+     * @var array<int, string>
+     */
+    public const COLONNES_FACULTATIVES = [
+        'espace_locatif',
+        'nom_artisan_officiel',
+        'redevance_convenue',
+    ];
+
+    /**
      * Valeurs qui ne désignent rien : le registre les emploie là où le
      * scribe n'a pas su.
      *
@@ -290,6 +308,9 @@ class LecteurRegistre
             montantTranscrit: $montant,
             ecartSignaleALaSource: $ecartSource,
             anomalies: $anomalies,
+            espaceLocatif: Normalisation::codeBoutique($brut['espace_locatif'] ?? ''),
+            nomArtisanOfficiel: Normalisation::lisible($brut['nom_artisan_officiel'] ?? ''),
+            redevanceConvenue: Normalisation::entier($brut['redevance_convenue'] ?? ''),
         );
 
         // L'écart de calcul est constaté sur les valeurs retenues, et non

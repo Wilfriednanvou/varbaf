@@ -74,6 +74,8 @@ class RapportImport
 
     public const ATTRIBUTIONS_CREEES = 'attributions_creees';
 
+    public const OCCUPATIONS_REFUSEES = 'occupations_refusees';
+
     public const PRODUITS_CREES = 'produits_crees';
 
     public const DEPOTS_CREES = 'depots_crees';
@@ -176,6 +178,50 @@ class RapportImport
         return $this->signalements;
     }
 
+    /**
+     * Combien de lignes portent chaque anomalie, de la plus fréquente à
+     * la plus rare.
+     *
+     * **Pourquoi ce dénombrement existe.** « Lignes signalées : 100 % »
+     * ne dit rien. Sur ce registre, la quantité est déduite du montant à
+     * chaque ligne parce que le cahier n'en note jamais : c'est une
+     * propriété de la source, pas un incident, et elle noyait les cent
+     * dates réellement héritées de la ligne du dessus. Le compte par
+     * nature sépare ce qui est structurel de ce qui est exceptionnel
+     * sans avoir à décider d'avance lequel est lequel — la fréquence le
+     * dit.
+     *
+     * Les rejets techniques sont regroupés sous un seul libellé : leur
+     * message porte le détail de l'erreur, qui est propre à chaque
+     * ligne et ne se compte pas.
+     *
+     * @return array<string, int>
+     */
+    public function anomaliesParNature(): array
+    {
+        $comptes = [];
+
+        foreach ($this->signalements as $signalement) {
+            $libelle = $signalement['anomalies'] ?? '';
+
+            if ($libelle === '') {
+                continue;
+            }
+
+            foreach (explode(' | ', $libelle) as $anomalie) {
+                if (str_starts_with($anomalie, 'Rejet technique')) {
+                    $anomalie = 'Rejet technique';
+                }
+
+                $comptes[$anomalie] = ($comptes[$anomalie] ?? 0) + 1;
+            }
+        }
+
+        arsort($comptes);
+
+        return $comptes;
+    }
+
     public function part(string $cle): string
     {
         $base = $this->valeur(self::LIGNES_TRAITEES);
@@ -194,10 +240,10 @@ class RapportImport
      */
     public function indicateurs(): array
     {
-        return [
+        $lignes = [
             ['Lignes', 'Lignes traitées', (string) $this->valeur(self::LIGNES_TRAITEES), '100,0 %'],
             ['Lignes', 'Lignes importées', (string) $this->valeur(self::LIGNES_IMPORTEES), $this->part(self::LIGNES_IMPORTEES)],
-            ['Lignes', 'Lignes signalées', (string) $this->valeur(self::LIGNES_SIGNALEES), $this->part(self::LIGNES_SIGNALEES)],
+            ['Lignes', 'Lignes portant au moins une anomalie', (string) $this->valeur(self::LIGNES_SIGNALEES), $this->part(self::LIGNES_SIGNALEES)],
             ['Lignes', 'Lignes non importées', (string) $this->valeur(self::LIGNES_NON_IMPORTEES), $this->part(self::LIGNES_NON_IMPORTEES)],
             ['Lignes', 'Lignes déjà reprises lors d\'un import antérieur', (string) $this->valeur(self::LIGNES_DEJA_REPRISES), $this->part(self::LIGNES_DEJA_REPRISES)],
 
@@ -217,8 +263,12 @@ class RapportImport
             ['Boutiques', 'Emplacements retenus', (string) $this->valeur(self::BOUTIQUES_RETENUES), '—'],
 
             ['Créations', 'Artisans créés', (string) $this->valeur(self::ARTISANS_CREES), '—'],
-            ['Créations', 'Espaces locatifs créés', (string) $this->valeur(self::ESPACES_CREES), '—'],
-            ['Créations', 'dont espaces hors parc (boutique technique)', (string) $this->valeur(self::ESPACES_HORS_PARC), '—'],
+            // Le compteur est conservé après le 26/08, où l'import a
+            // cessé d'en créer : « 0 » est désormais une affirmation,
+            // et la retirer de l'état reviendrait à ne plus la faire.
+            ['Créations', 'Espaces locatifs créés', (string) $this->valeur(self::ESPACES_CREES), 'L\'import n\'en crée plus depuis le 26/08'],
+            ['Anomalies', 'Espaces nommés au registre mais absents du parc', (string) $this->valeur(self::ESPACES_HORS_PARC), '—'],
+            ['Anomalies', 'Occupations refusées (espace déjà attribué)', (string) $this->valeur(self::OCCUPATIONS_REFUSEES), 'La vente est conservée'],
             ['Créations', 'Attributions créées', (string) $this->valeur(self::ATTRIBUTIONS_CREEES), '—'],
             ['Créations', 'Produits créés', (string) $this->valeur(self::PRODUITS_CREES), '—'],
             ['Créations', 'Dépôts créés', (string) $this->valeur(self::DEPOTS_CREES), '—'],
@@ -228,6 +278,29 @@ class RapportImport
             ['À compléter', 'Produits sans catégorie', (string) $this->valeur(self::PRODUITS_SANS_CATEGORIE), '—'],
             ['À compléter', 'Attributions sans redevance convenue', (string) $this->valeur(self::ATTRIBUTIONS_SANS_REDEVANCE), '—'],
         ];
+
+        // Le détail par nature ferme le tableau : c'est lui qui rend le
+        // compte des lignes signalées lisible, en montrant ce qui tient
+        // à la forme de la source et ce qui tient à un incident.
+        foreach ($this->anomaliesParNature() as $anomalie => $nombre) {
+            $lignes[] = ['Détail des anomalies', $anomalie, (string) $nombre, $this->partDeValeur($nombre)];
+        }
+
+        return $lignes;
+    }
+
+    /**
+     * Part d'un nombre de lignes dans le total traité.
+     */
+    protected function partDeValeur(int $nombre): string
+    {
+        $total = $this->valeur(self::LIGNES_TRAITEES);
+
+        if ($total === 0) {
+            return '—';
+        }
+
+        return number_format($nombre * 100 / $total, 1, ',', ' ').' %';
     }
 
     public function seuilLisible(): string
