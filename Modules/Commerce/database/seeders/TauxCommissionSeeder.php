@@ -14,25 +14,29 @@ use Modules\Socle\Models\VillageArtisanal;
  * semée refuserait toute vente. Poser un taux n'est donc pas un
  * confort, c'est ce qui rend l'application démarrable.
  *
- * **Le taux posé ici est provisoire.** Il vaut 10 %, dernier des trois
- * taux cités en exemple lors du cadrage (15 %, puis 5 %, puis 10 %). Ce
- * n'est pas une donnée relevée sur pièce, et CLAUDE.md interdit les
- * données inventées : la référence de décision le dit explicitement, et
- * la console le rappelle à chaque passage. Le taux réel et sa date
- * d'effet doivent être repris de l'acte de la coordination.
+ * **Le taux de 10 % est confirmé par la coordination** (26/08/2026). Il
+ * n'est plus provisoire : c'est le taux prélevé par le village sur les
+ * ventes des artisans. Seule la référence de l'acte qui le fixe reste à
+ * renseigner, et elle ne change ni la valeur ni la date d'effet.
+ *
+ * Le mécanisme d'historisation reste entier : `TauxCommission` porte une
+ * date d'effet parce que RG-11 fait dépendre le taux d'une vente de sa
+ * propre date. Qu'un seul taux soit en vigueur aujourd'hui ne dispense
+ * pas d'en poser un daté — c'est ce qui permettra d'en enregistrer un
+ * second sans retoucher le premier.
  *
  * Corriger revient à enregistrer un nouveau taux daté depuis l'écran —
  * jamais à retoucher celui-ci une fois entré en vigueur.
  */
 class TauxCommissionSeeder extends Seeder
 {
-    protected const TAUX_PROVISOIRE = 10.00;
+    protected const TAUX_EN_VIGUEUR = 10.00;
 
-    protected const REFERENCE_PROVISOIRE = 'TAUX PROVISOIRE — à remplacer par la référence de l\'acte en vigueur';
+    protected const REFERENCE_ACTE = 'Taux de 10 % confirmé par la coordination — référence de l\'acte à renseigner';
 
     /**
-     * Date d'effet du taux provisoire : l'ouverture de l'exercice
-     * pendant lequel s'ouvre le registre transcrit.
+     * Date d'effet : l'ouverture de l'exercice pendant lequel s'ouvre le
+     * registre transcrit.
      *
      * **Pourquoi remonter aussi loin.** Le taux appliqué à une vente est
      * celui en vigueur **à sa date** (règle 10), et `getTauxEnVigueur()`
@@ -46,10 +50,8 @@ class TauxCommissionSeeder extends Seeder
      *
      * La constante est datée et non calculée : elle désigne un fait —
      * l'ouverture du registre — et non une variable d'environnement.
-     * Elle disparaîtra avec le taux provisoire lui-même, le jour où la
-     * coordination saisira ses actes réels et leurs dates d'effet.
      */
-    protected const DATE_EFFET_PROVISOIRE = '2023-01-01';
+    protected const DATE_EFFET_INITIALE = '2023-01-01';
 
     public function run(): void
     {
@@ -69,17 +71,17 @@ class TauxCommissionSeeder extends Seeder
         $ouvertureExercice = $village->exerciceEnCours()?->date_debut?->toDateString()
             ?? now()->startOfYear()->toDateString();
 
-        $dateEffet = min(self::DATE_EFFET_PROVISOIRE, $ouvertureExercice);
+        $dateEffet = min(self::DATE_EFFET_INITIALE, $ouvertureExercice);
 
         $taux = TauxCommission::firstOrCreate(
             ['village_id' => $village->id, 'date_effet' => $dateEffet],
             [
-                'taux' => self::TAUX_PROVISOIRE,
-                'reference_decision' => self::REFERENCE_PROVISOIRE,
+                'taux' => self::TAUX_EN_VIGUEUR,
+                'reference_decision' => self::REFERENCE_ACTE,
             ],
         );
 
         $this->command?->info("Taux de commission en vigueur : {$taux->libelle()}.");
-        $this->command?->warn('Ce taux est PROVISOIRE. Saisissez le taux réel et sa date d\'effet depuis l\'écran « Taux de commission ».');
+        $this->command?->comment('Référence de l\'acte à renseigner depuis l\'écran « Taux de commission ».');
     }
 }
