@@ -1,0 +1,77 @@
+question;categorie_attendue;attendus;refus_attendu
+# ---------------------------------------------------------------------
+# Jeu d'évaluation de l'assistant d'interrogation — table 4.3 du rapport.
+#
+# Quatre colonnes, point-virgule pour séparateur :
+#   question            la question telle qu'on la poserait
+#   categorie_attendue  AGREGATION ou DESCRIPTIVE
+#   attendus            fragments cherchés dans les titres des sources,
+#                       séparés par des barres verticales. Vide pour une
+#                       question d'agrégation : sa réponse est un calcul,
+#                       elle n'a pas de source documentaire.
+#   refus_attendu       oui si l'assistant doit refuser de répondre
+#
+# Les fragments visent les corps de métier du village, qui sont seedés et
+# donc stables d'un import à l'autre. Les références de produits et les
+# matricules d'artisans changent à chaque reprise du registre : les viser
+# rendrait le jeu caduc à la première réimportation.
+# ---------------------------------------------------------------------
+# --- AGRÉGATION : recettes ------------------------------------------
+Quel est le chiffre d'affaires ?;AGREGATION;;non
+Quel est le chiffre d'affaires en juillet ?;AGREGATION;;non
+Quel chiffre d'affaires en 2024 ?;AGREGATION;;non
+Quel est le montant des ventes ce mois-ci ?;AGREGATION;;non
+Combien le village a-t-il vendu cette année ?;AGREGATION;;non
+Quelles sont les recettes de commission ?;AGREGATION;;non
+Quel est le montant des commissions en mars 2025 ?;AGREGATION;;non
+Combien de ventes ont été enregistrées ?;AGREGATION;;non
+Combien de ventes en juin 2024 ?;AGREGATION;;non
+Quel est le panier moyen ?;AGREGATION;;non
+# --- AGRÉGATION : trésorerie ----------------------------------------
+Quelles sont les dettes envers les artisans ?;AGREGATION;;non
+Combien reste-t-il à reverser ?;AGREGATION;;non
+Quel est le solde de caisse ?;AGREGATION;;non
+Combien y a-t-il en caisse ?;AGREGATION;;non
+Quel est le dernier reversement ?;AGREGATION;;non
+Quelle est la dernière campagne de reversement ?;AGREGATION;;non
+# --- AGRÉGATION : ventilations --------------------------------------
+Quelles sont les ventes par boutique ?;AGREGATION;;non
+Quelles sont les ventes par artisan ?;AGREGATION;;non
+Quelles sont les ventes par vendeur en 2025 ?;AGREGATION;;non
+Quelle est la provenance des clients ?;AGREGATION;;non
+Quel artisan vend le plus ?;AGREGATION;;non
+Quelle boutique vend le plus en juillet ?;AGREGATION;;non
+# --- AGRÉGATION : parc et catalogue ---------------------------------
+Quel est le taux d'occupation du parc ?;AGREGATION;;non
+Combien d'espaces sont occupés ?;AGREGATION;;non
+Quels produits sont en rupture de stock ?;AGREGATION;;non
+Combien de produits en rupture ?;AGREGATION;;non
+Quels sont les produits isolés du catalogue ?;AGREGATION;;non
+Quels sont les segments saturés ?;AGREGATION;;non
+# --- AGRÉGATION : paramètre obligatoire manquant ---------------------
+# Reconnue, mais sans artisan nommé : l'assistant doit demander la
+# précision plutôt que choisir un artisan à la place du demandeur.
+Quelle est la situation de l'artisan ?;AGREGATION;;non
+Quelle est l'activité de la boutique ?;AGREGATION;;non
+# --- DESCRIPTIVE : corps de métier ----------------------------------
+Quels artisans travaillent la vannerie ?;DESCRIPTIVE;vannerie;non
+Qui fait de la sculpture au village ?;DESCRIPTIVE;sculpture;non
+Quels artisans travaillent le bronze ?;DESCRIPTIVE;bronze;non
+Que propose l'agroalimentaire au village ?;DESCRIPTIVE;agroalimentaire;non
+Quels artisans font du tissage ?;DESCRIPTIVE;tissage;non
+Qui travaille le cuir ?;DESCRIPTIVE;cuir;non
+Quels artisans font de la menuiserie ?;DESCRIPTIVE;menuiserie;non
+Que trouve-t-on en cosmétiques ?;DESCRIPTIVE;cosmetique;non
+Quels produits relèvent de la décoration ?;DESCRIPTIVE;decoration;non
+Quels artisans pratiquent la broderie traditionnelle ?;DESCRIPTIVE;broderie;non
+# --- DESCRIPTIVE : sans réponse possible ----------------------------
+# Vocabulaire absent du corpus du village : l'assistant doit refuser,
+# non proposer le passage le moins éloigné.
+Quels artisans soufflent le verre de Murano ?;DESCRIPTIVE;;oui
+Où acheter des skis de fond au village ?;DESCRIPTIVE;;oui
+Quel est le taux de change du yen japonais ?;DESCRIPTIVE;;oui
+Quels artisans réparent les moteurs diesel ?;DESCRIPTIVE;;oui
+Le village propose-t-il des cours de plongée sous-marine ?;DESCRIPTIVE;;oui
+Quelle est la météo prévue pour la semaine prochaine ?;DESCRIPTIVE;;oui
+Qui vend des semi-conducteurs au village ?;DESCRIPTIVE;;oui
+Trouve-t-on de la porcelaine de Limoges ici ?;DESCRIPTIVE;;oui

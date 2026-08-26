@@ -78,9 +78,51 @@ return [
     |--------------------------------------------------------------------------
     */
     'recommandation' => [
+
+        // Nombre de voisins restitués au plus.
         'voisins' => 5,
+
+        // Plancher de qualite du rapprochement. Il porte sur la
+        // similarité brute, jamais sur le score : la majoration du même
+        // artisan classe, elle ne repêche pas.
         'seuil' => 0.15,
+
+        // Facteur appliqué au score de classement quand le voisin est du
+        // même artisan. À 1.0, la majoration est neutralisee.
         'bonus_meme_artisan' => 1.15,
+
+        // Défaut du paramètre de surface. Le portail le force a false :
+        // un produit épuisé y est annoncé « sur commande », pas masque.
+        'exclure_stock_epuise' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Analyse du catalogue
+    |--------------------------------------------------------------------------
+    |
+    | La meme mesure de similarité, retournée vers le catalogue entier.
+    | Deux lectures : ce qui n'a de voisin nulle part, ce qui en a trop.
+    |
+    */
+    'analyse' => [
+
+        // En dessous, un produit est dit isolé : rien du catalogue ne
+        // lui ressemble. Distinct du seuil de recommandation, pour
+        // pouvoir être calibré séparément.
+        'seuil_isolement' => 0.15,
+
+        // Au-dessus, deux produits sont dits très proches. Plus haut que
+        // le seuil de recommandation : suggérer un article approchant et
+        // signaler une concurrence ne demandent pas la même exigence.
+        'seuil_saturation' => 0.45,
+
+        // Nombre d'artisans distincts à partir duquel on parle de
+        // segment saturé.
+        'artisans_minimum' => 2,
+
+        // Bornes des listes affichées au tableau de bord.
+        'limite' => 8,
     ],
 
     /*
@@ -89,8 +131,34 @@ return [
     |--------------------------------------------------------------------------
     */
     'recherche' => [
+
+        // Plancher de similarité d'un extrait. En dessous, l'assistant
+        // refuse plutôt que de restituer le passage le moins éloigné :
+        // une réponse approchée à une question sans réponse est pire
+        // qu'un aveu d'ignorance.
         'seuil' => 0.10,
+
+        // Nombre d'extraits restitués, et borne du rappel@5.
         'extraits' => 5,
+
+        // Longueur maximale d'un extrait affiché, en caractères.
+        'longueur_extrait' => 200,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assistant d'interrogation
+    |--------------------------------------------------------------------------
+    */
+    'assistant' => [
+
+        // Score minimal de reconnaissance d'une intention, en nombre de
+        // termes. Deux au moins, et l'asymétrie est voulue : sous ce
+        // seuil la question part vers la branche descriptive, où elle
+        // n'obtiendra rien plutôt qu'un montant faux. Un faux négatif
+        // coûte une question sans réponse ; un faux positif attribue un
+        // montant au mauvais indicateur.
+        'seuil_intention' => 2,
     ],
 
 ];

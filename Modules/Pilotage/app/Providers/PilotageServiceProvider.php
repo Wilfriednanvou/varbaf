@@ -4,6 +4,11 @@ namespace Modules\Pilotage\Providers;
 
 use Livewire\Livewire;
 use Modules\Pilotage\Console\IndexerCorpusCommand;
+use Modules\Pilotage\Console\EvaluerAssistantCommand;
+use Modules\Pilotage\Console\VoisinsProduitCommand;
+use Modules\Pilotage\Recommandation\MoteurLexical;
+use Modules\Pilotage\Recherche\MoteurMotsCles;
+use Modules\Pilotage\Recommandation\ResolveurDeMoteur;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 /**
@@ -32,6 +37,22 @@ class PilotageServiceProvider extends ModuleServiceProvider
         // analytique sont lus à chaque calcul — un `config()` qui rend
         // null y deviendrait un zéro silencieux.
         $this->mergeConfigFrom(module_path($this->name, 'config/config.php'), $this->nameLower);
+
+        // Le catalogue des moteurs sémantiques, indexé par la clé que
+        // « pilotage.moteur.ordre » emploie. Une branche dense s'ajoutera
+        // ici sous la clé « dense » : c'est la seule ligne à écrire pour
+        // qu'elle passe devant, et le repli sur la branche lexicale
+        // fonctionne alors sans qu'aucun appelant ne change.
+        $this->app->singleton(ResolveurDeMoteur::class, fn ($app): ResolveurDeMoteur => new ResolveurDeMoteur([
+            'lexical' => $app->make(MoteurLexical::class),
+
+            // Le témoin par mots-clés est enregistré mais absent de
+            // « pilotage.moteur.ordre » : la commande d'évaluation
+            // peut l'atteindre par son nom, la résolution normale ne
+            // tombera jamais dessus. Ce n'est pas un moteur de repli,
+            // c'est un instrument de mesure.
+            'mots_cles' => $app->make(MoteurMotsCles::class),
+        ]));
     }
 
     public function boot(): void
@@ -51,6 +72,8 @@ class PilotageServiceProvider extends ModuleServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 IndexerCorpusCommand::class,
+                VoisinsProduitCommand::class,
+                EvaluerAssistantCommand::class,
             ]);
         }
     }

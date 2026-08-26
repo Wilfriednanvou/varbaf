@@ -2,6 +2,26 @@
     {{-- Les filtres vivent sur la page, pas sur chaque widget : trois
          sélecteurs d'exercice côte à côte finiraient par afficher trois
          périodes différentes sans que le lecteur s'en aperçoive. --}}
+    {{-- L'assistant est une autre façon d'interroger les mêmes
+         indicateurs : il vit donc à côté du tableau de bord, pas
+         ailleurs dans la navigation. --}}
+    <x-filament::section heading="Interroger le tableau de bord">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <p class="text-sm">
+                Posez une question en français : les questions chiffrées sont résolues par le calcul,
+                les questions descriptives par la recherche dans le corpus indexé.
+            </p>
+
+            <x-filament::button
+                tag="a"
+                :href="route('filament.admin.pages.assistant')"
+                icon="heroicon-o-chat-bubble-left-right"
+            >
+                Ouvrir l'assistant
+            </x-filament::button>
+        </div>
+    </x-filament::section>
+
     <x-filament::section heading="Portée des indicateurs">
         <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; align-items: end; margin-bottom: 1rem;">
             <div>
@@ -81,5 +101,17 @@
             :filtres="$filtres"
             :key="'alertes-'.$empreinte"
         />
+    @endcan
+
+    {{-- Lecture du catalogue par la similarité. Ces deux blocs ne
+         dépendent pas des filtres de période : ils décrivent la forme du
+         catalogue à l'instant présent, pas ce qui s'est vendu. Leur clé
+         ne porte donc pas l'empreinte du filtre — la remonter à chaque
+         changement de date relancerait un calcul coûteux pour un
+         résultat identique. --}}
+    @can('consulter_tableau_bord')
+        <livewire:pilotage::produits-isoles key="produits-isoles" />
+
+        <livewire:pilotage::segments-satures key="segments-satures" />
     @endcan
 </x-filament-panels::page>
