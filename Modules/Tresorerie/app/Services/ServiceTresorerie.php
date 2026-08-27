@@ -52,24 +52,58 @@ class ServiceTresorerie implements JournalDeCaisse
     private const VIOLATION_UNICITE = '23505';
 
     /**
-     * Section ciblée pour les opérations en cours.
+     * Section ciblée pour l'opération en cours.
      *
-     * Quand l'écran opérationnel de caisse enregistre une vente ou un
-     * mouvement, il cible la section affichée plutôt que la première
-     * section ouverte trouvée. La valeur est remise à null après usage.
+     * Quand l'écran opérationnel de caisse enregistre une vente, il
+     * cible la section affichée plutôt que la première section ouverte
+     * trouvée : la vente saisie au comptoir de la caisse secondaire ne
+     * doit pas atterrir au brouillard de la principale.
+     *
+     * **Propriété d'instance, et non statique — dette Y7.** La version
+     * précédente exposait un `static` que l'appelant posait puis
+     * remettait à null dans son propre `finally`. Le mécanisme
+     * fonctionnait, mais sa justesse reposait sur la discipline de qui
+     * l'appelle : un `finally` oublié, une exception dans un chemin non
+     * prévu, et la section restait ciblée pour tout ce qui suivait dans
+     * le même processus — sans que rien ne le signale, puisque les
+     * écritures continuaient de réussir, ailleurs. Le `finally` est
+     * désormais **dans** le service, où on ne peut plus l'oublier.
      */
-    protected static ?SectionCaisse $sectionCible = null;
+    private ?SectionCaisse $sectionCible = null;
 
     /**
-     * Cible temporairement une section pour les prochaines écritures.
+     * Exécute une opération en ciblant une section de caisse.
      *
-     * À appeler avant `ServiceVente::enregistrer()` ou toute autre
-     * opération passant par le brouillard, puis à remettre à null dans
-     * un bloc `finally`.
+     * Tout ce que l'opération écrira au brouillard sans nommer sa
+     * section — typiquement `ServiceVente::enregistrer()`, qui passe par
+     * le port `JournalDeCaisse` et ne connaît pas la Trésorerie — visera
+     * celle-ci.
+     *
+     * La section précédente est restaurée plutôt qu'effacée : deux
+     * ciblages imbriqués se défont dans l'ordre, et le plus extérieur
+     * survit au plus intérieur. Sans cette sauvegarde, une opération
+     * imbriquée relâcherait le ciblage de celle qui l'englobe.
+     *
+     * **Ce service doit être un singleton du conteneur** pour que le
+     * ciblage posé ici soit vu par l'instance que le Commerce utilise
+     * via `JournalDeCaisse`. Le fournisseur du module s'en charge, et
+     * `SessionCaisseTest` l'éprouve.
+     *
+     * @template TRetour
+     *
+     * @param  callable(): TRetour  $operation
+     * @return TRetour
      */
-    public static function ciblerSection(?SectionCaisse $section): void
+    public function pour(SectionCaisse $section, callable $operation): mixed
     {
-        static::$sectionCible = $section;
+        $precedente = $this->sectionCible;
+        $this->sectionCible = $section;
+
+        try {
+            return $operation();
+        } finally {
+            $this->sectionCible = $precedente;
+        }
     }
 
     /**
@@ -250,13 +284,19 @@ class ServiceTresorerie implements JournalDeCaisse
         // Si une section est ciblée par l'écran opérationnel, on la
         // retourne directement. Le contrôle « estOuverte » est fait
         // dans `enregistrer()`, pas ici.
-        if (static::$sectionCible) {
-            return static::$sectionCible;
+        if ($this->sectionCible) {
+            return $this->sectionCible;
         }
 
+        // `orderBy` explicite : sans lui, PostgreSQL ne promet aucun
+        // ordre, et le repli désignerait une caisse plutôt qu'une autre
+        // au gré du plan d'exécution. Le repli restera peut-être à
+        // amender le jour où « caisse unique ou multiple ? » sera
+        // tranché ; d'ici là, au moins il désigne toujours la même.
         $section = SectionCaisse::query()
             ->whereHas('caisse', fn ($q) => $q->where('etat', EtatCaisse::ACTIVE->value))
             ->where('etat', EtatSectionCaisse::OUVERTE->value)
+            ->orderBy('id')
             ->first();
 
         if (! $section) {

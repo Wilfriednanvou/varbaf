@@ -9,6 +9,7 @@ use Livewire\Livewire;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Artisanat\Models\CorpsMetier;
+use Modules\Commerce\Contracts\JournalDeCaisse;
 use Modules\Commerce\Enums\EtatVente;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Models\CategorieProduit;
@@ -515,6 +516,141 @@ class SessionCaisseTest extends TestCase
             EtatVente::VALIDEE,
             $vente->fresh()->etat,
             "La vente d'une autre caisse ne doit pas avoir été annulée."
+        );
+    }
+
+    // === CIBLAGE DE LA SECTION (dette Y7) ===
+
+    /**
+     * Le ciblage n'était éprouvé nulle part.
+     *
+     * `ServiceVente` ne connaît pas la Trésorerie : il écrit par le port
+     * `JournalDeCaisse`, sans nommer de section. C'est l'écran de caisse
+     * qui désigne celle qu'il affiche. Tant qu'une seule caisse était
+     * ouverte, le repli de `resoudreSectionOuverte()` tombait juste par
+     * accident, et rien n'aurait signalé que le ciblage ne fonctionnait
+     * plus. Ce test lui ôte cet accident : deux caisses ouvertes, et la
+     * vente doit atterrir dans la bonne.
+     */
+    public function test_une_vente_saisie_depuis_une_caisse_ecrit_au_brouillard_de_cette_caisse(): void
+    {
+        $this->actingAs($this->vendeuse);
+
+        $autreSection = $this->autreSectionOuverte();
+
+        Livewire::test(VentesCaisseTable::class, ['sectionId' => $autreSection->id])
+            ->call('creerVente', [
+                'lignes' => [['produit_id' => $this->produit->id, 'quantite' => 1]],
+                'mode_reglement' => 'ESPECES',
+            ])
+            ->assertNotified('Vente enregistrée');
+
+        $vente = Vente::query()->firstOrFail();
+
+        $this->assertSame(
+            $autreSection->id,
+            $vente->section_caisse_id,
+            'La vente doit être rattachée à la section depuis laquelle elle a été saisie.',
+        );
+
+        $mouvement = MouvementCaisse::query()
+            ->where('origine_type', 'Vente')
+            ->where('origine_id', $vente->id)
+            ->firstOrFail();
+
+        $this->assertSame(
+            $autreSection->id,
+            $mouvement->section_id,
+            "L'encaissement doit entrer au brouillard de la caisse secondaire, pas à celui de la principale.",
+        );
+    }
+
+    /**
+     * Le cœur de la dette Y7.
+     *
+     * La version précédente confiait le relâchement du ciblage au
+     * `finally` de l'appelant. Un `finally` oublié — ou un chemin de
+     * sortie qu'on n'avait pas prévu — et la section restait ciblée pour
+     * toutes les écritures suivantes du même processus, sans qu'aucune
+     * n'échoue : elles réussissaient, ailleurs.
+     */
+    public function test_le_ciblage_est_relache_meme_quand_l_operation_echoue(): void
+    {
+        $autreSection = $this->autreSectionOuverte();
+        $tresorerie = app(ServiceTresorerie::class);
+
+        $exceptionRemontee = false;
+
+        try {
+            $tresorerie->pour(
+                $autreSection,
+                fn () => throw new \DomainException('Panne au milieu de l\'opération'),
+            );
+        } catch (\DomainException) {
+            $exceptionRemontee = true;
+        }
+
+        $this->assertTrue(
+            $exceptionRemontee,
+            '`pour()` relâche le ciblage, il n\'avale pas l\'exception de l\'opération.',
+        );
+
+        $this->assertSame(
+            $this->sectionOuverte->id,
+            $tresorerie->resoudreSectionOuverte()->getKey(),
+            'Une opération en échec ne doit pas laisser la caisse secondaire ciblée pour tout ce qui suit.',
+        );
+    }
+
+    /**
+     * Le ciblage restaure le précédent au lieu de l'effacer : sans cela,
+     * une opération imbriquée relâcherait le ciblage de celle qui
+     * l'englobe, et la suite de l'opération englobante repartirait au
+     * repli sans que rien ne le dise.
+     */
+    public function test_deux_ciblages_imbriques_se_defont_dans_l_ordre(): void
+    {
+        $autreSection = $this->autreSectionOuverte();
+        $tresorerie = app(ServiceTresorerie::class);
+
+        $tresorerie->pour($autreSection, function () use ($tresorerie, $autreSection) {
+            $tresorerie->pour($this->sectionOuverte, function () use ($tresorerie) {
+                $this->assertSame(
+                    $this->sectionOuverte->id,
+                    $tresorerie->resoudreSectionOuverte()->getKey(),
+                    'Le ciblage intérieur prime tant qu\'il tient.',
+                );
+            });
+
+            $this->assertSame(
+                $autreSection->id,
+                $tresorerie->resoudreSectionOuverte()->getKey(),
+                'Le ciblage intérieur défait doit rendre la main à l\'extérieur, pas au repli.',
+            );
+        });
+
+        $this->assertSame(
+            $this->sectionOuverte->id,
+            $tresorerie->resoudreSectionOuverte()->getKey(),
+            'Hors de tout ciblage, la résolution retombe sur la première section ouverte.',
+        );
+    }
+
+    /**
+     * Le câblage, éprouvé pour lui-même — comme pour le registre des
+     * verrous de clôture.
+     *
+     * Si cette liaison disparaît, le ciblage continue de « marcher »
+     * sans rien cibler : l'écran le pose sur une instance, `ServiceVente`
+     * écrit par une autre, et la vente part au brouillard d'une caisse
+     * que personne n'a choisie. Aucun test métier ne tomberait — c'est
+     * exactement pourquoi celui-ci existe.
+     */
+    public function test_le_brouillard_et_le_port_du_commerce_sont_la_meme_instance(): void
+    {
+        $this->assertSame(
+            app(ServiceTresorerie::class),
+            app(JournalDeCaisse::class),
         );
     }
 

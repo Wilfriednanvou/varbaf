@@ -81,18 +81,22 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
             return;
         }
 
-        ServiceTresorerie::ciblerSection($this->section());
-
         try {
-            $vente = app(ServiceVente::class)->enregistrer(
-                lignes: $data['lignes'] ?? [],
-                modeReglement: ModeReglement::from($data['mode_reglement']),
-                client: [
-                    'nom_client' => $data['nom_client'] ?? null,
-                    'contact_client' => $data['contact_client'] ?? null,
-                    'accepte_notifications' => (bool) ($data['accepte_notifications'] ?? false),
-                    'provenance_client' => isset($data['provenance_client']) ? $data['provenance_client'] : null,
-                ],
+            // `pour()` plutôt qu'un ciblage posé ici et relâché dans un
+            // `finally` : c'est le service qui garantit le relâchement,
+            // y compris quand l'opération lève (Y7).
+            $vente = app(ServiceTresorerie::class)->pour(
+                $this->sectionOuverte(),
+                fn () => app(ServiceVente::class)->enregistrer(
+                    lignes: $data['lignes'] ?? [],
+                    modeReglement: ModeReglement::from($data['mode_reglement']),
+                    client: [
+                        'nom_client' => $data['nom_client'] ?? null,
+                        'contact_client' => $data['contact_client'] ?? null,
+                        'accepte_notifications' => (bool) ($data['accepte_notifications'] ?? false),
+                        'provenance_client' => isset($data['provenance_client']) ? $data['provenance_client'] : null,
+                    ],
+                ),
             );
 
             JournalAudit::enregistrer(
@@ -119,8 +123,6 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
-        } finally {
-            ServiceTresorerie::ciblerSection(null);
         }
     }
 
@@ -150,10 +152,14 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
             return;
         }
 
-        ServiceTresorerie::ciblerSection($this->section());
-
         try {
-            app(ServiceVente::class)->annuler($vente, $motif);
+            // La contre-passation vise la section affichée, pour la même
+            // raison que la saisie (Y7) : le relâchement du ciblage est
+            // porté par le service, plus par ce `finally`.
+            app(ServiceTresorerie::class)->pour(
+                $this->sectionOuverte(),
+                fn () => app(ServiceVente::class)->annuler($vente, $motif),
+            );
 
             JournalAudit::enregistrer(
                 'Annulation vente (session caisse)',
@@ -179,8 +185,6 @@ class VentesCaisseTable extends Component implements HasActions, HasSchemas, Has
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
-        } finally {
-            ServiceTresorerie::ciblerSection(null);
         }
     }
 
