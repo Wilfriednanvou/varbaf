@@ -62,3 +62,60 @@ Le registre normalisé compte **603 lignes**, dont **602 ventes importées**. Le
 
 - **374 tests au vert** sur la suite complète. Quatre échecs constatés vers 2 h 40 dans `AlerteStockTest`, tous en `SQLSTATE[40P01] Deadlock detected` sur les index d'unicité de Spatie : deux processus écrivaient sur la même base au même moment. Repassés 11/11 en isolation. Artefact d'exécution, pas régression.
 - Trois commits poussés : le registre de verrous, la nature du contenant, la mise à jour de la dette technique.
+
+---
+
+## Jeudi 27 août 2026
+
+### Ce qui a été fait
+
+**La branche dense a été construite, mesurée, puis écartée dans la même journée.** Ollama installé, `nomic-embed-text` téléchargé — 274 Mo, 768 dimensions —, corpus vectorisé à **100 % : 325 fiches sur 325, aucun échec**. La couche de code existait depuis la veille ; il ne lui manquait que des vecteurs.
+
+Puis la mesure, sur les 48 questions du jeu d'évaluation :
+
+| Moteur | Classification | Rappel@5 | Refus correct |
+|---|---|---|---|
+| lexical | 100,0 % | 20,0 % | **100,0 %** |
+| mots_cles | 100,0 % | 0,0 % | **100,0 %** |
+| dense | 100,0 % | 20,0 % | **0,0 %** |
+| hybride | 100,0 % | 20,0 % | **0,0 %** |
+
+La branche dense ne gagne rien au rappel et **détruit le refus** : les huit questions auxquelles le système doit refuser de répondre reçoivent toutes une réponse. Or le refus est l'argument central du volet IA — « aucun montant ne peut être produit par proximité textuelle » ne vaut que si le système sait se taire.
+
+`pilotage.moteur.ordre` est ramené à `['lexical']`. Le dense et l'hybride **restent enregistrés au catalogue des moteurs**, hors de l'ordre de résolution, au même titre que le témoin par mots-clés et pour la même raison déjà écrite dans le code : ce ne sont pas des moteurs de repli, ce sont des instruments de mesure. Les garder mesurables est ce qui permet de **citer** un résultat négatif plutôt que de le raconter.
+
+### Ce qui a résisté
+
+**L'instrument de mesure ne regardait pas ce qu'on lui demandait de mesurer.** `EvaluerAssistantCommand` énumérait ses moteurs en dur — `['lexical', 'mots_cles']` — et la session qui avait écrit la branche dense n'avait pas touché à cette ligne. Premier verdict : « 2 moteur(s) mesuré(s) » sur quatre. Un index construit à 100 % que rien n'allait voir, et aucun message d'erreur, puisque du point de vue de la commande tout s'était bien passé. Le texte d'aide de l'option `--moteur` était resté sur l'ancienne liste, ce qui aurait entretenu l'erreur pour le lecteur suivant.
+
+**Une hypothèse plausible, documentée, et fausse.** `nomic-embed-text` est entraîné avec des préfixes de tâche obligatoires — `search_document:` à l'indexation, `search_query:` à l'interrogation — et le code ne les posait nulle part. L'explication du 0 % de refus semblait tenir : sans préfixes, l'espace se replie et le seuil ne sépare plus rien. Une sonde de quarante lignes sur trois couples témoins l'a démentie en quatre minutes.
+
+| Couple | sans préfixe | avec préfixe |
+|---|---|---|
+| proche (attendu haut) | 0,644 | 0,583 |
+| lointain (attendu bas) | 0,505 | 0,522 |
+| étranger (attendu bas) | 0,538 | 0,560 |
+
+Les préfixes **dégradent** : le pouvoir de séparation tombe de 0,106 à 0,023. Et surtout, la colonne de gauche dit l'essentiel — le couple étranger score *au-dessus* du couple lointain. L'ordre lui-même est faux. Tout tient entre 0,50 et 0,64, donc aucune valeur de seuil ne peut séparer ce qu'il faut retenir de ce qu'il faut rejeter. La cause n'est pas le réglage mais le corpus : un modèle massivement anglophone, des fiches de deux ou trois mots de français.
+
+**Deux tests affirmaient une valeur de configuration.** `RechercheHybrideTest` et `AssistantInterrogationTest` lisaient `pilotage.moteur.ordre` pour affirmer « hybride ». Ils sont tombés au changement d'ordre — pour une décision qui ne les concernait pas. Chacun pose désormais l'ordre dont il a besoin, et un test neuf affirme, lui, que l'ordre livré ne retient que le lexical : celui-là ne couvre pas un mécanisme, il **retient une décision**.
+
+### Ce qui a été décidé
+
+- **Le dense est écarté sur la foi de la mesure, pas abandonné.** Le code reste, mesurable, avec son motif chiffré en commentaire dans le fichier de configuration.
+- **Grok en rédaction seule**, sans rattrapage du routage. Mettre un modèle de langage sur le chemin qui choisit *quelle branche répond* le placerait en amont de la frontière entre agrégation calculée et descriptif — la frontière même qui rend le volet IA défendable. La rédaction est en aval et sous surveillance de `GardeDesChiffres`.
+- **Le modèle de langage local est abandonné**, l'objet nul `ModeleIndisponible` absorbant sa disparition : la chaîne d'escalade passe de `['local', 'distant']` à `['distant']` sans qu'aucun appelant change. C'est ce que le port existe pour encaisser.
+- Les CSV de la mesure sont versés dans `docs/donnees/evaluation/` : ce sont les pièces justificatives de la table 4.3, et `storage/` n'est pas suivi par Git.
+
+### Ce que j'en retiens
+
+**Une déduction ne coûte rien à formuler et se défend toute seule tant qu'on ne construit pas ce qui pourrait la démentir.** C'est la troisième fois — la redevance au mètre carré, le sous-sol sans espace locatif, et aujourd'hui les préfixes de tâche. Mais aujourd'hui est le contre-exemple des deux autres : l'hypothèse est tombée en quatre minutes **parce qu'on a écrit la sonde**. Quarante lignes jetables, dont la valeur n'était pas de confirmer ce qu'on croyait savoir mais de découvrir qu'on se trompait. Les deux échecs précédents n'ont pas manqué de raisonnement, ils ont manqué d'un objet capable de dire non.
+
+**Trois défauts de la même famille en une journée.** Un instrument aveugle aux moteurs qu'on venait d'ajouter ; deux tests qui lisaient l'état du dépôt au lieu du comportement du code ; une hypothèse que rien ne mettait à l'épreuve. À chaque fois, quelque chose qui a l'air de vérifier et qui regarde ailleurs — et à chaque fois, un silence qu'on prend pour un accord.
+
+**Un résultat négatif documenté vaut mieux qu'une fonctionnalité non mesurée.** « Nous avons construit la branche dense, mesurée sur 48 questions, et écartée parce qu'elle annule le refus sans gagner en rappel » est une phrase plus solide que « nous avons implémenté une recherche hybride ». La première se prouve, chiffres et CSV à l'appui ; la seconde s'affirme.
+
+### En fin de journée
+
+- **399 tests au vert**, 1053 assertions.
+- Deux commits poussés : l'ouverture de la mesure aux nouvelles branches, puis le retrait du dense de l'ordre livré.
