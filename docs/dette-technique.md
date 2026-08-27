@@ -6,7 +6,6 @@
 
 | # | Écart | Motif | Traitement prévu |
 |---|---|---|---|
-| DT-01 | `Exercice::cloturer()` ne vérifie ni les sections de caisse clôturées ni les campagnes de reversement validées | Les modules Trésorerie et Commerce n'existaient pas au moment de l'écriture | À réarmer à la fin du module 4 (Trésorerie) |
 | DT-02 | Aucun contrôle de cohérence inter-villages sur les attributions | Le système ne gère qu'un village en exploitation ; le contrôle protège un scénario non atteignable | Version 2, si le déploiement s'étend à d'autres villages |
 | DT-03 | `SessionConnexion` non implémentée | Le journal d'audit couvre le besoin de traçabilité | Retirée du périmètre |
 | DT-04 | `EcheanceRedevance` et `PaiementRedevance` non implémentées | Retirées du périmètre par arbitrage de charge ; les redevances restent encaissables comme mouvement de caisse ordinaire | Version 2 |
@@ -38,6 +37,8 @@
 | 26/08 | `DB_PASSWORD` en clair dans `phpunit.xml`, fichier suivi par Git | Déplacé dans `.env.testing`, ignoré par Git. Le champ n'est pas laissé vide dans `phpunit.xml` mais retiré : PHPUnit pose ses variables avant Laravel et Dotenv n'écrase pas une variable déjà définie |
 | 26/08 | Règle 15 déclarée dans `CLAUDE.md` et sans effet : `SeuilAlerteFranchi` était émis au bon moment, aucun auditeur ne l'écoutait | `NotifierSeuilAlerte` branché par le fournisseur du module Commerce, table `notifications`, cloche activée sur le panneau. Portée réelle et écart résiduel en A-09 |
 | 26/08 | Le sous-sol et l'espace vert écartés du parc alors qu'ils portent trois espaces loués, dont le plus cher du village | Entrés au parc, colonne `nature` sur les contenants, taux d'occupation calculable sur les boutiques seules. Voir l'arbitrage A-05 bis |
+| 26/08 | DT-01 : `Exercice::cloturer()` ne vérifiait ni les sections de caisse ouvertes ni les campagnes non validées — on pouvait refermer une période en laissant de l'argent en caisse et des artisans impayés | Registre de verrous : le Socle expose `VerrouDeCloture`, la Trésorerie vient s'y déclarer depuis son propre fournisseur. La dépendance continue de descendre, et le Socle ne référence rien du module 4. Neuf tests, dont un qui éprouve le câblage lui-même |
+| 26/08 | La nature d'un contenant n'était éditable dans aucun écran : seul le seeder pouvait déclarer un local hors vente | Champ, colonne et filtre ajoutés à `BoutiqueResource` |
 | 26/08 | `EspaceLocatif::genererCode()` ne gardait que les chiffres du numéro : `SS01` et `EV01` se réduisaient à `B01` et fabriquaient les codes de la boutique B01 | Préfixe alphanumérique, rang calculé sur les seuls codes qui suivent la règle, et un code relevé sur le terrain — `G0201` sous `SS01` — survit désormais à la dérivation |
 | 26/08 | `notifications.data` posé en `text` par la migration standard de Laravel : la cloche de Filament compte les non-lues avec `data->>'format'`, que PostgreSQL refuse sur du texte. **Toute page du panneau plantait dans le navigateur** | Colonne passée en `json`. Le défaut était masqué parce que les tests montent les composants Livewire directement : seuls les deux qui font une vraie requête HTTP rendent la barre supérieure, et ils vivent dans un module sans rapport |
 
@@ -83,7 +84,9 @@ En exploitation, le coordonnateur du village portera probablement les deux rôle
 
 Si le coordonnateur valide physiquement un dossier saisi par une secrétaire, la réponse n'est pas d'ouvrir un `Select` — c'est que la secrétaire ne doit pas avoir la permission de cocher la case. Même raisonnement que l'exception levée plutôt que le `false` silencieux sur le journal d'audit : un mécanisme de preuve qui se laisse contourner poliment n'est pas un mécanisme de preuve.
 
-**Conséquence non encore implémentée :** le fait de cocher « dossier complet » n'est aujourd'hui gardé par aucune permission distincte — quiconque peut modifier une attribution peut se déclarer validateur. Une permission `valider_dossier_attribution` reste à créer.
+**Conséquence, implémentée depuis :** cocher « dossier complet » est gardé par une permission distincte de `modifier_attribution`. `valider_dossier_attribution` existe au seeder, n'est accordée qu'au coordonnateur, et la case n'apparaît qu'à qui la détient. `validee_par` reste hors de `$fillable` et `constaterValidationDuDossier()` prend `Auth::id()` : la trace se constate, elle ne se choisit ni ne se saisit.
+
+*Relevé le 26/08 : ce paragraphe annonçait encore ce travail comme à faire alors qu'il était fait. Un document qui décrit une dette éteinte fait perdre autant de temps qu'un document qui en tait une.*
 
 ### A-04 — Suppressions : la trace décide
 
