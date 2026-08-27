@@ -36,9 +36,11 @@ use Modules\Pilotage\Services\ServiceAssistant;
  *
  * `categorie_attendue` vaut AGREGATION ou DESCRIPTIVE. `attendus` est
  * une liste de fragments séparés par des barres verticales, cherchés
- * dans les titres des sources — des fragments plutôt que des
- * identifiants, pour que le jeu reste valable quand la base est
- * réimportée et que les clés changent. `refus_attendu` vaut oui ou non.
+ * dans les sources retrouvées — titre **et** extrait depuis le 27/08,
+ * les titres seuls ne pouvant jamais porter le corps de métier d'une
+ * fiche produit. Des fragments plutôt que des identifiants, pour que le
+ * jeu reste valable quand la base est réimportée et que les clés
+ * changent. `refus_attendu` vaut oui ou non.
  */
 class EvaluerAssistantCommand extends Command
 {
@@ -129,7 +131,10 @@ class EvaluerAssistantCommand extends Command
             $rappel = null;
 
             if ($cas_['categorie'] === CategorieQuestion::DESCRIPTIVE && $cas_['attendus'] !== []) {
-                $rappel = $this->rappel($cas_['attendus'], $reponse->titresDesSources());
+                // Titre **et** extrait : le corps de métier visé par le
+                // jeu ne figure pas dans le titre d'une fiche produit.
+                // Voir `ReponseAssistant::textesDesSources()`.
+                $rappel = $this->rappel($cas_['attendus'], $reponse->textesDesSources());
                 $rappels[] = $rappel;
             }
 

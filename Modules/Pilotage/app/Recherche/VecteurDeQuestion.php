@@ -23,6 +23,14 @@ use Modules\Pilotage\Models\TermeVocabulaire;
  * Un terme absent du vocabulaire n'a pas d'entrée : il est ignoré
  * plutôt que traité comme infiniment rare. Un mot que personne ne porte
  * ne discrimine rien — il ne peut rapprocher d'aucune fiche.
+ *
+ * **Une seule divergence avec l'indexation, et elle est assumée** :
+ * l'échafaudage de la question — « produits », « liste », « objets » —
+ * est élagué par `MotsDeQuestion` avant la pondération. Le corpus, lui,
+ * conserve ces mots. Ce n'est pas une entorse à la règle du même
+ * découpage : les termes restants sont découpés exactement comme à
+ * l'indexation, et c'est ce qui compte pour qu'ils se rencontrent. On
+ * retire des mots, on n'en fabrique pas d'autres.
  */
 final readonly class VecteurDeQuestion
 {
@@ -46,6 +54,13 @@ final readonly class VecteurDeQuestion
         if ($termes === []) {
             return new self($question, [], [], 0.0);
         }
+
+        // L'échafaudage de la question tombe ici, et **seulement ici** :
+        // le corpus n'est pas touché, donc rien n'est à réindexer et une
+        // fiche dont la désignation d'origine est « Produit » reste
+        // trouvable par ce mot. Voir `MotsDeQuestion` pour le motif, qui
+        // n'est pas celui de `MotsVides`.
+        $termes = MotsDeQuestion::elaguer($termes);
 
         $frequences = array_count_values($termes);
         $idf = TermeVocabulaire::idfDe(array_keys($frequences));

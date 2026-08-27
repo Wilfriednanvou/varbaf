@@ -1,0 +1,5 @@
+moteur;questions;classification;rappel_5;questions_rappel;refus_correct;questions_refus
+lexical;48;1.0000;0.2000;10;1.0000;8
+mots_cles;48;1.0000;0.0000;10;1.0000;8
+dense;48;1.0000;0.2000;10;0.0000;8
+hybride;48;1.0000;0.2000;10;0.0000;8

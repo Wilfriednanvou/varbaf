@@ -65,13 +65,43 @@ final readonly class ReponseAssistant
     }
 
     /**
-     * Les titres des sources, pour la mesure du rappel.
+     * Les titres des sources, pour l'affichage.
      *
      * @return array<int, string>
      */
     public function titresDesSources(): array
     {
         return $this->sources->map(fn (SegmentTrouve $segment): string => $segment->titre)->all();
+    }
+
+    /**
+     * Les sources en entier — titre **et** extrait —, pour la mesure.
+     *
+     * **Pourquoi pas les titres seuls, comme jusqu'au 27/08.** Le titre
+     * d'une fiche produit est sa référence et sa désignation :
+     * « BTQ12-0038 — Collier ». Le corps de métier, lui, n'apparaît que
+     * dans l'extrait : « Collier — Vannerie — MINTCHOUGOM SIDONIE ». Un
+     * jeu d'évaluation qui vise les corps de métier — parce qu'ils sont
+     * seedés, donc stables d'un import à l'autre — ne pouvait donc
+     * jamais valider une fiche produit, quelle que soit sa pertinence.
+     *
+     * Le rappel@5 mesurait ainsi une propriété des titres et non la
+     * qualité du classement : il restait à 20 % sur les quatre moteurs,
+     * témoin par mots-clés compris, ce qui aurait dû alerter plus tôt.
+     * Un indicateur qui ne bouge jamais ne mesure rien.
+     *
+     * Élargir à l'extrait n'assouplit pas la règle : une source dont le
+     * passage retrouvé parle de vannerie *est* une source sur la
+     * vannerie. C'est la définition de la pertinence qui est en jeu, pas
+     * son seuil.
+     *
+     * @return array<int, string>
+     */
+    public function textesDesSources(): array
+    {
+        return $this->sources
+            ->map(fn (SegmentTrouve $segment): string => $segment->titre.' '.$segment->extrait)
+            ->all();
     }
 
     /**

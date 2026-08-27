@@ -80,6 +80,8 @@ Puis la mesure, sur les 48 questions du jeu d'évaluation :
 | dense | 100,0 % | 20,0 % | **0,0 %** |
 | hybride | 100,0 % | 20,0 % | **0,0 %** |
 
+> **Correction du soir — la colonne « Rappel@5 » de ce tableau est fausse.** Elle a été mesurée contre les seuls titres des sources, où le corps de métier d'une fiche produit ne figure jamais. Le défaut a été trouvé en fin de journée et la mesure refaite ; les chiffres corrigés sont plus bas, dans l'entrée du soir. Le tableau reste ici tel qu'il a été produit, parce qu'une mesure qu'on corrige se montre — et parce que le raisonnement qui suit a été tenu sur ces chiffres-là. La colonne « Refus correct », elle, était valide, et c'est elle qui a emporté la décision.
+
 La branche dense ne gagne rien au rappel et **détruit le refus** : les huit questions auxquelles le système doit refuser de répondre reçoivent toutes une réponse. Or le refus est l'argument central du volet IA — « aucun montant ne peut être produit par proximité textuelle » ne vaut que si le système sait se taire.
 
 `pilotage.moteur.ordre` est ramené à `['lexical']`. Le dense et l'hybride **restent enregistrés au catalogue des moteurs**, hors de l'ordre de résolution, au même titre que le témoin par mots-clés et pour la même raison déjà écrite dans le code : ce ne sont pas des moteurs de repli, ce sont des instruments de mesure. Les garder mesurables est ce qui permet de **citer** un résultat négatif plutôt que de le raconter.
@@ -119,3 +121,62 @@ Les préfixes **dégradent** : le pouvoir de séparation tombe de 0,106 à 0,023
 
 - **399 tests au vert**, 1053 assertions.
 - Deux commits poussés : l'ouverture de la mesure aux nouvelles branches, puis le retrait du dense de l'ordre livré.
+
+---
+
+## Jeudi 27 août 2026 — soirée
+
+### Ce qui a été fait
+
+**La rédaction générative est livrée**, en aval de la frontière et sous surveillance du garde-fou 2. Un port volontairement étroit, `ModeleDeLangage`, n'expose qu'une opération : mettre en français suivi des extraits **déjà retrouvés**. Le modèle ne cherche rien, ne calcule rien, ne voit aucun indicateur — non parce qu'une consigne le lui interdit, mais parce qu'il n'a accès à rien d'où un chiffre pourrait venir.
+
+`classer()`, prévu à la conception pour rattraper le routeur, a été retiré. Le routage décide *quelle branche répond* : il est donc en amont de la frontière entre l'agrégation calculée et le descriptif, et y placer un appel non déterministe affaiblirait la garantie centrale. La classification est d'ailleurs mesurée à 100 % sur les 48 questions — on ne remplace pas un composant qui ne se trompe jamais par un qui le peut.
+
+**Une seule classe pour tous les fournisseurs.** xAI, Groq, Cerebras, Mistral, OpenRouter et Ollama exposent le même dialecte, `POST {url}/v1/chat/completions`. `ClientCompatibleOpenAI` le parle, et deux profils — `local` et `distant` — ne diffèrent que par ce qu'ils lisent en configuration. Changer de fournisseur est un changement de `.env`, jamais de code.
+
+**Le local passe devant le distant**, et le motif n'est pas la qualité : un modèle sur la machine ne coûte rien, ne demande aucune clé et ne dépend d'aucune connexion. C'est la règle 4 du rétroplanning appliquée à la lettre — une démonstration qui échoue faute de réseau coûte plus cher que l'ambition n'en rapporte. Le distant retenu est **Groq**, palier gratuit sans carte bancaire ; xAI a été écarté, payant.
+
+**Sans clé ni modèle, rien ne change.** `ModeleIndisponible` rend `null`, et l'assistant liste les extraits comme au premier jour. Le chemin dégradé n'est pas un secours écrit à part : c'est le chemin nominal d'hier, qu'on n'a pas retiré — et il est parcouru par toute la suite de tests, donc mieux éprouvé que le chemin nominal d'aujourd'hui.
+
+**L'échafaudage des questions est élagué.** « Produits », « liste », « objets » sont retirés de la question — jamais du corpus. Motif : l'IDF donne à « produit » un poids fort et il a raison, le terme est *rare* dans le corpus, porté par les seules fiches dont la désignation d'origine est un vide-poche. Le décalage n'était pas dans le corpus mais entre le vocabulaire des questions et celui des fiches. Liste distincte de `MotsVides`, et un test vérifie qu'elles ne se recoupent pas.
+
+### Ce qui a résisté
+
+**Le rappel@5 ne mesurait pas ce qu'il prétendait mesurer.** Il comparait les fragments attendus aux seuls **titres** des sources. Or le titre d'une fiche produit est sa référence et sa désignation — « BTQ12-0038 — Collier » — tandis que le corps de métier vit dans l'extrait : « Collier — Vannerie — MINTCHOUGOM SIDONIE ». Un jeu qui vise les corps de métier, parce qu'ils sont seedés et stables, ne pouvait donc **jamais** valider une fiche produit, quelle que soit sa pertinence.
+
+Le signal était visible depuis le matin et je ne l'ai pas lu : **20 %, identiques sur les quatre moteurs, témoin par mots-clés compris.** Un indicateur qui ne bouge jamais, quoi qu'on change, ne mesure pas ce qu'on croit.
+
+Mesure refaite sur titre **et** extrait :
+
+| Moteur | Rappel@5 avant | Rappel@5 après | Refus correct |
+|---|---|---|---|
+| lexical | 20,0 % | **70,0 %** | 100,0 % |
+| mots_cles | 0,0 % | **60,0 %** | 100,0 % |
+| dense | 20,0 % | **60,0 %** | 0,0 % |
+| hybride | 20,0 % | **70,0 %** | 0,0 % |
+
+Ce n'est pas un assouplissement destiné à obtenir un meilleur chiffre : une source dont l'extrait retrouvé parle de vannerie *est* une source sur la vannerie. C'est la définition de la pertinence qui était fausse, pas son seuil.
+
+**La décision du matin en sort renforcée, pas fragilisée.** Elle avait été prise sur le refus — 100 % contre 0 % —, et cette colonne-là était valide. Avec un rappel qui fonctionne, le dense est en outre **moins bon** que le lexical, 60 contre 70 ; et l'hybride égale le lexical sur le rappel tout en perdant le refus. Il ne rapporte rien et coûte tout. La conclusion était juste, la preuve ne l'était pas ; elle l'est maintenant.
+
+**Un identifiant de modèle est une valeur périssable.** `llama-3.3-70b-versatile` a été retiré du palier gratuit de Groq le 16 août, onze jours avant. Un modèle déprécié ne dégrade pas la réponse : il la refuse, et le repli le fait en silence.
+
+**PHP sous Windows n'embarque aucun magasin de certificats racine.** Premier appel réel : `cURL error 60`. Le `curl` en ligne de commande fonctionnait — Git Bash apporte le sien —, l'extension cURL de PHP non. Corrigé par `curl.cainfo` et `openssl.cafile` dans `php.ini`, pointant sur le `cacert.pem` du projet cURL. **Ce qui n'a pas été fait :** désactiver la vérification TLS côté client, le premier correctif que renvoient les forums. Dans un système qui manipule de l'argent public, retirer délibérément l'authentification du serveur est indéfendable, et ce serait consigné dans le code pour toujours. C'est une condition de déploiement à ajouter à la section 5 du rétroplanning : le poste du village aura le même problème.
+
+**La suite de tests allait partir sur le réseau.** `phpunit.xml` n'annulait pas `PILOTAGE_REDACTION` : dès qu'une clé était présente dans l'environnement, chaque test empruntant la branche descriptive aurait réellement appelé Groq. La suite serait devenue lente et intermittente, aurait échoué chez qui n'a pas de clé, et surtout **aurait éprouvé le service au lieu du code** — un test vert n'aurait plus dit si l'assistant est correct, mais si le fournisseur répondait ce matin-là. Une ligne le règle.
+
+### Ce que j'en retiens
+
+**Huit défauts aujourd'hui, tous de la même famille, et aucun ne s'est signalé tout seul.** Un instrument de mesure aveugle aux moteurs qu'on venait d'ajouter. Deux tests qui affirmaient une valeur de configuration au lieu d'un comportement. Une hypothèse plausible que rien ne mettait à l'épreuve. Un identifiant de modèle périssable. Un échec TLS avalé par le repli. Une suite de tests sur le point d'appeler le réseau sans le dire. Et un indicateur qui, depuis le début, mesurait une propriété des titres.
+
+Le fil est le même à chaque fois : **quelque chose qui a l'air de vérifier, et qui regarde ailleurs.** Un silence pris pour un accord.
+
+**Ce qui a permis de les voir n'est jamais l'intuition, c'est un objet écrit exprès.** La sonde de quarante lignes qui a démenti l'hypothèse des préfixes en quatre minutes. Le champ `redacteur` de la réponse, qui a montré qu'aucune rédaction n'avait eu lieu là où le texte semblait normal. Le `Log::warning` qui a nommé cURL 60 en une ligne. Sans eux, un système qui « marche » — et une moitié de journée de travail inutile qu'on n'aurait découverte qu'en soutenance.
+
+**Le repli doit être silencieux pour l'utilisateur et bavard pour le développeur.** C'est la même exigence que le nommage du moteur à l'écran, appliquée aux journaux : un système dégradé qui se tait des deux côtés est indiscernable d'un système qui fonctionne.
+
+### En fin de journée
+
+- **407 tests au vert**, 1073 assertions.
+- Rédaction générative opérationnelle sur données réelles. Question « Quels produits en vannerie sont exposés ? » → « Les produits en vannerie exposés sont le collier, le sac et le chapeau, tous présentés par MINTCHOUGOM SIDONIE. » Le modèle a écarté de lui-même les deux extraits hors sujet que le classement lui avait donnés — bénéfice réel, mais tri non audité : les cinq sources restent affichées, y compris celles qu'il n'a pas retenues.
+- Les deux séries de mesures sont versées dans `docs/donnees/evaluation/`.
