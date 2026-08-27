@@ -4,6 +4,7 @@ namespace Modules\Socle\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Modules\Socle\Models\Utilisateur;
+use Modules\Socle\Services\VerrousDeCloture;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class SocleServiceProvider extends ModuleServiceProvider
@@ -11,6 +12,17 @@ class SocleServiceProvider extends ModuleServiceProvider
     protected string $name = 'Socle';
 
     protected string $nameLower = 'socle';
+
+    public function register(): void
+    {
+        parent::register();
+
+        // Le registre est lié ici, dans `register()`, pour que les
+        // autres modules le trouvent déjà en place quand leur `boot()`
+        // vient y déposer leur verrou : tous les `register()` passent
+        // avant tous les `boot()`.
+        $this->app->singleton(VerrousDeCloture::class);
+    }
 
     public function boot(): void
     {

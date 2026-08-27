@@ -4,7 +4,9 @@ namespace Modules\Tresorerie\Providers;
 
 use Livewire\Livewire;
 use Modules\Commerce\Contracts\JournalDeCaisse;
+use Modules\Socle\Services\VerrousDeCloture;
 use Modules\Tresorerie\Services\ServiceTresorerie;
+use Modules\Tresorerie\Services\VerrouTresorerie;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class TresorerieServiceProvider extends ModuleServiceProvider
@@ -29,6 +31,14 @@ class TresorerieServiceProvider extends ModuleServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        // La Trésorerie vient déclarer ce qui, chez elle, s'oppose à la
+        // clôture d'un exercice (DT-01). Le dépôt a lieu dans `boot()`
+        // et non dans `register()` : le registre est lié par le Socle
+        // dans son propre `register()`, et tous les `register()` passent
+        // avant tous les `boot()`. C'est ce qui garantit qu'on dépose
+        // dans l'instance que le modèle interrogera.
+        $this->app->make(VerrousDeCloture::class)->ajouter(new VerrouTresorerie);
 
         // `nwidart/laravel-modules` enregistre la vue `tresorerie::...`
         // (namespace Blade), mais pas le namespace de composant Livewire

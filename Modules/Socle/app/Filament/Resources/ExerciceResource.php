@@ -4,6 +4,7 @@ namespace Modules\Socle\Filament\Resources;
 
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
@@ -11,6 +12,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Modules\Socle\Enums\NavigationGroup;
+use Modules\Socle\Exceptions\ExerciceNonCloturableException;
 use Modules\Socle\Filament\Resources\ExerciceResource\Pages;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
@@ -167,14 +169,38 @@ class ExerciceResource extends Resource
                     ->modalSubmitActionLabel('Enregistrer')
                     ->modalCancelActionLabel('Fermer')
                     ->modalFooterActionsAlignment(Alignment::End)
-                    ->action(fn (Exercice $record) => $record->cloturer())
-                    ->after(fn (Exercice $record) => JournalAudit::enregistrer(
-                        'Clôture exercice',
-                        'SOCLE',
-                        'Exercice',
-                        $record->id,
-                        ['libelle' => $record->libelle],
-                    )),
+                    ->action(function (Exercice $record, Actions\Action $action): void {
+                        try {
+                            $record->cloturer();
+                        } catch (ExerciceNonCloturableException $refus) {
+                            // Le refus vient du registre des verrous : une
+                            // caisse encore ouverte, une campagne non
+                            // validée. Il se dit à la coordination en
+                            // toutes lettres, avec ce qu'il lui reste à
+                            // faire — un message qui disparaît en trois
+                            // secondes n'aiderait personne.
+                            Notification::make()
+                                ->title('Clôture refusée')
+                                ->body($refus->getMessage())
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            $action->halt();
+                        }
+                    })
+                    // La trace ne s'écrit que si la clôture a eu lieu :
+                    // journaliser une action refusée ferait mentir le
+                    // journal d'audit.
+                    ->after(fn (Exercice $record) => $record->cloture
+                        ? JournalAudit::enregistrer(
+                            'Clôture exercice',
+                            'SOCLE',
+                            'Exercice',
+                            $record->id,
+                            ['libelle' => $record->libelle],
+                        )
+                        : null),
                 Actions\EditAction::make()
                     ->iconButton()
                     ->tooltip('Modifier')

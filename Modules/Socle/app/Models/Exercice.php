@@ -5,6 +5,8 @@ namespace Modules\Socle\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Socle\Exceptions\ExerciceNonCloturableException;
+use Modules\Socle\Services\VerrousDeCloture;
 
 /**
  * Période comptable et fonctionnelle du village.
@@ -109,15 +111,32 @@ class Exercice extends Model
     /**
      * Clôture l'exercice. Action irréversible.
      *
-     * Les contrôles de clôture des sections de caisse et de validation
-     * des campagnes de reversement seront ajoutés par le module
-     * Trésorerie, qui dépend du Socle : le Socle ne peut pas les
-     * connaître sans créer une dépendance montante.
+     * **Ce que la clôture vérifie, et comment.** Un exercice ne se
+     * clôture pas tant qu'une section de caisse reste ouverte ou qu'une
+     * campagne de reversement attend sa validation — sans quoi on
+     * refermerait une période en laissant de l'argent en caisse et des
+     * artisans impayés. Ces deux notions appartiennent au module
+     * Trésorerie, que le Socle n'a pas le droit de connaître : il
+     * interroge donc le registre des verrous, où chaque module vient
+     * déclarer ce qui, chez lui, s'oppose à une clôture.
+     *
+     * Le registre est résolu au conteneur plutôt qu'injecté, parce
+     * qu'un modèle Eloquent s'instancie sans constructeur maîtrisé.
+     * Vide — Socle seul —, il n'empêche rien, ce qui est le
+     * comportement juste : sans caisse, il n'y a rien à protéger.
+     *
+     * @throws ExerciceNonCloturableException si un module s'y oppose
      */
     public function cloturer(): bool
     {
         if ($this->cloture) {
             return false;
+        }
+
+        $obstacles = app(VerrousDeCloture::class)->obstacles($this);
+
+        if ($obstacles !== []) {
+            throw ExerciceNonCloturableException::pour($this, $obstacles);
         }
 
         $this->cloture = true;
