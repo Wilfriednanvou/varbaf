@@ -345,7 +345,33 @@ class AssistantInterrogationTest extends TestCase
     }
 
     /**
-     * Le moteur résolu est l'hybride depuis le 27/08.
+     * La réponse nomme le moteur qui l'a produite.
+     *
+     * Dans la configuration livrée, l'ordre ne retient que le lexical —
+     * la branche dense a été écartée le 27/08 sur mesure, le motif est
+     * en commentaire dans le fichier de configuration du Pilotage. Le
+     * nom affiché doit donc désigner le lexical, sans mention d'une
+     * fusion qui n'a pas eu lieu.
+     */
+    public function test_le_moteur_qui_a_repondu_est_nomme(): void
+    {
+        $this->produit('Panier tressé');
+        $this->indexer();
+
+        $reponse = $this->assistant()->repondre('Quels produits en vannerie ?');
+
+        $this->assertSame('lexical', $reponse->moteurCle);
+        $this->assertStringContainsString('TF-IDF', (string) $reponse->moteur);
+        $this->assertStringNotContainsString('⊕', (string) $reponse->moteur);
+    }
+
+    /**
+     * Et quand l'hybride répond, il dit laquelle de ses branches a servi.
+     *
+     * **L'ordre est posé ici, pas lu dans la configuration.** Ce test
+     * éprouve le nommage du moteur composite, pas la préférence de
+     * déploiement : lier les deux l'a fait échouer le 27/08 pour une
+     * décision qui ne le concernait pas.
      *
      * Aucun fournisseur d'embeddings ne tourne pendant les tests — c'est
      * délibéré, une suite qui exigerait un service lancé ne s'exécuterait
@@ -354,8 +380,10 @@ class AssistantInterrogationTest extends TestCase
      * différence entre un système dégradé qui s'annonce et un système
      * dégradé qui se tait.
      */
-    public function test_le_moteur_qui_a_repondu_est_nomme(): void
+    public function test_l_hybride_annonce_sa_branche_lexicale_quand_le_dense_se_tait(): void
     {
+        config(['pilotage.moteur.ordre' => ['hybride', 'lexical']]);
+
         $this->produit('Panier tressé');
         $this->indexer();
 

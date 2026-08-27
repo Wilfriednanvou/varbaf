@@ -21,16 +21,38 @@ return [
     | dépend d'aucun service externe et ne peut donc pas être
     | indisponible.
     |
-    | L'hybride est en tête depuis le 27/08. Il se déclare disponible
-    | dès qu'une de ses deux branches l'est, et dégrade tout seul :
-    | fournisseur d'embeddings arrêté, il répond ce que le lexical
-    | aurait répondu, en le disant à l'écran. Le repli explicite qui le
-    | suit couvre le seul cas où il ne saurait rien faire — un corpus
-    | jamais indexé — et existe surtout pour que l'ordre reste lisible.
+    | L'hybride a été en tête le 27/08, le temps d'une mesure. Il en est
+    | retiré le soir même, et le motif mérite d'être lu avant d'être
+    | défait.
+    |
+    | La branche dense a été construite sur tout le corpus — 325 fiches,
+    | 768 dimensions, 100 % de couverture — puis mesurée par
+    | « varbaf:evaluer-assistant » sur les 48 questions du jeu
+    | d'évaluation. Résultat : rappel@5 identique au lexical (20 %) et
+    | taux de refus correct tombé de 100 % à 0 %. Les huit questions
+    | auxquelles le système doit refuser de répondre reçoivent une
+    | réponse.
+    |
+    | Ce n'est pas un seuil mal réglé. Une sonde sur trois couples
+    | témoins donne 0,644 pour un couple qui doit être proche, 0,505 et
+    | 0,538 pour deux couples qui doivent être lointains — l'étranger
+    | au-dessus du lointain. L'ordre lui-même est faux, et un pouvoir de
+    | séparation de 0,106 sur une échelle où tout tient entre 0,50 et
+    | 0,64 signifie qu'aucune valeur de seuil ne sépare quoi que ce
+    | soit. Les préfixes de tâche du modèle, essayés, dégradent encore
+    | (0,023). La cause est le corpus et non le réglage :
+    | « nomic-embed-text » est massivement anglophone, et les fiches du
+    | village font deux ou trois mots de français.
+    |
+    | Le dense et l'hybride restent enregistrés au catalogue des moteurs
+    | — comme le témoin par mots-clés, et pour la même raison : ce sont
+    | des instruments de mesure, pas des moteurs de repli. Les garder
+    | mesurables tout en les tenant hors de l'ordre de résolution est ce
+    | qui permet de citer un résultat négatif plutôt que de le raconter.
     |
     */
     'moteur' => [
-        'ordre' => ['hybride', 'lexical'],
+        'ordre' => ['lexical'],
     ],
 
     /*

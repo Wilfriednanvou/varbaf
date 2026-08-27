@@ -293,14 +293,50 @@ class RechercheHybrideTest extends TestCase
         $this->assertStringContainsString('TF-IDF', $lesDeux->nom());
     }
 
-    public function test_le_resolveur_designe_l_hybride(): void
+    /**
+     * Le résolveur sait désigner l'hybride — si on le lui demande.
+     *
+     * **L'ordre est posé par le test, et ce n'est pas un détail.** Cette
+     * méthode éprouve le mécanisme de résolution, pas la préférence de
+     * déploiement du jour : elle affirmait « hybride » en lisant la
+     * configuration de production, et elle est tombée le 27/08 quand
+     * cette configuration a changé pour un motif qui ne la concernait
+     * pas. Un test qui échoue parce qu'une décision a été prise ailleurs
+     * ne dit rien sur le code qu'il couvre.
+     */
+    public function test_le_resolveur_designe_l_hybride_quand_l_ordre_le_demande(): void
     {
+        config(['pilotage.moteur.ordre' => ['hybride', 'lexical']]);
+
         $this->produit('Panier tressé en raphia');
         $this->indexer();
 
         // Aucun vecteur n'a été calculé : `MoteurDense` vérifie l'index
         // avant de sonder le réseau, aucun appel sortant n'a donc lieu.
         $this->assertSame('hybride', app(ResolveurDeMoteur::class)->resoudre()->cle());
+    }
+
+    /**
+     * L'ordre livré est le seul lexical, et cela s'affirme.
+     *
+     * La branche dense a été construite, mesurée, puis écartée le 27/08 :
+     * rappel@5 inchangé et taux de refus correct tombé de 100 % à 0 % sur
+     * les 48 questions du jeu d'évaluation. Le motif complet est en
+     * commentaire dans « Modules/Pilotage/config/config.php ».
+     *
+     * Ce test ne couvre pas un mécanisme — il **retient une décision**.
+     * Remettre l'hybride en tête sans refaire la mesure le fera échouer,
+     * ce qui est exactement le service attendu : le code qui rendait le
+     * refus inopérant est toujours là, enregistré au catalogue, et rien
+     * d'autre n'empêcherait qu'on l'y remette par mégarde.
+     */
+    public function test_l_ordre_livre_ne_retient_que_le_lexical(): void
+    {
+        $this->assertSame(
+            ['lexical'],
+            app(ResolveurDeMoteur::class)->ordre(),
+            'La branche dense a été écartée sur mesure : voir config.php du Pilotage.',
+        );
     }
 
     // =================================================================
