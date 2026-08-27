@@ -44,7 +44,7 @@ class EvaluerAssistantCommand extends Command
 {
     protected $signature = 'varbaf:evaluer-assistant
         {fichier? : Chemin du jeu de questions, relatif à la racine du projet}
-        {--moteur= : Restreindre la mesure à un moteur (lexical, mots_cles)}
+        {--moteur= : Restreindre la mesure à un moteur (lexical, mots_cles, dense, hybride)}
         {--rapport= : Répertoire où déposer le CSV des résultats}
         {--detail : Afficher le détail question par question}';
 
@@ -261,6 +261,21 @@ class EvaluerAssistantCommand extends Command
     }
 
     /**
+     * Les moteurs à mesurer, dans l'ordre où le tableau les présentera.
+     *
+     * **La liste est explicite et non déduite de `clesDisponibles()`.**
+     * Une mesure comparative n'a de sens que si l'on sait, en la lisant,
+     * ce qui a été comparé : un catalogue qui s'enrichirait tout seul
+     * ferait varier la table 4.3 d'une version à l'autre sans que rien
+     * ne le dise. Le prix de ce choix est qu'un moteur ajouté au
+     * catalogue reste invisible ici tant qu'on ne l'y déclare pas —
+     * c'est précisément ce qui est arrivé aux branches dense et hybride,
+     * indexées à 100 % et mesurées par personne.
+     *
+     * `estDisponible()` fait le reste : sur un poste sans fournisseur
+     * d'embeddings, les deux dernières clés disparaissent d'elles-mêmes
+     * et la mesure se réduit aux deux moteurs locaux, sans échouer.
+     *
      * @return array<string, MoteurDeRecherche|null>
      */
     protected function moteurs(ResolveurDeMoteur $resolveur): array
@@ -275,7 +290,7 @@ class EvaluerAssistantCommand extends Command
 
         $moteurs = [];
 
-        foreach (['lexical', 'mots_cles'] as $cle) {
+        foreach (['lexical', 'mots_cles', 'dense', 'hybride'] as $cle) {
             $moteur = $resolveur->moteurNomme($cle);
 
             if ($moteur !== null && $moteur->estDisponible()) {
