@@ -4,9 +4,14 @@ namespace Modules\Pilotage\Providers;
 
 use Livewire\Livewire;
 use Modules\Pilotage\Console\IndexerCorpusCommand;
+use Modules\Pilotage\Console\IndexerVecteursCommand;
 use Modules\Pilotage\Console\EvaluerAssistantCommand;
 use Modules\Pilotage\Console\VoisinsProduitCommand;
+use Modules\Pilotage\Contracts\FournisseurDEmbeddings;
+use Modules\Pilotage\Embeddings\ClientOllama;
 use Modules\Pilotage\Recommandation\MoteurLexical;
+use Modules\Pilotage\Recherche\MoteurDense;
+use Modules\Pilotage\Recherche\MoteurHybride;
 use Modules\Pilotage\Recherche\MoteurMotsCles;
 use Modules\Pilotage\Recommandation\ResolveurDeMoteur;
 use Nwidart\Modules\Support\ModuleServiceProvider;
@@ -38,13 +43,31 @@ class PilotageServiceProvider extends ModuleServiceProvider
         // null y deviendrait un zéro silencieux.
         $this->mergeConfigFrom(module_path($this->name, 'config/config.php'), $this->nameLower);
 
-        // Le catalogue des moteurs sémantiques, indexé par la clé que
-        // « pilotage.moteur.ordre » emploie. Une branche dense s'ajoutera
-        // ici sous la clé « dense » : c'est la seule ligne à écrire pour
-        // qu'elle passe devant, et le repli sur la branche lexicale
-        // fonctionne alors sans qu'aucun appelant ne change.
+        // Le fournisseur d'embeddings, derrière son port.
+        //
+        // Singleton parce que `ClientOllama` mémorise la disponibilité
+        // du service et l'âge de son point d'entrée pour la durée du
+        // processus : une instance neuve à chaque résolution
+        // resonderait le réseau à chaque question, sur le chemin même
+        // où l'utilisateur attend une réponse.
+        $this->app->singleton(FournisseurDEmbeddings::class, ClientOllama::class);
+
+        // Le catalogue des moteurs, indexé par la clé que
+        // « pilotage.moteur.ordre » emploie.
         $this->app->singleton(ResolveurDeMoteur::class, fn ($app): ResolveurDeMoteur => new ResolveurDeMoteur([
+            // L'hybride est en tête de l'ordre configuré. Il n'est pas
+            // un troisième moteur à côté des deux autres : il les
+            // arbitre, et se réduit à la branche lexicale quand le
+            // fournisseur d'embeddings ne répond pas — en le disant.
+            'hybride' => $app->make(MoteurHybride::class),
+
             'lexical' => $app->make(MoteurLexical::class),
+
+            // Le dense est enregistré pour que la commande d'évaluation
+            // puisse le mesurer seul, et volontairement absent de
+            // « pilotage.moteur.ordre » : il n'a pas vocation à
+            // répondre sans le lexical pour tempérer sa complaisance.
+            'dense' => $app->make(MoteurDense::class),
 
             // Le témoin par mots-clés est enregistré mais absent de
             // « pilotage.moteur.ordre » : la commande d'évaluation
@@ -72,6 +95,7 @@ class PilotageServiceProvider extends ModuleServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 IndexerCorpusCommand::class,
+                IndexerVecteursCommand::class,
                 VoisinsProduitCommand::class,
                 EvaluerAssistantCommand::class,
             ]);

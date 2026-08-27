@@ -344,6 +344,16 @@ class AssistantInterrogationTest extends TestCase
         }
     }
 
+    /**
+     * Le moteur résolu est l'hybride depuis le 27/08.
+     *
+     * Aucun fournisseur d'embeddings ne tourne pendant les tests — c'est
+     * délibéré, une suite qui exigerait un service lancé ne s'exécuterait
+     * chez personne d'autre. L'hybride se réduit donc à sa branche
+     * lexicale, et le nom affiché doit le **dire** : c'est toute la
+     * différence entre un système dégradé qui s'annonce et un système
+     * dégradé qui se tait.
+     */
     public function test_le_moteur_qui_a_repondu_est_nomme(): void
     {
         $this->produit('Panier tressé');
@@ -351,8 +361,9 @@ class AssistantInterrogationTest extends TestCase
 
         $reponse = $this->assistant()->repondre('Quels produits en vannerie ?');
 
-        $this->assertSame('lexical', $reponse->moteurCle);
-        $this->assertSame('Similarité lexicale (TF-IDF)', $reponse->moteur);
+        $this->assertSame('hybride', $reponse->moteurCle);
+        $this->assertStringContainsString('branche lexical seule', (string) $reponse->moteur);
+        $this->assertStringContainsString('TF-IDF', (string) $reponse->moteur);
     }
 
     // =================================================================

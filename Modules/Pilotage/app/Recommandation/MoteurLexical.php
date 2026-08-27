@@ -50,6 +50,15 @@ class MoteurLexical implements MoteurSemantique
         return 'Similarité lexicale (TF-IDF)';
     }
 
+    /**
+     * Le même : ce moteur cherche et calcule un voisinage par la même
+     * mesure. La distinction n'a de sens que pour un composite.
+     */
+    public function nomDuVoisinage(): string
+    {
+        return $this->nom();
+    }
+
     public function cle(): string
     {
         return 'lexical';

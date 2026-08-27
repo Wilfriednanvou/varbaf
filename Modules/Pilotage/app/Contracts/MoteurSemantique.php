@@ -32,4 +32,24 @@ interface MoteurSemantique extends MoteurDeRecherche
      * @return Collection<int, ProduitVoisin> triés par score décroissant
      */
     public function voisins(int $produitId, CriteresDeVoisinage $criteres): Collection;
+
+    /**
+     * Le nom de ce qui calcule le **voisinage**, qui n'est pas toujours
+     * le nom de ce qui calcule la **recherche**.
+     *
+     * Deux méthodes de nommage parce qu'il y a deux opérations, et
+     * qu'un moteur composite peut n'engager qu'une partie de lui-même
+     * dans l'une des deux. `MoteurHybride` en est le cas : il fusionne
+     * deux branches pour chercher, mais délègue le voisinage au seul
+     * lexical, délibérément et pour toujours — les exclusions métier du
+     * voisinage sont exprimées en SQL et ne se rejouent pas sur un
+     * index comparé en mémoire.
+     *
+     * Sans cette séparation, la fiche produit du portail annoncerait
+     * « Hybride — lexical ⊕ dense » sous des suggestions que le dense
+     * n'a jamais vues. Ce serait dire ce qui était configuré plutôt que
+     * ce qui s'est passé, c'est-à-dire exactement ce que le nommage des
+     * moteurs existe pour empêcher.
+     */
+    public function nomDuVoisinage(): string;
 }

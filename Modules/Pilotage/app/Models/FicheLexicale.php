@@ -17,6 +17,9 @@ use Modules\Pilotage\Enums\TypeFicheLexicale;
  * @property string|null $texte
  * @property int $nombre_termes
  * @property float $norme
+ * @property array<int, float>|null $vecteur
+ * @property string|null $vecteur_modele
+ * @property string|null $vecteur_empreinte
  * @property string|null $empreinte
  * @property \Illuminate\Support\Carbon|null $indexee_le
  */
@@ -31,6 +34,9 @@ class FicheLexicale extends Model
         'texte',
         'nombre_termes',
         'norme',
+        'vecteur',
+        'vecteur_modele',
+        'vecteur_empreinte',
         'empreinte',
         'indexee_le',
     ];
@@ -42,6 +48,10 @@ class FicheLexicale extends Model
             'source_id' => 'integer',
             'nombre_termes' => 'integer',
             'norme' => 'float',
+            // Le vecteur dense est lu en bloc et comparé en PHP : le
+            // cast le rend directement sous forme de tableau de
+            // flottants, sans que chaque appelant ait à le décoder.
+            'vecteur' => 'array',
             'indexee_le' => 'datetime',
         ];
     }

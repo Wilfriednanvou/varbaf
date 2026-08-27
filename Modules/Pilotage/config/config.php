@@ -19,12 +19,100 @@ return [
     | première qui se déclare disponible et retombe sur la suivante
     | sinon. La branche lexicale est toujours en dernier : elle ne
     | dépend d'aucun service externe et ne peut donc pas être
-    | indisponible. Une branche dense (embeddings, pgvector) viendra se
-    | placer devant sans que les appelants changent.
+    | indisponible.
+    |
+    | L'hybride est en tête depuis le 27/08. Il se déclare disponible
+    | dès qu'une de ses deux branches l'est, et dégrade tout seul :
+    | fournisseur d'embeddings arrêté, il répond ce que le lexical
+    | aurait répondu, en le disant à l'écran. Le repli explicite qui le
+    | suit couvre le seul cas où il ne saurait rien faire — un corpus
+    | jamais indexé — et existe surtout pour que l'ordre reste lisible.
     |
     */
     'moteur' => [
-        'ordre' => ['lexical'],
+        'ordre' => ['hybride', 'lexical'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Branche dense
+    |--------------------------------------------------------------------------
+    |
+    | Le fournisseur d'embeddings est local — Ollama sur la machine du
+    | village. Aucune clé, aucun budget par appel, et aucune donnée du
+    | village qui sorte du village. C'est la condition qui rendait un
+    | service distant inacceptable ici, pas son coût.
+    |
+    | Rien de ce bloc n'est requis pour que le système fonctionne : si
+    | le service est absent, la branche se tait et le lexical répond.
+    |
+    */
+    'dense' => [
+
+        'ollama' => [
+
+            'url' => env('OLLAMA_URL', 'http://127.0.0.1:11434'),
+
+            // « nomic-embed-text » : 768 dimensions, environ 270 Mo,
+            // entraîné pour la recherche de passages et non pour la
+            // conversation. Un modèle de discussion produirait des
+            // vecteurs, mais pas des vecteurs faits pour être comparés.
+            'modele' => env('OLLAMA_MODELE_EMBEDDINGS', 'nomic-embed-text'),
+
+            // Un appel de vectorisation, en secondes. Large : le premier
+            // appel après le démarrage du service charge le modèle en
+            // mémoire et peut prendre plusieurs secondes.
+            'delai' => 20,
+
+            // La sonde de disponibilité, elle, doit être brève : elle
+            // est sur le chemin d'une question, là où l'utilisateur
+            // attend. Mieux vaut se déclarer indisponible que faire
+            // patienter.
+            'delai_sonde' => 2,
+
+            // Nombre de textes envoyés par appel à l'indexation.
+            'lot' => 32,
+        ],
+
+        // Plancher du cosinus dense. Nettement plus haut que celui du
+        // lexical, et ce n'est pas une préférence : un espace vectoriel
+        // continu rapproche *toujours* quelque chose, et 0,30 entre deux
+        // textes sans rapport y est banal. Les deux seuils ne mesurent
+        // pas la même chose.
+        'seuil' => 0.35,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fusion des branches
+    |--------------------------------------------------------------------------
+    |
+    | Fusion par rangs réciproques : un score TF-IDF et un cosinus dense
+    | ne vivent pas sur la même échelle, mais « premier » veut dire la
+    | même chose chez les deux. Voir `FusionReciproque` pour le détail.
+    |
+    */
+    'fusion' => [
+
+        // Amortit l'écart entre les premiers rangs. À 60, passer du rang
+        // 1 au rang 2 coûte 1,6 % : assez pour classer, trop peu pour
+        // qu'un moteur impose seul son premier contre l'avis de l'autre.
+        'k' => 60,
+
+        // À poids égal, aucune branche n'a raison d'avance. Ces deux
+        // nombres sont là pour être bougés et justifiés par la mesure de
+        // « varbaf:evaluer-assistant », pas pour rester à 1 par défaut
+        // faute d'avoir été regardés.
+        'poids' => [
+            'lexical' => 1.0,
+            'dense' => 1.0,
+        ],
+
+        // Candidats remontés par chaque branche avant la fusion. Plus
+        // large que le nombre d'extraits affichés : un passage huitième
+        // chez l'un et deuxième chez l'autre mérite d'être vu, et il ne
+        // le serait pas si chaque branche s'arrêtait à cinq.
+        'candidats' => 10,
     ],
 
     /*

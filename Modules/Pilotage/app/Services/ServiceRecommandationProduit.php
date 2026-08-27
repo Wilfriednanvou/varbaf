@@ -76,11 +76,16 @@ class ServiceRecommandationProduit
     }
 
     /**
-     * Le nom du moteur qui répondrait, pour l'afficher à côté des
-     * suggestions. Null si aucun n'est disponible.
+     * Le nom de ce qui a calculé les suggestions affichées à côté.
+     *
+     * `nomDuVoisinage()` et non `nom()` : ce service ne fait que du
+     * voisinage, et un moteur composite n'engage pas forcément les
+     * mêmes branches dans les deux opérations. Voir `MoteurSemantique`.
+     *
+     * Null si aucun moteur n'est disponible.
      */
     public function nomDuMoteur(): ?string
     {
-        return $this->resolveur->resoudreOuNul()?->nom();
+        return $this->resolveur->resoudreOuNul()?->nomDuVoisinage();
     }
 }
