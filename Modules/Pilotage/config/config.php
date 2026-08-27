@@ -57,6 +57,106 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Rédaction générative
+    |--------------------------------------------------------------------------
+    |
+    | Un modèle de langage met les extraits retrouvés en français suivi.
+    | Il n'intervient que dans la branche descriptive, ne reçoit que ces
+    | extraits, et sa sortie est relue par « GardeDesChiffres » comme
+    | n'importe quel autre texte. Sans clé, l'assistant liste les
+    | extraits — le comportement livré depuis le premier jour.
+    |
+    | Le rattrapage du routage par le modèle a été écarté le 27/08 : le
+    | routage décide quelle branche répond, donc se situe en amont de la
+    | frontière entre l'agrégation calculée et le descriptif, et la
+    | classification est déjà mesurée à 100 % sur les 48 questions du jeu
+    | d'évaluation.
+    |
+    */
+    'redaction' => [
+
+        // Interrupteur franc, indépendant de la présence d'une clé : il
+        // permet de démontrer le repli devant un jury sans avoir à
+        // retirer quoi que ce soit du fichier d'environnement.
+        'active' => (bool) env('PILOTAGE_REDACTION', true),
+
+        // Chaîne d'escalade : le premier profil disponible rédige.
+        //
+        // **Le local d'abord, et le motif n'est pas la performance.** Un
+        // modèle sur la machine ne coûte rien, ne demande aucune clé et
+        // ne dépend d'aucune connexion — donc il fonctionne le jour de la
+        // soutenance, y compris dans une salle sans réseau. Le distant
+        // n'est que le rattrapage, et il est lui-même facultatif : sans
+        // clé, sans réseau, sans rien, l'assistant liste les extraits
+        // comme il le fait depuis le premier jour.
+        'ordre' => ['local', 'distant'],
+
+        // Budget de temps d'un appel, en secondes. Au-delà, l'assistant
+        // compose mécaniquement : une réponse moins bien tournée vaut
+        // mieux qu'une page qui ne s'affiche pas.
+        'budget' => 8,
+
+        /*
+         | Les deux profils parlent le même dialecte — « chat completions »
+         | d'OpenAI — et sont servis par la même classe. Changer de
+         | fournisseur est un changement de configuration, jamais de code :
+         | il suffit que l'URL réponde à « POST {url}/v1/chat/completions ».
+         |
+         | Bases connues, à titre de repère :
+         |   Ollama (local)  http://127.0.0.1:11434
+         |   Groq            https://api.groq.com/openai
+         |   Cerebras        https://api.cerebras.ai
+         |   Mistral         https://api.mistral.ai
+         |   OpenRouter      https://openrouter.ai/api
+         |   xAI (payant)    https://api.x.ai
+         */
+        'profils' => [
+
+            'local' => [
+                'libelle' => 'local',
+                'url' => env('REDACTION_LOCALE_URL', 'http://127.0.0.1:11434'),
+                'modele' => env('REDACTION_LOCALE_MODELE', 'qwen2.5:3b'),
+
+                // Ollama exige un jeton et ne le vérifie pas. Mettre une
+                // valeur ici n'est donc pas un secret laissé en clair,
+                // c'est la satisfaction d'une formalité du protocole.
+                'cle' => env('REDACTION_LOCALE_CLE', 'ollama'),
+
+                // Un service local se sonde : il coûte une milliseconde
+                // à interroger, et le cas « pas lancé » est fréquent.
+                'sonder' => true,
+                'delai_sonde' => 2,
+            ],
+
+            'distant' => [
+                'libelle' => 'distant',
+                'url' => env('REDACTION_DISTANTE_URL', 'https://api.groq.com/openai'),
+
+                // **Un identifiant de modèle est une valeur périssable.**
+                // « llama-3.3-70b-versatile » a été retiré du palier
+                // gratuit de Groq le 16/08/2026, et un identifiant
+                // déprécié ne dégrade pas la réponse : il la refuse. Le
+                // repli couvre le cas — l'assistant listera les extraits
+                // — mais silencieusement, et c'est précisément le genre
+                // de panne qu'on découvre devant un jury. Vérifier
+                // « GET {url}/v1/models » avant une démonstration coûte
+                // dix secondes.
+                'modele' => env('REDACTION_DISTANTE_MODELE', 'openai/gpt-oss-120b'),
+
+                // Jamais de valeur par défaut ici : une clé écrite dans
+                // un fichier suivi par Git est une clé compromise.
+                'cle' => env('REDACTION_DISTANTE_CLE', ''),
+
+                // Un service en ligne ne se sonde pas : l'aller-retour
+                // pèserait sur chaque question, et la panne se découvre
+                // très bien à l'appel, où le repli est déjà écrit.
+                'sonder' => false,
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Branche dense
     |--------------------------------------------------------------------------
     |

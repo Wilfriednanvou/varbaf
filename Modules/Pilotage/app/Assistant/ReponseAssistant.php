@@ -35,6 +35,18 @@ final readonly class ReponseAssistant
         public ?string $moteur = null,
         public ?string $moteurCle = null,
         public array $parametres = [],
+        /**
+         * Qui a **tourné** le texte, quand ce n'est pas la composition
+         * mécanique.
+         *
+         * Distinct de `$moteur`, qui dit qui a **trouvé** les extraits.
+         * Un lecteur a le droit de savoir qu'une phrase a été écrite par
+         * un modèle de langage plutôt que citée telle quelle : c'est le
+         * principe du nommage du moteur, appliqué à l'autre moitié du
+         * travail. `null` signifie que rien n'a été rédigé — les extraits
+         * sont montrés bruts.
+         */
+        public ?string $redacteur = null,
     ) {}
 
     public function aRepondu(): bool
@@ -73,6 +85,7 @@ final readonly class ReponseAssistant
             'branche' => $this->branche->value,
             'intention' => $this->intention,
             'moteur' => $this->moteurCle,
+            'redacteur' => $this->redacteur,
             'texte' => $this->texte,
             'sources' => $this->sources->map(fn (SegmentTrouve $s): array => $s->enTableau())->all(),
             'parametres' => $this->parametres,

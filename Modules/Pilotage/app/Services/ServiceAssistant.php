@@ -10,6 +10,7 @@ use Modules\Pilotage\Assistant\GardeDesChiffres;
 use Modules\Pilotage\Assistant\ParametresQuestion;
 use Modules\Pilotage\Assistant\ReponseAssistant;
 use Modules\Pilotage\Assistant\Routeur;
+use Modules\Pilotage\Contracts\ModeleDeLangage;
 use Modules\Pilotage\Contracts\MoteurDeRecherche;
 use Modules\Pilotage\Enums\BrancheReponse;
 use Modules\Pilotage\Enums\CategorieQuestion;
@@ -44,6 +45,16 @@ use Modules\Pilotage\Recommandation\ResolveurDeMoteur;
  * Le nom du moteur qui a répondu est porté par la réponse : couper le
  * réseau devant un jury doit se voir à l'écran, pas seulement dans les
  * journaux.
+ *
+ * **La rédaction générative, ajoutée le 27/08, n'ouvre aucune brèche
+ * dans ce dispositif.** Un modèle de langage peut tourner les extraits
+ * en français suivi, mais il n'est appelé que dans la branche
+ * descriptive, il ne reçoit que les extraits déjà retrouvés, et sa
+ * sortie passe par le garde-fou 2 comme n'importe quel autre texte. Il
+ * ne cherche rien, ne calcule rien et ne voit aucun indicateur : la
+ * frontière posée par le `Routeur` est en amont de lui. Quand aucun
+ * modèle n'est disponible — pas de clé, pas de réseau — la réponse est
+ * composée mécaniquement, et c'est le comportement d'origine.
  */
 class ServiceAssistant
 {
@@ -55,6 +66,7 @@ class ServiceAssistant
         protected RapportService $rapport,
         protected ServiceAnalyseCatalogue $analyse,
         protected GardeDesChiffres $garde,
+        protected ModeleDeLangage $modele,
     ) {}
 
     /**
@@ -170,12 +182,22 @@ class ServiceAssistant
             );
         }
 
-        $texte = $this->composerLaReponse($segments);
+        // Une rédaction, si un modèle est là pour la faire ; sinon la
+        // liste des extraits, qui est le comportement livré depuis le
+        // premier jour. La matière est la même dans les deux cas.
+        $redaction = $this->modele->redigerDepuisExtraits($question, $segments);
+        $texte = $redaction ?? $this->listerLesExtraits($segments);
 
         // Garde-fou 2 : un chiffre sans source fait basculer en refus.
         // On ne corrige pas le texte, on le refuse : réparer une réponse
         // qui a inventé un nombre reviendrait à parier sur la nature de
         // l'invention.
+        //
+        // Le contrôle ne sait pas — et n'a pas à savoir — laquelle des
+        // deux compositions il relit. C'est ce qui le rend suffisant :
+        // ajouter un modèle génératif n'ajoute aucune exception à la
+        // règle, il ajoute seulement une manière de la violer, que la
+        // règle attrape déjà.
         $orphelins = $this->garde->chiffresSansSource($texte, $segments);
 
         if ($orphelins !== []) {
@@ -198,20 +220,30 @@ class ServiceAssistant
             sources: $segments,
             moteur: $moteur->nom(),
             moteurCle: $moteur->cle(),
+            // Rien n'a été rédigé : le dire, plutôt que de laisser croire
+            // qu'un modèle est passé sur un texte qu'il n'a pas vu.
+            redacteur: $redaction === null ? null : $this->modele->nom(),
         );
     }
 
     /**
-     * Compose la réponse à partir des seuls extraits retrouvés.
+     * La composition mécanique : montrer, sans écrire.
      *
      * **Aucune synthèse.** L'assistant n'écrit pas ce qu'il a compris,
      * il montre ce qu'il a trouvé. C'est ce qui rend le garde-fou 2
-     * tenable : un texte qui ne fait que citer ne peut avancer que des
-     * chiffres qui figurent dans ce qu'il cite.
+     * tenable sans modèle : un texte qui ne fait que citer ne peut
+     * avancer que des chiffres qui figurent dans ce qu'il cite.
+     *
+     * **Ce n'est pas un chemin de secours écrit à part.** C'est le
+     * comportement livré depuis le premier jour, qu'on n'a pas retiré en
+     * ajoutant la rédaction. Il est parcouru à chaque exécution de la
+     * suite de tests, puisque aucun modèle n'y est disponible : le
+     * chemin dégradé est donc le mieux éprouvé des deux, ce qui est
+     * exactement la propriété qu'on attend d'un repli.
      *
      * @param  Collection<int, SegmentTrouve>  $segments
      */
-    protected function composerLaReponse(Collection $segments): string
+    protected function listerLesExtraits(Collection $segments): string
     {
         $lignes = $segments
             ->map(fn (SegmentTrouve $segment): string => '— '.$segment->titre.' : '.$segment->extrait)

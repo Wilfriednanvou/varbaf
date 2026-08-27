@@ -13,6 +13,7 @@ use Modules\Pilotage\Assistant\CatalogueDIntentions;
 use Modules\Pilotage\Assistant\ExtracteurDeParametres;
 use Modules\Pilotage\Assistant\GardeDesChiffres;
 use Modules\Pilotage\Assistant\Routeur;
+use Modules\Pilotage\Contracts\ModeleDeLangage;
 use Modules\Pilotage\Enums\BrancheReponse;
 use Modules\Pilotage\Enums\CategorieQuestion;
 use Modules\Pilotage\Enums\TypeFicheLexicale;
@@ -24,6 +25,7 @@ use Modules\Pilotage\Services\ServiceIndexationLexicale;
 use Modules\Socle\Enums\CategorieVillage;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\VillageArtisanal;
+use Tests\Doubles\ModeleDeLangageDeTest;
 use Tests\TestCase;
 
 /**
@@ -543,5 +545,104 @@ class AssistantInterrogationTest extends TestCase
     public function test_la_commande_d_evaluation_refuse_un_fichier_absent(): void
     {
         $this->artisan('varbaf:evaluer-assistant', ['fichier' => 'docs/introuvable.csv'])->assertFailed();
+    }
+
+    // =================================================================
+    //  LA RÉDACTION GÉNÉRATIVE
+    // =================================================================
+
+    /**
+     * Sans modèle, la réponse est celle d'avant. Au caractère près.
+     *
+     * **C'est le test qui autorise tous les autres.** Ajouter un modèle
+     * de langage à un système dont la garantie centrale est de ne rien
+     * inventer n'est tenable que si son absence ramène exactement le
+     * comportement éprouvé jusque-là. Si ce test tombe, la rédaction
+     * n'est pas une couche ajoutée : c'est une réécriture.
+     */
+    public function test_sans_modele_la_reponse_reste_la_liste_des_extraits(): void
+    {
+        $this->app->instance(ModeleDeLangage::class, ModeleDeLangageDeTest::muet());
+
+        $this->produit('Panier tressé');
+        $this->indexer();
+
+        $reponse = $this->assistant()->repondre('Quels produits en vannerie ?');
+
+        $this->assertSame(BrancheReponse::RECHERCHE, $reponse->branche);
+        $this->assertStringStartsWith('Voici ce que le corpus du village contient de plus proche :', $reponse->texte);
+        $this->assertNull(
+            $reponse->redacteur,
+            'Aucun modèle n\'a écrit : l\'annoncer laisserait croire qu\'une phrase a été tournée.',
+        );
+    }
+
+    /**
+     * Avec un modèle, c'est sa rédaction qui sort — et il est nommé.
+     */
+    public function test_la_redaction_du_modele_remplace_la_liste_et_est_annoncee(): void
+    {
+        $this->app->instance(ModeleDeLangage::class, ModeleDeLangageDeTest::fidele());
+
+        $this->produit('Panier tressé');
+        $this->indexer();
+
+        $reponse = $this->assistant()->repondre('Quels produits en vannerie ?');
+
+        $this->assertSame(BrancheReponse::RECHERCHE, $reponse->branche);
+        $this->assertStringStartsWith('Le corpus mentionne :', $reponse->texte);
+        $this->assertStringNotContainsString('Voici ce que le corpus', $reponse->texte);
+        $this->assertSame('Modèle de test', $reponse->redacteur);
+        $this->assertTrue($reponse->sources->isNotEmpty(), 'Garde-fou 3 : les sources accompagnent la rédaction aussi.');
+    }
+
+    /**
+     * Un modèle qui invente un chiffre est écarté par le garde-fou 2.
+     *
+     * **Le test qui rend la rédaction générative défendable.** La consigne
+     * envoyée au modèle lui interdit d'inventer un nombre, mais une
+     * consigne ne se démontre pas : elle se contourne, se dilue, et varie
+     * d'un modèle à l'autre. Ici le modèle désobéit délibérément, et ce
+     * n'est pas la consigne qui rattrape la faute — c'est un contrôle
+     * mécanique qui relit le texte et bascule en refus.
+     *
+     * Noter ce qui n'est pas fait : le texte n'est pas corrigé, ni
+     * amputé du chiffre fautif. Réparer une réponse qui a inventé un
+     * nombre reviendrait à parier sur la nature de l'invention.
+     */
+    public function test_un_chiffre_invente_par_le_modele_fait_basculer_en_refus(): void
+    {
+        $this->app->instance(ModeleDeLangage::class, ModeleDeLangageDeTest::affabulateur());
+
+        $this->produit('Panier tressé');
+        $this->indexer();
+
+        $reponse = $this->assistant()->repondre('Quels produits en vannerie ?');
+
+        $this->assertSame(BrancheReponse::REFUS, $reponse->branche);
+        $this->assertStringContainsString('47', $reponse->texte, 'Le refus nomme le chiffre fautif : un refus muet ne s\'explique pas.');
+        $this->assertStringContainsString('ne figurent dans aucun extrait', $reponse->texte);
+    }
+
+    /**
+     * La rédaction ne touche pas la branche du calcul.
+     *
+     * La frontière tient des deux côtés : un modèle branché ne doit pas
+     * s'inviter là où un montant est produit par calcul. Si ce test
+     * tombe, la garantie « aucun montant produit par proximité
+     * textuelle » ne vaut plus rien, quel que soit l'état du reste.
+     */
+    public function test_le_modele_n_intervient_jamais_dans_la_branche_du_calcul(): void
+    {
+        $this->app->instance(ModeleDeLangage::class, ModeleDeLangageDeTest::affabulateur());
+
+        $this->produit('Panier tressé');
+        $this->indexer();
+
+        $reponse = $this->assistant()->repondre("Quel est le chiffre d'affaires ?");
+
+        $this->assertSame(BrancheReponse::CALCUL, $reponse->branche);
+        $this->assertNull($reponse->redacteur);
+        $this->assertStringNotContainsString('47', $reponse->texte);
     }
 }

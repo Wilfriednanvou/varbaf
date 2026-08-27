@@ -8,7 +8,10 @@ use Modules\Pilotage\Console\IndexerVecteursCommand;
 use Modules\Pilotage\Console\EvaluerAssistantCommand;
 use Modules\Pilotage\Console\VoisinsProduitCommand;
 use Modules\Pilotage\Contracts\FournisseurDEmbeddings;
+use Modules\Pilotage\Contracts\ModeleDeLangage;
 use Modules\Pilotage\Embeddings\ClientOllama;
+use Modules\Pilotage\Modele\ClientCompatibleOpenAI;
+use Modules\Pilotage\Modele\ResolveurDeModele;
 use Modules\Pilotage\Recommandation\MoteurLexical;
 use Modules\Pilotage\Recherche\MoteurDense;
 use Modules\Pilotage\Recherche\MoteurHybride;
@@ -51,6 +54,31 @@ class PilotageServiceProvider extends ModuleServiceProvider
         // resonderait le réseau à chaque question, sur le chemin même
         // où l'utilisateur attend une réponse.
         $this->app->singleton(FournisseurDEmbeddings::class, ClientOllama::class);
+
+        // Le catalogue des modèles de rédaction, indexé par la clé que
+        // « pilotage.redaction.ordre » emploie.
+        //
+        // Les deux profils sont servis par la même classe : ils ne
+        // diffèrent que par ce qu'ils lisent dans la configuration. Un
+        // troisième fournisseur n'ajouterait ni classe ni ligne ici, mais
+        // une entrée dans « pilotage.redaction.profils ».
+        $this->app->singleton(ResolveurDeModele::class, fn (): ResolveurDeModele => new ResolveurDeModele([
+            'local' => new ClientCompatibleOpenAI('local'),
+            'distant' => new ClientCompatibleOpenAI('distant'),
+        ]));
+
+        // Le modèle derrière son port.
+        //
+        // **Toujours lié, jamais absent.** Le résolveur rend
+        // `ModeleIndisponible` quand aucun modèle ne se déclare
+        // disponible, de sorte qu'aucun appelant n'ait à distinguer
+        // « pas de modèle » de « modèle qui n'a pas voulu rédiger ». Une
+        // installation sans clé d'API n'a donc rien à configurer pour
+        // fonctionner : elle liste les extraits, comme avant.
+        $this->app->bind(
+            ModeleDeLangage::class,
+            fn ($app): ModeleDeLangage => $app->make(ResolveurDeModele::class)->resoudre(),
+        );
 
         // Le catalogue des moteurs, indexé par la clé que
         // « pilotage.moteur.ordre » emploie.
