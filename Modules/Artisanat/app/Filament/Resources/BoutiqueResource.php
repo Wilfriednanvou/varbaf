@@ -12,6 +12,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Validation\Rules\Unique;
+use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Enums\ZoneBoutique;
 use Modules\Artisanat\Filament\Resources\BoutiqueResource\Pages;
 use Modules\Artisanat\Models\Boutique;
@@ -24,6 +25,10 @@ use Modules\Socle\Models\JournalAudit;
  * L'occupant, l'état d'occupation et la redevance ont quitté cet écran
  * en même temps qu'ils ont quitté le modèle : ils appartiennent à
  * l'espace locatif. Ce qui se saisit ici est ce qui décrit le bâtiment.
+ *
+ * La nature s'y est ajoutée le 26/08, quand le sous-sol et l'espace vert
+ * sont entrés au parc : elle dit si un contenant est un local de vente,
+ * et c'est elle qui borne le taux d'occupation présenté à la tutelle.
  */
 class BoutiqueResource extends Resource
 {
@@ -77,11 +82,23 @@ class BoutiqueResource extends Resource
                         ->required(),
                 ]),
                 Grid::make(2)->schema([
+                    // Sans ce champ, seul le seeder pouvait déclarer un
+                    // contenant hors vente : la coordination n'avait
+                    // aucun moyen d'en ajouter un depuis l'écran.
+                    Forms\Components\Select::make('nature')
+                        ->label('Nature du contenant')
+                        ->options(NatureContenant::options())
+                        ->default(NatureContenant::BOUTIQUE->value)
+                        ->required()
+                        ->native(false)
+                        ->selectablePlaceholder(false),
                     Forms\Components\TextInput::make('superficie')
                         ->label('Superficie (m²)')
                         ->placeholder('12')
                         ->numeric()
                         ->minValue(0),
+                ]),
+                Grid::make(2)->schema([
                     Forms\Components\Select::make('emplacement')
                         ->label('Emplacement')
                         ->options(ZoneBoutique::options())
@@ -100,6 +117,10 @@ class BoutiqueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge(),
+                Tables\Columns\TextColumn::make('nature')
+                    ->label('Nature')
+                    ->badge()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('emplacement')
                     ->label('Emplacement')
                     ->formatStateUsing(fn (?string $state) => $state ? ZoneBoutique::from($state)->getLabel() : null)
@@ -134,6 +155,12 @@ class BoutiqueResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // Le parc de vente et le locatif entier ne se lisent pas
+                // pareil : ce filtre est ce qui permet de retrouver à
+                // l'écran le dénominateur du taux d'occupation.
+                Tables\Filters\SelectFilter::make('nature')
+                    ->label('Nature')
+                    ->options(NatureContenant::options()),
                 Tables\Filters\SelectFilter::make('village_id')
                     ->label('Village')
                     ->relationship('village', 'nom'),
