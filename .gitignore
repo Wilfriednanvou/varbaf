@@ -31,3 +31,7 @@ Thumbs.db
 # nwidart/laravel-modules — dépendances propres à un module
 /Modules/*/vendor
 /Modules/*/node_modules
+
+# Sorties d'execution de la mesure. La serie versee au depot vit
+# dans docs/donnees/evaluation/, citee par le rapport.
+/storage/evaluation/

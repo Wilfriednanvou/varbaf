@@ -1,6 +1,6 @@
 # VARBAF — contexte de reprise
 
-**Instantané du 27 août 2026, vers 03 h 15.** À coller en tête d'une nouvelle conversation. Ce document périme vite : `docs/journal-de-bord.md` et `docs/dette-technique.md` font foi dès qu'ils divergent de lui.
+**Instantané du 27 août 2026, en fin de journée.** À coller en tête d'une nouvelle conversation. Ce document périme vite : `docs/journal-de-bord.md` et `docs/dette-technique.md` font foi dès qu'ils divergent de lui.
 
 ---
 
@@ -8,7 +8,7 @@
 
 **VARBAF** — ERP du Village Artisanal Régional de Bafoussam. Stage académique.
 
-- **Remise : 5 septembre 2026.** Gel du code officiel le 3 septembre, **gel effectif décidé au 31 août** (avancer est plus strict, jamais plus laxiste).
+- **Remise : 5 septembre 2026.** Gel du code officiel le 3 septembre, **gel effectif décidé au 31 août**.
 - Tout est en **français** : interface, libellés, commentaires, messages de commit.
 - Stack : PHP 8.3, Laravel 12, Filament 5 (panneau `admin`), `nwidart/laravel-modules`, `spatie/laravel-permission`, PostgreSQL 14+, `barryvdh/laravel-dompdf`.
 - Dépôt : `~/Desktop/varbaf`, branche `master`, distant à jour.
@@ -17,20 +17,18 @@
 
 Socle (1) → Artisanat (2) → Commerce (3) → Tresorerie (4) → Pilotage (5) → Portail (6).
 
-**Un module ne référence que les modules dont il dépend. Aucune dépendance montante, jamais.** Pour franchir une frontière : le *consommateur* déclare l'interface, le *fournisseur* l'implémente et la lie. Trois exemples en service — `Commerce\Contracts\JournalDeCaisse` (lié par la Trésorerie), `Socle\Contracts\VerrouDeCloture` (registre où la Trésorerie vient se déclarer), `Pilotage\Contracts\FournisseurDEmbeddings` (le même idiome appliqué à une dépendance externe).
+**Un module ne référence que les modules dont il dépend. Aucune dépendance montante, jamais.** Pour franchir une frontière : le *consommateur* déclare l'interface, le *fournisseur* l'implémente et la lie. Quatre exemples en service — `Commerce\Contracts\JournalDeCaisse`, `Socle\Contracts\VerrouDeCloture`, `Pilotage\Contracts\FournisseurDEmbeddings`, `Pilotage\Contracts\ModeleDeLangage`.
 
 ### À lire avant d'agir
 
 | Fichier | Contenu |
 |---|---|
 | `CLAUDE.md` | 15 règles métier non négociables, conventions Filament, permissions, audit |
-| `docs/dette-technique.md` | Dettes ouvertes, arbitrages, et « Écarts corrigés » tenu au fil de l'eau |
+| `docs/dette-technique.md` | Dettes ouvertes, arbitrages, et « Écarts corrigés » |
 | `docs/retroplanning.md` | Périmètre arbitré et les 5 règles de conduite du planning |
 | `docs/specification-tresorerie.md` | RG-01 à RG-27 |
 | `docs/journal-de-bord.md` | Notes du soir — matière du chapitre réalisation |
-| `docs/questions-coordination.md` | 7 questions en attente, avec l'hypothèse retenue à défaut de réponse |
-
-Règles de conduite qui ont réellement servi : **1.** le gel est intangible ; **2.** un jour de retard se compense par une coupe, jamais par une nuit blanche ; **3.** écrire chaque soir.
+| `docs/questions-coordination.md` | 7 questions en attente, avec l'hypothèse retenue à défaut |
 
 ---
 
@@ -38,86 +36,70 @@ Règles de conduite qui ont réellement servi : **1.** le gel est intangible ; *
 
 **`device_bash` est indisponible.** Toute lecture passe par `device_stage_files`, toute écriture par `SendUserFile` puis `device_commit_files`. **L'utilisateur exécute lui-même chaque commande** et colle la sortie.
 
-Deux pièges vérifiés :
+Trois pièges vérifiés :
 
 - Son terminal est **Git Bash (MINGW64)** sur Windows — pas PowerShell.
-- Git Bash ne sait pas piper la sortie d'un binaire natif (« stdout is not a tty ») : utiliser `php artisan test --compact`, **jamais** `| tail`.
+- Git Bash ne sait pas piper la sortie d'un binaire natif : utiliser `php artisan test --compact`, **jamais** `| tail`.
+- **PHP sous Windows n'embarque aucun magasin de certificats racine.** Réglé le 27/08 par `curl.cainfo` et `openssl.cafile` dans `C:\php-8.3.30-Win32-vs16-x64\php.ini`, pointant sur `extras\ssl\cacert.pem`. Sans cela, tout appel HTTPS sortant échoue en `cURL error 60` — et le repli l'avale en silence. À refaire sur le poste du village.
 
-**Avant de modifier un fichier, le re-stager.** Une autre session a écrit dans le même dépôt cette nuit ; travailler sur une copie de plus de quelques minutes fait écraser silencieusement le travail d'autrui (voir plus bas).
+**Avant de modifier un fichier, le re-stager.**
 
 ---
 
 ## État au moment de la reprise
 
-`HEAD = d0f3267`, poussé. **L'arbre de travail n'est pas propre** — quatre lots distincts y cohabitent :
+`HEAD = 8ca5b81`, poussé, **arbre propre**. **407 tests au vert**, 1073 assertions.
 
-1. **Y7, fait cette nuit.** `ServiceTresorerie::$sectionCible` était un état *statique* relâché par le `finally` de l'appelant. Remplacé par une propriété d'instance et une méthode `pour(SectionCaisse, callable)` qui pose, exécute et relâche dans son propre `finally`. La section précédente est restaurée, pas effacée (ciblages imbriqués). `ServiceTresorerie` devient **singleton du conteneur**, sans quoi le ciblage porterait sur une instance et l'écriture sur une autre. `resoudreSectionOuverte()` reçoit un `orderBy('id')` explicite. Quatre tests ajoutés à `SessionCaisseTest`, dont deux qui n'existaient pas : **le ciblage n'était éprouvé nulle part** — avec une seule caisse ouverte le repli tombait juste par accident.
-2. **Deux documents neufs** : `docs/journal-de-bord.md` (entrée du 26/08) et `docs/questions-coordination.md`.
-3. **Une couche de recherche dense/hybride, écrite par une autre session** entre 02:10 et 02:21 : `FournisseurDEmbeddings`, `ClientOllama` (embeddings locaux, `nomic-embed-text`), `MoteurDense`, `MoteurHybride`, `FusionReciproque` (RRF, k=60), `ServiceIndexationDense`, `IndexerVecteursCommand`, migration `2026_08_27_500300_ajouter_le_vecteur_dense_aux_fiches`, `tests/Doubles/`, `RechercheHybrideTest`. `pilotage.moteur.ordre` vaut désormais `['hybride', 'lexical']`.
-4. **Un correctif de nommage**, livré juste après : `MoteurHybride::voisins()` délègue au seul lexical **par conception** (les exclusions métier du voisinage sont en SQL et ne se rejouent pas sur un index en mémoire), mais `nom()` était partagé avec `rechercher()`. Le portail aurait annoncé « Hybride — lexical ⊕ dense » sous des suggestions que le dense n'a jamais vues, **le jour où Ollama tourne**. `nomDuVoisinage()` ajouté à `MoteurSemantique`, implémenté par le lexical et l'hybride, appelé par `ServiceRecommandationProduit`.
-
-### Ce qui reste à faire tout de suite
-
-```bash
-php artisan test --compact
-```
-
-Le dernier passage donnait **2 échecs, 395 réussis** — les deux échecs sont ceux que le correctif de nommage adresse, et il n'a pas été rejoué depuis. La migration dense est appliquée. **L'index dense n'a jamais été construit** et on ne sait pas si Ollama est installé sur la machine.
-
-Puis quatre commits séparés — Y7, les deux documents, la branche dense, le correctif de nommage. Ne pas les mélanger : le travail de l'autre session mérite le sien.
-
----
-
-## Décisions en cours
-
-**L'hybride local + Grok, demandé et pas encore livré.** L'utilisateur veut un modèle de langage local complété par une clé d'API **Grok** pour les tâches complexes. Conception arrêtée, code écrit mais **non livré sur sa machine** :
-
-- Port `Modules\Pilotage\Contracts\ModeleDeLangage` — volontairement étroit : `redigerDepuisExtraits()` et `classer()`, rien de générique. **La forme du port est la contrainte : le modèle ne produit jamais un chiffre.** Les montants viennent de `RapportService`, par calcul, et de nulle part ailleurs.
-- `ModeleIndisponible` — objet nul, pour que le chemin dégradé soit le *même code* que le nominal.
-- `ResolveurDeModele` — rend une **chaîne** d'escalade (`['local', 'distant']`), l'appelant décide d'escalader sur une condition mécanique : routeur sous son seuil, recherche vide, délai dépassé. Budget de temps 8 s.
-- API xAI : `https://api.x.ai/v1/chat/completions`, `Authorization: Bearer`, modèles `grok-4.6` / `grok-4`, corps compatible OpenAI.
-- `GardeDesChiffres` existe déjà et relit mécaniquement toute réponse rédigée : c'est ce qui rend la rédaction générative tenable, et il n'a pas eu à changer.
-
-**Deux questions sans réponse :** Ollama est-il installé, et avec quel modèle ? Et le périmètre — la rédaction seule, ou la rédaction plus le rattrapage du routage ?
-
-**Coût annoncé :** environ deux jours, qui mangent le 28 et le 29. La coupe proposée en contrepartie : DT-09 redevient une limite assumée, `docs/modele-classes.md` glisse au 2 septembre.
-
-### Dettes encore ouvertes
-
-- **DT-09** — aucun garde-fou sur `date_debut` quand une redevance est encaissée. Facultatif.
-- **DT-12** — cumul saisie / clôture en caisse ; c'est la question 6 à la coordination.
-- `docs/donnees/README.md` décrit encore le registre supprimé le 26.
-- `docs/modele-classes.md` n'a pas suivi le changement de parc du 26.
-
-### En attente d'une information du village
-
-`Mme Justina` (190 000 F de ventes, aucun espace à son nom) et « Bijoux en perles » (hors des quatorze secteurs). Les deux sont dans `docs/questions-coordination.md` avec leur hypothèse de repli.
+Reste à faire immédiatement : sortir `storage/evaluation/` du suivi Git (les CSV versés vivent dans `docs/donnees/evaluation/`).
 
 ---
 
 ## Le volet IA tel qu'il existe
 
-L'assistant a **deux branches et une frontière qui ne se franchit jamais** : une question d'agrégation part vers `RapportService` et se résout par calcul déterministe ; une question descriptive part vers la recherche et n'a **aucun** accès aux indicateurs. Aucun montant ne peut être produit par proximité textuelle.
+**Deux branches et une frontière qui ne se franchit jamais.** Une question d'agrégation part vers `RapportService` et se résout par calcul déterministe ; une question descriptive part vers la recherche et n'a **aucun** accès aux indicateurs. Aucun montant ne peut être produit par proximité textuelle.
 
-Trois garde-fous : rien sous le seuil de similarité ; `GardeDesChiffres` bascule en refus si un nombre n'apparaît dans aucun extrait ; les sources accompagnent toujours la réponse. S'y ajoutent la recommandation de produits, l'analyse du catalogue (produits isolés, segments saturés) et la commande `varbaf:evaluer-assistant` qui mesure classification, rappel@5 et **taux de refus correct**.
+**Trois garde-fous** : rien sous le seuil de similarité ; `GardeDesChiffres` bascule en refus si un nombre n'apparaît dans aucun extrait ; les sources accompagnent toujours la réponse.
+
+**Rédaction générative** (27/08). Le port `ModeleDeLangage` n'expose qu'une opération : mettre en français suivi des extraits **déjà retrouvés**. Le modèle ne cherche rien, ne calcule rien, ne voit aucun indicateur. `classer()` a été délibérément retiré du port — le routage est en amont de la frontière. Sans clé ni modèle, `ModeleIndisponible` rend `null` et l'assistant liste les extraits : c'est le comportement d'origine, et il est parcouru par toute la suite de tests.
+
+Une seule classe, `ClientCompatibleOpenAI`, sert tous les fournisseurs (même dialecte `POST {url}/v1/chat/completions`). Deux profils, `local` (Ollama) et `distant` (**Groq**, palier gratuit), ordre `['local', 'distant']` — le local devant parce qu'il fonctionne sans réseau le jour de la soutenance. Changer de fournisseur est un changement de `.env`.
+
+**Branche dense construite, mesurée, écartée** le 27/08. Ollama + `nomic-embed-text`, index à 100 % (325 fiches, 768 dimensions). Elle est moins bonne au rappel que le lexical **et** fait tomber le refus correct de 100 % à 0 %. `pilotage.moteur.ordre` vaut `['lexical']` ; le dense et l'hybride restent au catalogue comme instruments de mesure, et un test retient la décision. Motif chiffré en commentaire dans `Modules/Pilotage/config/config.php`.
+
+### Mesures — table 4.3 du rapport
+
+Sur les 48 questions de `Modules/Pilotage/resources/evaluation/questions.csv` :
+
+| Moteur | Classification | Rappel@5 | Refus correct |
+|---|---|---|---|
+| lexical | 100,0 % | **70,0 %** | **100,0 %** |
+| mots_cles | 100,0 % | 60,0 % | 100,0 % |
+| dense | 100,0 % | 60,0 % | 0,0 % |
+| hybride | 100,0 % | 70,0 % | 0,0 % |
+
+H3 : +10 points pour la pondération TF-IDF sur le témoin par mots-clés.
+
+**Une série antérieure, à 20 % partout, figure aussi au dépôt et dans le journal.** Elle est fausse : le rappel était mesuré contre les seuls titres des sources, où le corps de métier d'une fiche produit ne figure jamais. Elle est conservée délibérément — une mesure qu'on corrige se montre. Le rapport doit porter les deux séries.
 
 ---
 
-## Le jeu de données
+## Ce qui reste
 
-Repris le 26 août depuis trois documents réels du village. **603 lignes, 602 ventes importées.** Vérifié en console : CA 2 021 350 F, commission 202 135 F (exactement 10 %), part artisan 1 819 215 F (la somme retombe sur le CA), entrées en caisse 2 021 350 F, 1 204 mouvements de stock (602 × 2), 24 attributions pour 115 000 F de redevance.
-
-Le sous-sol et l'espace vert font partie du parc locatif depuis le 26 (G0201 loué à la CNTC pour 60 000 F, la redevance la plus élevée du village). La colonne `nature` sur les contenants porte la distinction ; le taux d'occupation présenté à la tutelle se calcule sur les seules boutiques.
-
-**Ce qui n'a délibérément pas été fait :** les catégories des 285 produits, faute de source. Une catégorie devinée ne se distinguerait plus d'une catégorie relevée.
+- **Deux documents faux** : `docs/donnees/README.md` décrit le registre supprimé le 26 ; `docs/modele-classes.md` n'a pas suivi le changement de parc.
+- **DT-09** — aucun garde-fou sur `date_debut` quand une redevance est encaissée. Facultatif, assumé.
+- **DT-12** — cumul saisie / clôture en caisse ; question 6 à la coordination.
+- **En attente du village** : `Mme Justina` (190 000 F de ventes, aucun espace) et « Bijoux en perles » (hors des quatorze secteurs). Voir `docs/questions-coordination.md`.
+- La clé Groq du 27/08 a circulé en clair dans une conversation : à révoquer et remplacer.
 
 ---
 
-## Deux leçons de méthode qui ont coûté cher
+## Trois leçons de méthode qui ont coûté cher
 
-**Une règle inventée par déduction ne se fait jamais démentir tant que rien ne la remplit.** Deux fois : la redevance au mètre carré, qui n'a jamais produit un montant ; et « le sous-sol ne comporte aucun espace locatif », déduit de ce que le sous-sol *est*, jamais vérifié contre une donnée.
+**Une règle inventée par déduction ne se fait jamais démentir tant que rien ne la remplit.** Trois fois : la redevance au mètre carré ; « le sous-sol ne comporte aucun espace locatif » ; les préfixes de tâche de `nomic-embed-text`. La troisième est tombée en quatre minutes — parce qu'on avait écrit la sonde qui pouvait la démentir.
 
-**La suite complète attrape ce que la suite filtrée laisse passer.** Un bug qui cassait toutes les pages du panneau (`notifications.data` en `text`, que la cloche de Filament interroge en JSON) n'existait, du point de vue des tests, que dans deux fichiers d'un module sans rapport.
+**La suite complète attrape ce que la suite filtrée laisse passer.**
+
+**Quelque chose qui a l'air de vérifier peut regarder ailleurs.** Huit cas le 27/08 : un instrument de mesure aveugle aux moteurs qu'on venait d'ajouter, deux tests qui affirmaient une valeur de configuration, une hypothèse jamais éprouvée, un identifiant de modèle périmé depuis onze jours, un échec TLS avalé par le repli, une suite de tests sur le point d'appeler le réseau, et un indicateur qui mesurait une propriété des titres. Aucun ne s'est signalé tout seul. **Le repli doit être silencieux pour l'utilisateur et bavard pour le développeur.**
 
 ---
 
