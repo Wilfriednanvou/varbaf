@@ -48,5 +48,27 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!--
+            Aucune rédaction générative pendant les tests.
+
+            Sans cette ligne, la suite appellerait réellement le service
+            distant dès qu'une clé est présente dans l'environnement du
+            développeur : chaque test empruntant la branche descriptive
+            partirait sur le réseau. Trois conséquences, toutes
+            mauvaises. La suite deviendrait lente et intermittente ; elle
+            échouerait chez qui n'a pas de clé, ou plus de quota ; et
+            surtout elle éprouverait le service au lieu du code — un test
+            vert ne dirait plus si l'assistant est correct, mais si le
+            fournisseur répondait ce matin-là.
+
+            Les tests qui portent sur la rédaction injectent leur propre
+            double par le conteneur. Ce sont les seuls qui doivent voir
+            un modèle, et ils en voient un qu'ils gouvernent.
+
+            C'est aussi ce qui garantit que le chemin dégradé — la liste
+            des extraits — reste parcouru par toute la suite, donc
+            durablement éprouvé.
+        -->
+        <env name="PILOTAGE_REDACTION" value="false"/>
     </php>
 </phpunit>
