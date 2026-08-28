@@ -1,0 +1,29 @@
+/*
+ | Thème du panneau « admin ».
+ |
+ | **Pourquoi ce fichier existe.** La règle CSS de CLAUDE.md — « aucun CSS
+ | personnalisé hors du fichier de thème du panneau » — suppose ce fichier,
+ | qui n'avait jamais été créé. Sans lui, le panneau tourne sur la feuille
+ | précompilée de Filament, qui ne contient que les classes utilisées par
+ | Filament lui-même : tout utilitaire écrit dans une vue de module y est
+ | absent, silencieusement. Le symptôme n'est pas une erreur mais une page
+ | qui s'affiche sans sa mise en forme, ce qu'aucun test ne signale.
+ |
+ | C'est ce qui avait conduit à écrire des `style="..."` en dur dans
+ | `tableau-de-bord.blade.php` : un contournement qui violait la règle
+ | qu'on croyait respecter. Ces styles sont retirés avec ce thème.
+ |
+ | `theme.css` de Filament importe Tailwind avec `source(none)` : rien
+ | n'est scanné par défaut, chaque thème déclare ses propres sources. Les
+ | trois premières lignes sont l'échafaudage standard de Filament ; les
+ | deux dernières ouvrent les modules, sans quoi rien n'aurait changé.
+ */
+
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*.php';
+@source '../../../../resources/views/filament/**/*.blade.php';
+@source '../../../../vendor/filament/**/*.blade.php';
+
+@source '../../../../Modules/**/resources/views/**/*.blade.php';
+@source '../../../../Modules/**/app/Filament/**/*.php';

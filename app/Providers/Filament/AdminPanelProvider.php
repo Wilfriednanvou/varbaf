@@ -45,6 +45,15 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            // **Le thème du panneau, sans quoi les vues des modules
+            // s'affichent sans mise en forme.** Filament sert par défaut
+            // une feuille précompilée qui ne contient que les classes
+            // qu'il emploie lui-même : un utilitaire écrit dans une vue
+            // de module n'y figure pas, et la page s'affiche nue sans
+            // qu'aucune erreur ne le signale — c'est une panne muette,
+            // pas une erreur. Le fichier désigné ici déclare les modules
+            // parmi ses sources.
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

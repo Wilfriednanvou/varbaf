@@ -6,6 +6,7 @@ use Filament\Resources\Pages\ManageRecords;
 use Modules\Commerce\Contracts\JournalDeCaisse;
 use Modules\Commerce\Filament\Resources\VenteResource;
 use Modules\Commerce\Models\TauxCommission;
+use Modules\Socle\Filament\Concerns\TitreLisible;
 
 /**
  * Écran de consultation. La saisie n'a qu'un chemin : le composant
@@ -14,6 +15,11 @@ use Modules\Commerce\Models\TauxCommission;
  */
 class ManageVentes extends ManageRecords
 {
+    // Filament capitalise chaque mot du libelle pluriel pour en
+    // faire le titre : « Corps De Metier » la ou le menu et le fil
+    // d'Ariane disent « Corps de metier ». Voir le trait.
+    use TitreLisible;
+
     protected static string $resource = VenteResource::class;
 
     public function getBreadcrumbs(): array

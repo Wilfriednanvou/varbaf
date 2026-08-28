@@ -176,7 +176,7 @@ class TauxCommissionResource extends Resource
                     ->modalHeading('Activer ce taux dès aujourd\'hui ?')
                     ->modalDescription(fn (TauxCommission $record) => "Le taux {$record->libelle()} verra sa date d'effet avancée à aujourd'hui. Il deviendra immédiatement le taux en vigueur pour toutes les nouvelles ventes.")
                     ->modalSubmitActionLabel('Activer maintenant')
-                    ->modalCancelActionLabel('Annuler')
+                    ->modalCancelActionLabel('Fermer')
                     ->action(function (TauxCommission $record): void {
                         $record->update(['date_effet' => now()->toDateString()]);
                         JournalAudit::enregistrer(
@@ -203,7 +203,7 @@ class TauxCommissionResource extends Resource
                     ->modalHeading('Réappliquer ce taux ?')
                     ->modalDescription(fn (TauxCommission $record) => "Un nouveau taux de {$record->taux} % sera créé avec la date d'aujourd'hui. Il deviendra le taux actif pour toutes les nouvelles ventes.")
                     ->modalSubmitActionLabel('Réappliquer maintenant')
-                    ->modalCancelActionLabel('Annuler')
+                    ->modalCancelActionLabel('Fermer')
                     ->action(function (TauxCommission $record): void {
                         $nouveau = TauxCommission::create([
                             'taux'               => $record->taux,
@@ -232,7 +232,7 @@ class TauxCommissionResource extends Resource
                     ->modalHeading('Supprimer ce taux ?')
                     ->modalDescription(fn (TauxCommission $record) => "Le taux {$record->libelle()} sera définitivement supprimé. Cette action est irréversible.")
                     ->modalSubmitActionLabel('Supprimer')
-                    ->modalCancelActionLabel('Annuler')
+                    ->modalCancelActionLabel('Fermer')
                     ->before(fn (TauxCommission $record) => JournalAudit::enregistrer(
                         'Suppression taux de commission',
                         'COMMERCE',

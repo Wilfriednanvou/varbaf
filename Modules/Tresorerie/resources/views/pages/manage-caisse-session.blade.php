@@ -4,7 +4,7 @@
         :description="$this->caisse ? ('Code : ' . $this->caisse->code) : null"
     >
         <x-slot name="afterHeader">
-            <div style="width: 16rem;">
+            <div class="w-full sm:w-64">
                 <x-filament::input.wrapper>
                     <x-filament::input.select wire:model.live="selectedSectionId">
                         <option value="">— Sélectionner —</option>
@@ -16,27 +16,42 @@
             </div>
         </x-slot>
         @if ($this->selectedSection)
-            <dl style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+            {{-- Ces styles étaient écrits en `style="..."`, et deux
+                 d'entre eux étaient sans effet : `rgba(var(--success-600), 1)`
+                 est une syntaxe Filament 3, où les variables de couleur
+                 portaient un triplet RVB. Les deux soldes qui comptent
+                 s'affichaient donc en noir, sans que rien ne le signale. --}}
+            <dl class="mb-6 grid grid-cols-2 gap-6 lg:grid-cols-4">
                 <div>
-                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Caissier responsable</dt>
-                    <dd style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;">{{ $this->caisse?->caissierResponsable?->nom_complet ?? 'Non assigné' }}</dd>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Caissier responsable</dt>
+                    <dd class="mt-1 font-medium text-gray-950 dark:text-white">
+                        {{ $this->caisse?->caissierResponsable?->nom_complet ?? 'Non assigné' }}
+                    </dd>
                 </div>
                 <div>
-                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Exercice</dt>
-                    <dd style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;">{{ $this->exercice?->libelle ?? '—' }}</dd>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Exercice</dt>
+                    <dd class="mt-1 font-medium text-gray-950 dark:text-white">
+                        {{ $this->exercice?->libelle ?? '—' }}
+                    </dd>
                 </div>
                 <div>
-                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Solde d'ouverture</dt>
-                    <dd style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;">{{ number_format($this->selectedSection->solde_ouverture, 0, ',', ' ') }} FCFA</dd>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Solde d'ouverture</dt>
+                    <dd class="mt-1 font-medium tabular-nums text-gray-950 dark:text-white">
+                        {{ number_format($this->selectedSection->solde_ouverture, 0, ',', ' ') }} FCFA
+                    </dd>
                 </div>
                 <div>
-                    <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Solde actuel</dt>
-                    <dd style="font-size: 1rem; font-weight: 700; margin-top: 0.25rem; color: rgba(var(--success-600), 1);">{{ number_format($this->selectedSection->soldeCourant(), 0, ',', ' ') }} FCFA</dd>
+                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Solde actuel</dt>
+                    <dd class="mt-1 font-bold tabular-nums text-success-600 dark:text-success-400">
+                        {{ number_format($this->selectedSection->soldeCourant(), 0, ',', ' ') }} FCFA
+                    </dd>
                 </div>
                 @if ($this->selectedSection->estCloturee())
                     <div>
-                        <dt style="font-size: 0.875rem; font-weight: 500; color: gray;">Solde de clôture</dt>
-                        <dd style="font-size: 1rem; font-weight: 700; margin-top: 0.25rem; color: rgba(var(--danger-600), 1);">{{ number_format((int) $this->selectedSection->solde_cloture, 0, ',', ' ') }} FCFA</dd>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Solde de clôture</dt>
+                        <dd class="mt-1 font-bold tabular-nums text-danger-600 dark:text-danger-400">
+                            {{ number_format((int) $this->selectedSection->solde_cloture, 0, ',', ' ') }} FCFA
+                        </dd>
                     </div>
                 @endif
             </dl>

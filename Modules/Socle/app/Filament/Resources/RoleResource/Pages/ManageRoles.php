@@ -5,12 +5,18 @@ namespace Modules\Socle\Filament\Resources\RoleResource\Pages;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 use Filament\Support\Enums\Alignment;
+use Modules\Socle\Filament\Concerns\TitreLisible;
 use Modules\Socle\Filament\Resources\RoleResource;
 use Modules\Socle\Models\JournalAudit;
 use Spatie\Permission\Models\Role;
 
 class ManageRoles extends ManageRecords
 {
+    // Filament capitalise chaque mot du libelle pluriel pour en
+    // faire le titre : « Corps De Metier » la ou le menu et le fil
+    // d'Ariane disent « Corps de metier ». Voir le trait.
+    use TitreLisible;
+
     protected static string $resource = RoleResource::class;
 
     public function getBreadcrumbs(): array

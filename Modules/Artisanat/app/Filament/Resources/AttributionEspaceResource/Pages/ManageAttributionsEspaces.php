@@ -6,12 +6,32 @@ use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 use Filament\Support\Enums\Alignment;
 use Modules\Artisanat\Filament\Resources\AttributionEspaceResource;
+use Modules\Artisanat\Filament\Widgets\StatistiquesAttributions;
 use Modules\Artisanat\Models\AttributionEspace;
+use Modules\Socle\Filament\Concerns\TitreLisible;
 use Modules\Socle\Models\JournalAudit;
 
 class ManageAttributionsEspaces extends ManageRecords
 {
+    // Filament capitalise chaque mot du libelle pluriel pour en
+    // faire le titre : « Corps De Metier » la ou le menu et le fil
+    // d'Ariane disent « Corps de metier ». Voir le trait.
+    use TitreLisible;
+
     protected static string $resource = AttributionEspaceResource::class;
+
+    /**
+     * Les indicateurs se lisent **au-dessus** du tableau : un chiffre
+     * placé sous une liste n'est rencontré qu'une fois la lecture finie.
+     *
+     * @return array<int, class-string>
+     */
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            StatistiquesAttributions::class,
+        ];
+    }
 
     public function getBreadcrumbs(): array
     {
