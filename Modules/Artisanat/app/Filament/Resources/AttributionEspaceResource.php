@@ -19,6 +19,7 @@ use Modules\Artisanat\Enums\PeriodiciteRedevance;
 use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Filament\Resources\AttributionEspaceResource\Pages;
 use Modules\Artisanat\Models\AttributionEspace;
+use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
@@ -88,6 +89,46 @@ class AttributionEspaceResource extends Resource
         };
     }
 
+    /**
+     * Le libellé d'un espace dans la liste déroulante, avec sa situation.
+     *
+     * **Dire avant, plutôt que refuser après.** La liste propose tout ce
+     * qui n'est pas déclaré indisponible — soit, au parc du village,
+     * trente-six espaces dont vingt-quatre sont occupés. L'agent en
+     * choisissait un, remplissait le reste du formulaire, et se faisait
+     * renvoyer par la règle de non-chevauchement : deux choix sur trois
+     * menaient à un échec, et rien ne le laissait deviner avant.
+     *
+     * **Les occupés ne sont pas masqués pour autant.** Une attribution
+     * peut légitimement commencer après la libération d'un espace, et
+     * filtrer sur l'occupation du jour interdirait de préparer une
+     * installation à venir. On informe donc, on n'interdit pas — la règle
+     * de non-chevauchement reste le filet, à sa place.
+     */
+    protected static function libelleDEspace(EspaceLocatif $espace): string
+    {
+        $courante = $espace->attributionsActives
+            ->first(fn (AttributionEspace $attribution): bool => $attribution->date_debut?->isToday()
+                || ($attribution->date_debut?->isPast()
+                    && (blank($attribution->date_fin) || ! $attribution->date_fin->isPast())));
+
+        $identite = $espace->identite;
+
+        if ($espace->boutique?->numero) {
+            $identite .= ' ('.$espace->boutique->numero.')';
+        }
+
+        if (! $courante) {
+            return $identite.' — libre';
+        }
+
+        $jusque = $courante->date_fin
+            ? 'jusqu\'au '.$courante->date_fin->format('d/m/Y')
+            : 'sans terme';
+
+        return $identite.' — occupé par '.($courante->artisan?->nom_complet ?? 'un artisan').', '.$jusque;
+    }
+
     public static function form(Schema $form): Schema
     {
         return $form
@@ -113,16 +154,23 @@ class AttributionEspaceResource extends Resource
                         ->relationship(
                             name: 'espaceLocatif',
                             titleAttribute: 'code',
-                            modifyQueryUsing: fn (Builder $query, ?Model $record) => $query->where(
-                                fn (Builder $sousRequete) => $sousRequete
-                                    ->where('etat', '!=', EtatEspaceLocatif::INDISPONIBLE->value)
-                                    ->when(
-                                        $record?->espace_locatif_id,
-                                        fn (Builder $q, $identifiant) => $q->orWhere('espaces_locatifs.id', $identifiant),
-                                    ),
-                            ),
+                            // Les attributions en cours sont chargées avec
+                            // les espaces : le libellé de chaque option les
+                            // lit sans repartir en base, faute de quoi
+                            // afficher l'occupant coûterait une requête par
+                            // ligne de la liste déroulante.
+                            modifyQueryUsing: fn (Builder $query, ?Model $record) => $query
+                                ->with(['attributionsActives.artisan', 'boutique'])
+                                ->where(
+                                    fn (Builder $sousRequete) => $sousRequete
+                                        ->where('etat', '!=', EtatEspaceLocatif::INDISPONIBLE->value)
+                                        ->when(
+                                            $record?->espace_locatif_id,
+                                            fn (Builder $q, $identifiant) => $q->orWhere('espaces_locatifs.id', $identifiant),
+                                        ),
+                                ),
                         )
-                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->identite)
+                        ->getOptionLabelFromRecordUsing(fn (EspaceLocatif $record) => self::libelleDEspace($record))
                         ->searchable()
                         ->preload()
                         ->required()
@@ -130,10 +178,15 @@ class AttributionEspaceResource extends Resource
                         ->rules([self::regleNonChevauchement()]),
                 ]),
                 Grid::make(2)->schema([
+                    // Le cas courant est une installation qui prend effet
+                    // le jour où on la saisit. La date reste modifiable —
+                    // une attribution peut être antidatée à la reprise
+                    // d'un contrat, ou préparée pour plus tard.
                     Forms\Components\DatePicker::make('date_debut')
                         ->label('Date de début')
                         ->native(false)
                         ->displayFormat('d/m/Y')
+                        ->default(fn () => now()->toDateString())
                         ->required(),
                     Forms\Components\DatePicker::make('date_fin')
                         ->label('Date de fin')
@@ -187,28 +240,40 @@ class AttributionEspaceResource extends Resource
                     // Le statut ne se saisit pas : il évolue par les
                     // actions « Résilier » et « Terminer », qui portent
                     // chacune leur trace d'audit.
+                    //
+                    // **Absent à la création.** Il y vaut toujours
+                    // « Active » et ne peut pas valoir autre chose : la
+                    // case n'apprend rien et occupe une place. Elle
+                    // reprend son sens en modification, où l'attribution
+                    // a une histoire.
                     Forms\Components\Select::make('statut')
                         ->label('Statut')
                         ->options(StatutAttribution::options())
                         ->default(StatutAttribution::ACTIVE->value)
                         ->disabled()
-                        ->dehydrated(false),
+                        ->dehydrated(false)
+                        ->visible(fn (?Model $record): bool => $record !== null),
                 ]),
-                Grid::make(2)->schema([
-                    // Le premier mois est offert : la date est calculée
-                    // par le modèle et seulement montrée ici, pour que
-                    // l'agent qui saisit le contrat voie tout de suite à
-                    // partir de quand l'espace sera facturé.
-                    Forms\Components\DatePicker::make('date_debut_facturation')
-                        ->label('Début de facturation')
-                        ->native(false)
-                        ->displayFormat('d/m/Y')
-                        ->disabled()
-                        ->dehydrated(false),
-                    Forms\Components\Placeholder::make('validee_par_affichage')
-                        ->label('Dossier validé par')
-                        ->content(fn (?Model $record) => $record?->valideePar?->name ?? 'Pas encore validé'),
-                ]),
+                // **Ces deux champs n'existent qu'après l'enregistrement.**
+                // La date de facturation est calculée par le modèle — le
+                // premier mois est offert — et le validateur du dossier
+                // n'est connu qu'une fois la case cochée. À la création,
+                // l'un est vide et l'autre affiche « Pas encore validé » :
+                // deux cases pour zéro information, sur un formulaire
+                // qu'on remplit debout au guichet.
+                Grid::make(2)
+                    ->visible(fn (?Model $record): bool => $record !== null)
+                    ->schema([
+                        Forms\Components\DatePicker::make('date_debut_facturation')
+                            ->label('Début de facturation')
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->disabled()
+                            ->dehydrated(false),
+                        Forms\Components\Placeholder::make('validee_par_affichage')
+                            ->label('Dossier validé par')
+                            ->content(fn (?Model $record) => $record?->valideePar?->name ?? 'Pas encore validé'),
+                    ]),
                 // Le droit de constater la complétude est distinct du
                 // droit de modifier l'attribution : une trace ne vaut que
                 // si le droit de la produire est nominatif. Un compte
@@ -262,9 +327,19 @@ class AttributionEspaceResource extends Resource
                     ->money('XAF')
                     ->description(fn (AttributionEspace $record) => $record->periodicite?->getLabel())
                     ->sortable(),
-                Tables\Columns\IconColumn::make('dossier_complet')
+                // **Un dossier incomplet n'est pas une erreur.** Rendu
+                // par `IconColumn::boolean()`, `false` se peignait en
+                // croix rouge : la colonne affichait vingt-quatre alertes
+                // là où elle décrit un avancement normal — les pièces ne
+                // sont pas encore réunies, ce qui est le cas de départ de
+                // tout dossier. Même contresens de couleur que celui
+                // évité dans les indicateurs : le rouge est réservé à ce
+                // qui appelle une correction.
+                Tables\Columns\TextColumn::make('dossier_complet')
                     ->label('Dossier')
-                    ->boolean()
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => $state ? 'Complet' : 'À compléter')
+                    ->color(fn ($state): string => $state ? 'success' : 'gray')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('valideePar.name')
                     ->label('Validé par')
