@@ -202,6 +202,62 @@ class EspaceLocatif extends Model
     }
 
     /**
+     * La clause « attribution en cours », écrite une seule fois.
+     *
+     * Reprise telle quelle par `getOccupantActuel()`, par les deux
+     * scopes ci-dessous et par les indicateurs des deux modules. La
+     * dupliquer serait le moyen le plus sûr de finir avec deux comptages
+     * différents de la même chose.
+     */
+    protected static function clauseEnCours(Builder $requete): Builder
+    {
+        return $requete
+            ->where('statut', StatutAttribution::ACTIVE->value)
+            ->whereDate('date_debut', '<=', now())
+            ->where(fn (Builder $terme) => $terme
+                ->whereNull('date_fin')
+                ->orWhereDate('date_fin', '>=', now()));
+    }
+
+    /**
+     * Espaces portant une attribution en cours à la date du jour.
+     *
+     * **L'occupation se calcule, elle ne se stocke pas.** La colonne
+     * `etat` porte aussi une valeur `OCCUPE`, mais elle est écrite à
+     * l'import et **jamais mise à jour par les attributions** :
+     * `AttributionEspace` la lit — pour refuser un espace indisponible —
+     * et ne l'écrit nulle part. Une attribution qui atteint sa date de
+     * fin libère donc l'espace au sens du métier tout en le laissant
+     * « Occupé » en base, définitivement.
+     *
+     * Compter sur `etat` revient à faire d'un champ dénormalisé la
+     * source de vérité d'un fait qui vit ailleurs. C'est exactement ce
+     * que RG-9 interdit pour le solde de l'artisan — « calculé, jamais
+     * stocké comme valeur modifiable » — et rien ne justifie que
+     * l'occupation d'un espace y échappe.
+     *
+     * Les deux définitions donnaient le même nombre le 28/08, l'import
+     * ayant écrit `OCCUPE` sur exactement les espaces attribués. Ce
+     * scope existe pour qu'elles ne puissent plus se séparer en silence.
+     */
+    public function scopeOccupe(Builder $requete): Builder
+    {
+        return $requete->whereHas('attributions', static::clauseEnCours(...));
+    }
+
+    /**
+     * Attribuable et sans occupant à la date du jour.
+     *
+     * Ce n'est pas « tout sauf occupé » : un espace indisponible n'est
+     * ni occupé ni libre, et l'ajouter aux libres annoncerait une
+     * capacité qui n'existe pas.
+     */
+    public function scopeLibre(Builder $requete): Builder
+    {
+        return $requete->attribuable()->whereDoesntHave('attributions', static::clauseEnCours(...));
+    }
+
+    /**
      * Artisan attributaire à la date du jour.
      */
     public function getOccupantActuel(): ?Artisan

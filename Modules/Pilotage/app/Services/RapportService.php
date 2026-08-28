@@ -4,7 +4,6 @@ namespace Modules\Pilotage\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Modules\Artisanat\Enums\EtatEspaceLocatif;
 use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Commerce\Enums\EtatVente;
@@ -245,6 +244,28 @@ class RapportService
      * locatif entier ferait varier l'indicateur sans que rien n'ait
      * changé sur le terrain.
      *
+     * **L'occupation est comptée par les attributions, pas par la
+     * colonne `etat`** — corrigé le 28/08. Cette méthode comptait les
+     * espaces dont `etat` valait `OCCUPE`, pendant que les indicateurs
+     * du module Artisanat comptaient ceux portant une attribution en
+     * cours. Les deux rendaient 24 sur 36, l'import ayant écrit `OCCUPE`
+     * sur exactement les espaces attribués — une égalité de circonstance,
+     * pas de définition.
+     *
+     * `etat` n'est jamais mis à jour par une attribution :
+     * `AttributionEspace` la lit et ne l'écrit pas. La première
+     * attribution créée ou arrivée à terme dans l'application aurait donc
+     * séparé les deux chiffres, sans que rien ne le signale, sur un
+     * indicateur présenté à la tutelle. `EspaceLocatif::scopeOccupe()`
+     * porte désormais la définition unique.
+     *
+     * Le dénominateur reste le parc du périmètre, et non les seuls
+     * espaces attribuables : c'est un taux de remplissage présenté à la
+     * tutelle, pas un taux de commercialisation. Les indicateurs de
+     * l'Artisanat, eux, rapportent aux attribuables — deux questions
+     * différentes, deux dénominateurs assumés, et c'est écrit des deux
+     * côtés.
+     *
      * @return array{occupes: int, total: int, taux: float}
      */
     public function tauxOccupationEspaces(?NatureContenant $nature = null): array
@@ -256,7 +277,7 @@ class RapportService
             ));
 
         $total = $requete()->count();
-        $occupes = $requete()->where('etat', EtatEspaceLocatif::OCCUPE->value)->count();
+        $occupes = $requete()->occupe()->count();
 
         return [
             'occupes' => $occupes,

@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Artisanat\Enums\EtatEspaceLocatif;
 use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Models\Artisan;
+use Modules\Artisanat\Models\AttributionEspace;
 use Modules\Artisanat\Models\Boutique;
 use Modules\Artisanat\Models\CorpsMetier;
 use Modules\Artisanat\Models\EspaceLocatif;
@@ -116,7 +116,14 @@ class RapportServiceTest extends TestCase
         // Un espace locatif occupé sur deux : le taux d'occupation vaut
         // 50 %. Il se mesure sur les espaces et non sur les boutiques,
         // puisqu'un local peut en abriter plusieurs.
-        $espaceA->update(['etat' => EtatEspaceLocatif::OCCUPE]);
+        //
+        // **L'occupation se déclare par une attribution, pas par la
+        // colonne `etat`.** Ce montage écrivait auparavant
+        // `etat = OCCUPE` en base, sans attribuer l'espace à personne :
+        // il éprouvait donc un champ stocké que rien ne tient à jour,
+        // et non le fait métier. Corrigé le 28/08, en même temps que la
+        // définition qu'il couvrait — voir `EspaceLocatif::scopeOccupe()`.
+        $this->attribuer($espaceA, $this->kamdem);
 
         $this->panier = $this->creerProduit('Panier tressé', 4000, $categorie->id, $this->kamdem->id, $this->boutiqueA->id, null, 10);
         $this->statue = $this->creerProduit('Statue en bois', 10000, $categorie->id, $this->fotso->id, $this->boutiqueB->id, 20, 20);
@@ -318,8 +325,10 @@ class RapportServiceTest extends TestCase
             'village_id' => $this->village->id,
         ]);
 
-        EspaceLocatif::create(['boutique_id' => $sousSol->id])
-            ->update(['etat' => EtatEspaceLocatif::OCCUPE]);
+        $this->attribuer(
+            EspaceLocatif::create(['boutique_id' => $sousSol->id]),
+            $this->fotso,
+        );
 
         $locatif = $this->rapport->tauxOccupationEspaces();
 
@@ -485,6 +494,28 @@ class RapportServiceTest extends TestCase
     protected function toutLExercice(): FiltreRapport
     {
         return new FiltreRapport(exerciceId: $this->exercice->id);
+    }
+
+    /**
+     * Occupe un espace, comme le village le fait réellement.
+     *
+     * Une attribution active, commencée hier et sans terme : c'est la
+     * seule manière de rendre un espace occupé au sens du métier. La
+     * date de début est dans le passé parce que la clause « en cours »
+     * exige `date_debut <= aujourd'hui` — une attribution datée du jour
+     * même passerait, mais une attribution datée de demain non, et un
+     * montage qui tomberait juste par hasard sur la borne ne vaudrait
+     * pas mieux que celui qu'il remplace.
+     */
+    protected function attribuer(EspaceLocatif $espace, Artisan $artisan): AttributionEspace
+    {
+        return AttributionEspace::create([
+            'date_debut' => now()->subDay()->toDateString(),
+            'redevance_convenue' => 5000,
+            'artisan_id' => $artisan->id,
+            'espace_locatif_id' => $espace->id,
+            'exercice_id' => $this->exercice->id,
+        ]);
     }
 
     protected function creerProduit(

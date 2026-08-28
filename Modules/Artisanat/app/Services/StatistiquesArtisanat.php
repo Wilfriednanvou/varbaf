@@ -179,9 +179,7 @@ class StatistiquesArtisanat
      */
     public function nombreEspacesOccupes(): int
     {
-        return EspaceLocatif::query()
-            ->whereHas('attributions', $this->attributionCourante(...))
-            ->count();
+        return EspaceLocatif::query()->occupe()->count();
     }
 
     /**
@@ -193,10 +191,7 @@ class StatistiquesArtisanat
      */
     public function nombreEspacesLibres(): int
     {
-        return EspaceLocatif::query()
-            ->attribuable()
-            ->whereDoesntHave('attributions', $this->attributionCourante(...))
-            ->count();
+        return EspaceLocatif::query()->libre()->count();
     }
 
     public function nombreEspacesIndisponibles(): int
