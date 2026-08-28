@@ -119,10 +119,12 @@ class RapportServiceTest extends TestCase
         //
         // **L'occupation se déclare par une attribution, pas par la
         // colonne `etat`.** Ce montage écrivait auparavant
-        // `etat = OCCUPE` en base, sans attribuer l'espace à personne :
-        // il éprouvait donc un champ stocké que rien ne tient à jour,
-        // et non le fait métier. Corrigé le 28/08, en même temps que la
-        // définition qu'il couvrait — voir `EspaceLocatif::scopeOccupe()`.
+        // `etat = OCCUPE` en base sans attribuer l'espace à personne : il
+        // fabriquait un espace occupé par personne, situation qui ne peut
+        // pas exister dans le village, et vérifiait ensuite qu'on lisait
+        // bien ce qu'on venait d'écrire. Corrigé le 28/08 en même temps
+        // que la définition qu'il couvrait — voir
+        // `EspaceLocatif::scopeOccupe()`.
         $this->attribuer($espaceA, $this->kamdem);
 
         $this->panier = $this->creerProduit('Panier tressé', 4000, $categorie->id, $this->kamdem->id, $this->boutiqueA->id, null, 10);

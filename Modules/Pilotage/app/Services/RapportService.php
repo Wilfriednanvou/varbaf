@@ -252,12 +252,14 @@ class RapportService
      * sur exactement les espaces attribués — une égalité de circonstance,
      * pas de définition.
      *
-     * `etat` n'est jamais mis à jour par une attribution :
-     * `AttributionEspace` la lit et ne l'écrit pas. La première
-     * attribution créée ou arrivée à terme dans l'application aurait donc
-     * séparé les deux chiffres, sans que rien ne le signale, sur un
-     * indicateur présenté à la tutelle. `EspaceLocatif::scopeOccupe()`
-     * porte désormais la définition unique.
+     * `etat` est un cache tenu à jour par `synchroniserEtat()` à chaque
+     * écriture d'attribution — mais jamais par le simple passage du
+     * temps. Une attribution qui atteint sa date de fin ne déclenche
+     * aucun événement : l'espace reste `OCCUPE` alors qu'il est libre.
+     * L'indicateur présenté à la tutelle se serait donc mis à surestimer
+     * l'occupation, un peu plus à chaque contrat expiré, sans que rien
+     * ne le signale. `EspaceLocatif::scopeOccupe()` porte désormais la
+     * définition unique, et elle est datée.
      *
      * Le dénominateur reste le parc du périmètre, et non les seuls
      * espaces attribuables : c'est un taux de remplissage présenté à la

@@ -223,22 +223,30 @@ class EspaceLocatif extends Model
      * Espaces portant une attribution en cours à la date du jour.
      *
      * **L'occupation se calcule, elle ne se stocke pas.** La colonne
-     * `etat` porte aussi une valeur `OCCUPE`, mais elle est écrite à
-     * l'import et **jamais mise à jour par les attributions** :
-     * `AttributionEspace` la lit — pour refuser un espace indisponible —
-     * et ne l'écrit nulle part. Une attribution qui atteint sa date de
-     * fin libère donc l'espace au sens du métier tout en le laissant
-     * « Occupé » en base, définitivement.
+     * `etat` porte aussi une valeur `OCCUPE`, tenue à jour par
+     * `synchroniserEtat()`, qu'`AttributionEspace` appelle à chaque
+     * création, modification et suppression d'attribution. Ce cache est
+     * donc synchronisé par les **événements** — mais jamais par le
+     * **temps**.
      *
-     * Compter sur `etat` revient à faire d'un champ dénormalisé la
-     * source de vérité d'un fait qui vit ailleurs. C'est exactement ce
-     * que RG-9 interdit pour le solde de l'artisan — « calculé, jamais
-     * stocké comme valeur modifiable » — et rien ne justifie que
-     * l'occupation d'un espace y échappe.
+     * Or l'occupation est une notion qui dépend de la date du jour.
+     * Aucun événement ne survient quand une attribution atteint sa date
+     * de fin, ni quand une attribution datée du futur devient courante :
+     * un espace dont le contrat a expiré reste `OCCUPE`, et un espace
+     * dont le contrat commence demain reste `DISPONIBLE` après cette
+     * date — jusqu'à ce qu'une écriture sans rapport vienne le toucher.
+     * `etat` est juste à l'instant de la dernière écriture, et dérive
+     * ensuite tout seul.
      *
-     * Les deux définitions donnaient le même nombre le 28/08, l'import
-     * ayant écrit `OCCUPE` sur exactement les espaces attribués. Ce
-     * scope existe pour qu'elles ne puissent plus se séparer en silence.
+     * Compter sur ce cache revient donc à faire d'un champ dénormalisé
+     * la source de vérité d'un fait qui vit ailleurs et qui change sans
+     * qu'on le touche. C'est ce que RG-9 interdit pour le solde de
+     * l'artisan — « calculé, jamais stocké comme valeur modifiable » —
+     * et rien ne justifie que l'occupation y échappe.
+     *
+     * `etat` garde son emploi : il reste ce qu'on **affiche**, et
+     * `INDISPONIBLE` reste une décision administrative que rien ne
+     * recalcule. Ce scope est ce qu'on **compte**.
      */
     public function scopeOccupe(Builder $requete): Builder
     {
