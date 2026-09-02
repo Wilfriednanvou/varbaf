@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\Boutique;
@@ -231,8 +232,14 @@ class CampagneReversementTest extends TestCase
         $decaissementsAvant = $this->nombreDeDecaissements();
 
         // La vente est annulée le mois suivant : l'artisan a touché une
-        // part qui n'est plus due.
+        // part qui n'est plus due. `annuler()` pose `date_annulation`
+        // à `now()` (RG-27 ne date jamais un mouvement a posteriori) :
+        // sans figer l'horloge sur une date d'août, ce test dépend du
+        // jour réel où il s'exécute et casse dès que le calendrier
+        // dépasse août — c'est arrivé le 1er septembre 2026.
+        Carbon::setTestNow('2026-08-15');
         $this->ventes->annuler($vente, 'Client revenu sur son achat');
+        Carbon::setTestNow();
 
         $aout = $this->service->valider(
             $this->service->preparer($this->campagne('2026-08-01', '2026-08-31'))
@@ -265,7 +272,11 @@ class CampagneReversementTest extends TestCase
             $this->service->preparer($this->campagne('2026-07-01', '2026-07-31'))
         );
 
+        // Même figement qu'au test précédent : la reprise doit tomber
+        // en août pour que la campagne d'août la retienne.
+        Carbon::setTestNow('2026-08-15');
         $this->ventes->annuler($vente, 'Client revenu sur son achat');
+        Carbon::setTestNow();
 
         // Août reprend la part indûment payée...
         $this->service->valider(
