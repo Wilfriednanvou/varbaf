@@ -25,6 +25,12 @@ final class ModeleDeLangageDeTest implements ModeleDeLangage
     /** @var callable(string, Collection<int, SegmentTrouve>): ?string */
     private $regle;
 
+    /** @var callable(string): ?string */
+    private $accueil;
+
+    /** @var callable(string, array): ?string */
+    private $reformulation;
+
     /**
      * @param  (callable(string, Collection<int, SegmentTrouve>): ?string)|null  $regle
      */
@@ -34,6 +40,32 @@ final class ModeleDeLangageDeTest implements ModeleDeLangage
         private string $nom = 'Modèle de test',
     ) {
         $this->regle = $regle ?? static fn (string $question, Collection $extraits): string => 'Rédaction de test.';
+        $this->accueil = static fn (string $saisie): string => 'Bonjour. Je réponds sur les artisans, les produits et les chiffres du village.';
+        $this->reformulation = static fn (string $saisie, array $historique): ?string => null;
+    }
+
+    /**
+     * Le modèle dont l'accueil avance un chiffre.
+     *
+     * Sur ce chemin il n'y a aucun extrait à confronter : la règle est
+     * donc plus stricte qu'ailleurs — aucun chiffre n'est toléré, quel
+     * qu'il soit. Ce cas existe pour éprouver ce rejet-là.
+     */
+    public function accueilAvecChiffre(string $texte = 'Bonjour ! Le village compte 47 artisans.'): self
+    {
+        $this->accueil = static fn (): string => $texte;
+
+        return $this;
+    }
+
+    /**
+     * Le modèle qui rend une question autonome à partir d'une suite.
+     */
+    public function reformulantEn(string $question): self
+    {
+        $this->reformulation = static fn (): string => $question;
+
+        return $this;
     }
 
     /**
@@ -88,5 +120,23 @@ final class ModeleDeLangageDeTest implements ModeleDeLangage
         }
 
         return ($this->regle)($question, $extraits);
+    }
+
+    public function accueillir(string $saisie): ?string
+    {
+        if (! $this->disponible) {
+            return null;
+        }
+
+        return ($this->accueil)($saisie);
+    }
+
+    public function reformuler(string $saisie, array $historique): ?string
+    {
+        if (! $this->disponible) {
+            return null;
+        }
+
+        return ($this->reformulation)($saisie, $historique);
     }
 }

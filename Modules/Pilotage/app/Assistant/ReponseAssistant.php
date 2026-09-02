@@ -47,7 +47,56 @@ final readonly class ReponseAssistant
          * sont montrés bruts.
          */
         public ?string $redacteur = null,
+        /**
+         * La question telle que l'assistant l'a comprise, quand elle a
+         * dû être reconstruite depuis l'échange précédent.
+         *
+         * **Elle s'affiche.** Une reformulation invisible serait un
+         * endroit où le sens de la question peut changer sans que
+         * personne le voie — exactement ce que le nommage du moteur et
+         * le champ `redacteur` existent pour empêcher ailleurs. `null`
+         * signifie que la question a été prise telle qu'elle a été
+         * tapée.
+         */
+        public ?string $questionReformulee = null,
     ) {}
+
+    /**
+     * La même réponse, sachant de quelle saisie elle provient.
+     *
+     * **Une réponse est un procès-verbal : elle ne se modifie pas.** La
+     * classe est `readonly` depuis l'origine, et c'est ce qui a fait
+     * échouer trente et un tests le jour où le service a voulu poser la
+     * reformulation après coup. La contrainte avait raison — un objet
+     * qui dit ce qui s'est passé ne doit pas pouvoir dire autre chose
+     * une ligne plus loin. On en dérive donc une nouvelle.
+     *
+     * Sans reformulation, l'instance courante est rendue telle quelle :
+     * le cas ordinaire — la question a été prise comme elle a été tapée —
+     * ne coûte aucune allocation.
+     */
+    public function avecReformulation(?string $questionReformulee): self
+    {
+        if ($questionReformulee === null) {
+            return $this;
+        }
+
+        return new self(
+            question: $this->question,
+            categorie: $this->categorie,
+            branche: $this->branche,
+            texte: $this->texte,
+            sources: $this->sources,
+            lignes: $this->lignes,
+            intention: $this->intention,
+            intentionLibelle: $this->intentionLibelle,
+            moteur: $this->moteur,
+            moteurCle: $this->moteurCle,
+            parametres: $this->parametres,
+            redacteur: $this->redacteur,
+            questionReformulee: $questionReformulee,
+        );
+    }
 
     public function aRepondu(): bool
     {

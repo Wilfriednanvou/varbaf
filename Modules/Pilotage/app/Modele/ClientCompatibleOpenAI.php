@@ -111,6 +111,75 @@ class ClientCompatibleOpenAI implements ModeleDeLangage
             return null;
         }
 
+        return $this->appeler($this->consigne(), $this->matiere($question, $extraits));
+    }
+
+    /**
+     * Accueille une saisie qui n'est pas une question sur le village.
+     *
+     * **Rien du village ne part avec l'appel.** La matière est la saisie
+     * seule. Le modèle ne peut donc pas rapporter un fait qu'il n'a pas :
+     * c'est la même contrainte que la rédaction, poussée au bout.
+     */
+    public function accueillir(string $saisie): ?string
+    {
+        if (! $this->estDisponible() || trim($saisie) === '') {
+            return null;
+        }
+
+        return $this->appeler($this->consigneDAccueil(), trim($saisie));
+    }
+
+    /**
+     * Rend une question de suite autonome, à partir de l'historique.
+     *
+     * Ce que le modèle rend est une **question**. Elle repart ensuite
+     * dans le routeur, l'extracteur et `RapportService` : aucun chiffre
+     * ne sort d'ici.
+     *
+     * @param  array<int, array{question: string, reponse: string}>  $historique
+     */
+    public function reformuler(string $saisie, array $historique): ?string
+    {
+        if (! $this->estDisponible() || $historique === [] || trim($saisie) === '') {
+            return null;
+        }
+
+        $fil = [];
+
+        foreach ($historique as $tour) {
+            $fil[] = 'Q : '.($tour['question'] ?? '');
+            $fil[] = 'R : '.($tour['reponse'] ?? '');
+        }
+
+        $matiere = implode("\n", $fil)."\n\nNouvelle saisie : ".trim($saisie);
+
+        $reformulee = $this->appeler($this->consigneDeReformulation(), $matiere);
+
+        if ($reformulee === null) {
+            return null;
+        }
+
+        // Un modèle bavard répond parfois « Voici la question : ... ».
+        // On ne garde qu'une ligne, et jamais plus long qu'une question.
+        $reformulee = trim(strtok($reformulee, "\n"));
+
+        return ($reformulee === '' || mb_strlen($reformulee) > 200) ? null : $reformulee;
+    }
+
+    // =================================================================
+
+    /**
+     * L'unique voie d'appel du service.
+     *
+     * Les trois opérations ne diffèrent que par leur consigne et leur
+     * matière. Une seule voie signifie un seul endroit où se posent le
+     * budget de temps, la capture de panne et la lecture de la réponse —
+     * donc un repli qui ne peut pas être correct pour la rédaction et
+     * oublié pour l'accueil.
+     */
+    protected function appeler(string $consigne, string $matiere): ?string
+    {
         try {
             $reponse = Http::baseUrl($this->racine())
                 ->withToken($this->cle())
@@ -119,13 +188,13 @@ class ClientCompatibleOpenAI implements ModeleDeLangage
                 ->post('/v1/chat/completions', [
                     'model' => $this->modele(),
                     // Une rédaction n'est pas une création : on veut la
-                    // même phrase pour les mêmes extraits, d'une
+                    // même phrase pour la même matière, d'une
                     // démonstration à l'autre. Une température non nulle
                     // rendrait la soutenance irreproductible.
                     'temperature' => 0,
                     'messages' => [
-                        ['role' => 'system', 'content' => $this->consigne()],
-                        ['role' => 'user', 'content' => $this->matiere($question, $extraits)],
+                        ['role' => 'system', 'content' => $consigne],
+                        ['role' => 'user', 'content' => $matiere],
                     ],
                 ]);
         } catch (ConnectionException $panne) {
@@ -224,6 +293,55 @@ class ClientCompatibleOpenAI implements ModeleDeLangage
             - Ne calcule rien, ne totalise rien, n'estime rien.
             - Deux à quatre phrases, ton neutre et factuel, sans formule de politesse.
             - Si les extraits ne répondent pas à la question, dis-le simplement.
+            TEXTE;
+    }
+
+    /**
+     * La consigne d'accueil.
+     *
+     * Elle décrit le rôle et interdit d'énoncer quoi que ce soit sur le
+     * village. **La consigne n'est pas la garantie** : l'appelant rejette
+     * toute sortie portant un chiffre, et ce rejet-là ne dépend d'aucune
+     * obéissance du modèle. La consigne sert à ce que le cas nominal soit
+     * agréable ; le contrôle sert à ce que le cas anormal ne passe pas.
+     */
+    protected function consigneDAccueil(): string
+    {
+        return <<<'TEXTE'
+            Tu es l'assistant du Village Artisanal Régional de Bafoussam (VARBAF), en français.
+
+            Le message reçu n'est PAS une question sur le village : c'est une salutation,
+            un remerciement, ou un propos hors sujet.
+
+            Règles :
+            - Réponds en une ou deux phrases, courtoisement.
+            - Dis ce que tu sais traiter : les artisans, les produits, les boutiques,
+              les locations et les chiffres du village.
+            - N'énonce AUCUN fait sur le village : aucun nom, aucune quantité, aucun montant.
+            - N'écris aucun chiffre, sous aucune forme.
+            - Pas de liste, pas de titre : du texte suivi.
+            TEXTE;
+    }
+
+    /**
+     * La consigne de reformulation.
+     *
+     * Le modèle rend une question, jamais une réponse — et si la saisie
+     * se suffit déjà, il la rend inchangée. C'est ce qui permet à
+     * l'appelant de savoir qu'il n'y a rien eu à reformuler : la sortie
+     * est égale à l'entrée.
+     */
+    protected function consigneDeReformulation(): string
+    {
+        return <<<'TEXTE'
+            Tu reformules la dernière saisie d'un utilisateur en une question autonome, en français.
+
+            Règles :
+            - Rends UNIQUEMENT la question reformulée, sur une seule ligne, sans préambule.
+            - Remplace les sous-entendus par ce à quoi ils renvoient dans l'échange précédent.
+            - Ne réponds PAS à la question. Ne calcule rien. N'ajoute aucun fait.
+            - N'introduis aucun chiffre qui ne soit déjà dans la saisie ou dans la question précédente.
+            - Si la saisie est déjà une question autonome, rends-la mot pour mot.
             TEXTE;
     }
 

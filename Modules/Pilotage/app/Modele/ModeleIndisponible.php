@@ -37,4 +37,21 @@ class ModeleIndisponible implements ModeleDeLangage
     {
         return null;
     }
+
+    public function accueillir(string $saisie): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Sans modèle, une question de suite reste ce qu'elle est.
+     *
+     * L'appelant emploie alors la saisie brute — « et en juillet ? » sera
+     * mal comprise, et le refus le dira. C'est le comportement correct :
+     * un système dégradé répond moins bien, il ne répond pas à côté.
+     */
+    public function reformuler(string $saisie, array $historique): ?string
+    {
+        return null;
+    }
 }

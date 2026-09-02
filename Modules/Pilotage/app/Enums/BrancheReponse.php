@@ -29,6 +29,22 @@ enum BrancheReponse: string implements HasLabel, HasColor
     /** Rien n'atteint le seuil : l'information n'est pas disponible. */
     case REFUS = 'REFUS';
 
+    /**
+     * La saisie ne portait pas sur le village.
+     *
+     * Distincte du refus, et la distinction n'est pas cosmétique : un
+     * refus dit « j'ai cherché et je n'ai rien », un accueil dit « ce
+     * n'est pas une question que je sache traiter ». Confondre les deux
+     * faisait répondre « l'information n'est pas disponible dans le
+     * corpus » à quelqu'un qui avait écrit « bonjour » — un diagnostic
+     * faux pour une décision juste.
+     *
+     * Aucune donnée du village n'est produite ici, donc rien à garantir
+     * côté chiffres : l'accueil ne compte ni dans le rappel ni dans le
+     * taux de refus correct.
+     */
+    case ACCUEIL = 'ACCUEIL';
+
     public function getLabel(): string
     {
         return match ($this) {
@@ -36,6 +52,7 @@ enum BrancheReponse: string implements HasLabel, HasColor
             self::RECHERCHE => 'Recherche',
             self::PRECISION => 'Précision demandée',
             self::REFUS => 'Sans réponse',
+            self::ACCUEIL => 'Accueil',
         };
     }
 
@@ -46,6 +63,7 @@ enum BrancheReponse: string implements HasLabel, HasColor
             self::RECHERCHE => 'info',
             self::PRECISION => 'warning',
             self::REFUS => 'gray',
+            self::ACCUEIL => 'gray',
         };
     }
 

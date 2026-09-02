@@ -17,6 +17,13 @@ use Modules\Pilotage\Recherche\SegmentTrouve;
  * chiffre, non pas parce qu'on le lui interdit dans une consigne, mais
  * parce qu'il n'a accès à rien d'où un chiffre pourrait venir.
  *
+ * **Les trois opérations sont étroites pour la même raison.** Rédiger ne
+ * reçoit que des extraits déjà retrouvés. Accueillir ne reçoit rien du
+ * village — donc ne peut rien en dire. Reformuler rend une *question* et
+ * jamais une réponse, et cette question repart dans le même routeur
+ * déterministe que les autres. Aucune des trois ne donne au modèle
+ * l'occasion d'énoncer un fait sur le village de sa propre autorité.
+ *
  * **Ce que le port n'expose délibérément pas.** La conception initiale
  * prévoyait aussi `classer()`, pour rattraper le routeur quand sa
  * confiance passe sous le seuil. Écarté le 27/08 : le routage décide
@@ -68,4 +75,43 @@ interface ModeleDeLangage
      * @param  Collection<int, SegmentTrouve>  $extraits  les seuls matériaux autorisés
      */
     public function redigerDepuisExtraits(string $question, Collection $extraits): ?string;
+
+    /**
+     * Répond à une saisie qui n'est pas une question sur le village.
+     *
+     * **Ne reçoit que la saisie.** Ni extrait, ni indicateur, ni chiffre :
+     * le modèle n'a accès à rien du village, donc il ne peut rien en
+     * affirmer — la même mécanique que `redigerDepuisExtraits()`, poussée
+     * jusqu'à ne rien donner du tout. Un bonjour, un remerciement, un mot
+     * hors sujet : l'assistant salue et dit ce qu'il sait faire.
+     *
+     * L'appelant rejette toute sortie contenant un chiffre. Un accueil
+     * n'a aucune raison d'en porter un, et cette règle-là ne dépend
+     * d'aucune consigne envoyée au modèle.
+     *
+     * `null` rend la main à une phrase fixe : sans clé ni réseau,
+     * l'assistant accueille quand même, simplement sans tournure.
+     */
+    public function accueillir(string $saisie): ?string;
+
+    /**
+     * Rend une question autonome à partir d'une question de suite.
+     *
+     * **Le modèle produit une question, jamais une réponse.** « Et en
+     * juillet ? » devient « Quel est le chiffre d'affaires en juillet ? »,
+     * et cette question-là traverse ensuite le routeur, l'extracteur de
+     * paramètres et `RapportService` exactement comme si elle avait été
+     * tapée. Le chiffre reste calculé ; le modèle n'a fait que rendre
+     * explicite ce que l'utilisateur sous-entendait.
+     *
+     * **Ce n'est pas le `classer()` écarté le 27/08.** Là, le modèle
+     * choisissait quelle branche répond — il décidait de la garantie.
+     * Ici il ne choisit rien : la question reformulée est classée par le
+     * routeur déterministe, dont la classification reste mesurée à 100 %.
+     * Et la reformulation est **affichée** à l'utilisateur, donc une
+     * dérive se voit au lieu de se produire en silence.
+     *
+     * @param  array<int, array{question: string, reponse: string}>  $historique  du plus ancien au plus récent
+     */
+    public function reformuler(string $saisie, array $historique): ?string;
 }
