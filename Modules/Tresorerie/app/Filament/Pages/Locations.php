@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Artisanat\Enums\StatutAttribution;
 use Modules\Artisanat\Models\AttributionEspace;
 use Modules\Socle\Enums\NavigationGroup;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Tresorerie\Services\ServiceLocations;
 
 /**
@@ -86,7 +87,7 @@ class Locations extends \Filament\Pages\Page implements HasActions, HasSchemas, 
      */
     public function totaux(): array
     {
-        return app(ServiceLocations::class)->totaux();
+        return app(ServiceLocations::class)->totaux(exerciceId: $this->exerciceConsulteId());
     }
 
     /**
@@ -104,7 +105,16 @@ class Locations extends \Filament\Pages\Page implements HasActions, HasSchemas, 
      */
     public function etat(): array
     {
-        return app(ServiceLocations::class)->etatDuParc()->keyBy('id')->all();
+        return app(ServiceLocations::class)->etatDuParc(exerciceId: $this->exerciceConsulteId())->keyBy('id')->all();
+    }
+
+    /**
+     * L'exercice affiché par le sélecteur global de la barre
+     * supérieure — jamais forcément l'actif, voir `ContexteExercice`.
+     */
+    protected function exerciceConsulteId(): ?int
+    {
+        return app(ContexteExercice::class)->exerciceConsulte()?->getKey();
     }
 
     public function table(Table $table): Table
@@ -116,11 +126,12 @@ class Locations extends \Filament\Pages\Page implements HasActions, HasSchemas, 
                 AttributionEspace::query()
                     ->with(['espaceLocatif.boutique', 'artisan.corpsMetier'])
                     ->where('statut', StatutAttribution::ACTIVE->value)
+                    ->when(
+                        $this->exerciceConsulteId(),
+                        fn (Builder $requete, int $exerciceId) => $requete->where('exercice_id', $exerciceId),
+                    )
             )
-            ->defaultSort(fn (Builder $requete) => $requete
-                ->join('espaces_locatifs', 'espaces_locatifs.id', '=', 'attributions_espaces.espace_locatif_id')
-                ->orderBy('espaces_locatifs.code')
-                ->select('attributions_espaces.*'))
+            ->defaultSort('espaceLocatif.code')
             ->columns([
                 Tables\Columns\TextColumn::make('espaceLocatif.code')
                     ->label('Espace')

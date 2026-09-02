@@ -47,7 +47,7 @@ class ServiceLocations
      *
      * @return Collection<int, object>
      */
-    public function etatDuParc(?Carbon $arrete = null): Collection
+    public function etatDuParc(?Carbon $arrete = null, ?int $exerciceId = null): Collection
     {
         $arrete ??= Carbon::today();
 
@@ -82,6 +82,7 @@ class ServiceLocations
             ->selectRaw('coalesce(m.encaisse, 0) as encaisse')
             ->selectRaw('m.dernier_paiement')
             ->where('a.statut', StatutAttribution::ACTIVE->value)
+            ->when($exerciceId, fn ($requete, int $id) => $requete->where('a.exercice_id', $id))
             ->orderBy('b.numero')
             ->orderBy('e.code')
             ->get();
@@ -102,9 +103,9 @@ class ServiceLocations
      *
      * @return array{attributions: int, mensuel: int, du: int, encaisse: int, reste: int, a_jour: int}
      */
-    public function totaux(?Carbon $arrete = null): array
+    public function totaux(?Carbon $arrete = null, ?int $exerciceId = null): array
     {
-        $parc = $this->etatDuParc($arrete);
+        $parc = $this->etatDuParc($arrete, $exerciceId);
 
         return [
             'attributions' => $parc->count(),

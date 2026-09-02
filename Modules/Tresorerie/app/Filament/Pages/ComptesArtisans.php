@@ -9,8 +9,11 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
+use Modules\Artisanat\Enums\StatutParticipationArtisan;
+use Modules\Artisanat\Models\ArtisanExercice;
 use Modules\Commerce\Models\TauxCommission;
 use Modules\Socle\Enums\NavigationGroup;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Tresorerie\Services\ServiceCompteArtisan;
 
 /**
@@ -80,11 +83,49 @@ class ComptesArtisans extends \Filament\Pages\Page implements HasActions, HasSch
     }
 
     /**
+     * Les comptes, restreints aux artisans qui participent à l'exercice
+     * consulté — sans toucher aux montants eux-mêmes.
+     *
+     * **Le solde dû est une dette cumulée, pas une dette de l'exercice
+     * (RG-15).** Filtrer les ventes ou les reversements par exercice
+     * romprait la formule elle-même : un report de campagne (RG-20)
+     * franchit une frontière d'exercice sans cesser d'être dû. Ce
+     * qu'on borne ici, c'est *qui* apparaît dans la liste — les
+     * artisans dont la participation à l'exercice consulté est
+     * active — jamais *combien* on leur doit.
+     *
+     * Même repli que `ArtisanResource::getEloquentQuery()` : tant que
+     * la table de jonction n'a rien à dire pour cet exercice, rien
+     * n'est retiré.
+     */
+    protected function comptesFiltres(): \Illuminate\Support\Collection
+    {
+        $comptes = app(ServiceCompteArtisan::class)->comptesDeTousLesArtisans();
+
+        $exerciceId = app(ContexteExercice::class)->exerciceConsulte()?->getKey();
+
+        if ($exerciceId === null || ! ArtisanExercice::query()->where('exercice_id', $exerciceId)->exists()) {
+            return $comptes;
+        }
+
+        $participants = ArtisanExercice::query()
+            ->where('exercice_id', $exerciceId)
+            ->whereIn('statut', [
+                StatutParticipationArtisan::ACTIF->value,
+                StatutParticipationArtisan::RECONDUIT->value,
+            ])
+            ->pluck('artisan_id')
+            ->all();
+
+        return $comptes->whereIn('id', $participants);
+    }
+
+    /**
      * @return array{artisans: int, crediteurs: int, vendu: int, commission: int, part: int, reverse: int, du: int}
      */
     public function totaux(): array
     {
-        $comptes = app(ServiceCompteArtisan::class)->comptesDeTousLesArtisans();
+        $comptes = $this->comptesFiltres();
 
         return [
             'artisans' => $comptes->count(),
@@ -109,8 +150,7 @@ class ComptesArtisans extends \Filament\Pages\Page implements HasActions, HasSch
     public function table(Table $table): Table
     {
         return $table
-            ->records(fn (): \Illuminate\Support\Collection => app(ServiceCompteArtisan::class)
-                ->comptesDeTousLesArtisans()
+            ->records(fn (): \Illuminate\Support\Collection => $this->comptesFiltres()
                 ->map(fn (object $c): array => (array) $c)
                 ->keyBy('id'))
             ->columns([
