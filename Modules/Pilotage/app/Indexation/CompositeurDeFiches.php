@@ -75,9 +75,42 @@ class CompositeurDeFiches
                 'categorie' => $this->lignageDeCategorie($produit),
                 'corps_metier' => $produit->artisan?->corpsMetier?->libelle,
                 'description' => $produit->description,
+
+                // Les rubriques de la fiche technique. C'est ce qui rend
+                // le stockage en base preferable a une piece jointe : un
+                // .docx accroche au produit serait un binaire, invisible
+                // a l'assistant comme a la recommandation par similarite.
+                // Les intitules de rubrique entrent dans le corpus au
+                // meme titre que leur contenu : « Matieres premieres »
+                // rapproche autant que « bois de colatier ».
+                'caracteristiques' => $this->texteDesCaracteristiques($produit),
+
                 'artisan' => $produit->artisan?->nom_complet,
             ],
         );
+    }
+
+    /**
+     * Les rubriques de la fiche technique, aplaties en un seul texte.
+     *
+     * Le corpus lexical ne manipule que des chaines : la structure de la
+     * fiche sert a l'ecran et au portail, pas a la ponderation. Les
+     * rubriques absentes rendent une chaine vide, que `array_filter`
+     * ecarte en amont — un produit sans fiche compose exactement la meme
+     * fiche lexicale qu'avant.
+     */
+    private function texteDesCaracteristiques(Produit $produit): ?string
+    {
+        $rubriques = $produit->caracteristiques ?? [];
+
+        if ($rubriques === []) {
+            return null;
+        }
+
+        return collect($rubriques)
+            ->map(fn (array $r): string => trim(($r['rubrique'] ?? '').' '.($r['contenu'] ?? '')))
+            ->filter()
+            ->implode(' ');
     }
 
     public function pourArtisan(Artisan $artisan): FicheComposee

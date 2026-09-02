@@ -162,17 +162,26 @@ class IndexationLexicaleTest extends TestCase
     //  COMPOSITION DES FICHES
     // =================================================================
 
-    public function test_la_fiche_produit_reprend_les_cinq_champs(): void
+    public function test_la_fiche_produit_reprend_les_six_champs(): void
     {
         $produit = $this->deposer('Panier tressé', 'Fibres de raphia teintes');
 
         $fiche = app(CompositeurDeFiches::class)->pourProduit($produit->fresh());
 
         $this->assertSame(TypeFicheLexicale::PRODUIT, $fiche->type);
+        // `caracteristiques` porte les rubriques de la fiche technique
+        // depuis le 30/08. C'est ce qui rend le stockage en base
+        // preferable a une piece jointe : un .docx accroche au produit
+        // serait invisible au corpus.
         $this->assertSame(
-            ['designation', 'categorie', 'corps_metier', 'description', 'artisan'],
+            ['designation', 'categorie', 'corps_metier', 'description', 'caracteristiques', 'artisan'],
             array_keys($fiche->champs),
         );
+
+        // Un produit sans fiche technique compose exactement la meme
+        // fiche lexicale qu'avant : le champ est nul, et `array_filter`
+        // l'ecarte en aval.
+        $this->assertNull($fiche->champs['caracteristiques']);
         $this->assertSame('Panier tressé', $fiche->champs['designation']);
         $this->assertSame('Paniers Vannerie', $fiche->champs['categorie'], 'La catégorie porte aussi sa parente.');
         $this->assertStringContainsString('Vannerie', (string) $fiche->champs['corps_metier']);

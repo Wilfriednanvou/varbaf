@@ -37,6 +37,8 @@ use Modules\Socle\Models\Utilisateur;
  * @property string $designation
  * @property string $prix_unitaire
  * @property int|null $seuil_alerte
+ * @property array<int, array{rubrique: string, contenu: string}>|null $caracteristiques
+ * @property string|null $fiche_technique
  * @property StatutValidationProduit $statut_validation
  * @property int|null $valide_par
  * @property \Illuminate\Support\Carbon|null $valide_le
@@ -56,10 +58,17 @@ class Produit extends Model
     protected $fillable = [
         'designation',
         'description',
+
+        // Les rubriques de la fiche technique, telles que l'artisan les
+        // a ecrites. La forme varie d'un metier a l'autre : la colonne
+        // est un jsonb, pas un jeu de colonnes. Voir la migration.
+        'caracteristiques',
+
         'prix_unitaire',
         'seuil_alerte',
         'piece_unique',
         'photo',
+        'fiche_technique',
         'actif',
         'categorie_id',
         'artisan_id',
@@ -74,6 +83,7 @@ class Produit extends Model
     {
         return [
             'prix_unitaire' => 'decimal:2',
+            'caracteristiques' => 'array',
             'seuil_alerte' => 'integer',
             'statut_validation' => StatutValidationProduit::class,
             'valide_le' => 'datetime',

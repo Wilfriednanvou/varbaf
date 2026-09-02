@@ -247,6 +247,14 @@ return [
     | plus lisible de dire qu'une désignation pèse plus qu'une
     | description, et elle se démontre en une phrase.
     |
+    | **Modifier un poids ici ne suffit pas à le rendre effectif.**
+    | L'empreinte d'une fiche ne porte que son contenu — type, source et
+    | champs renseignés — pas les poids appliqués. Une fiche dont le
+    | texte n'a pas bougé est donc déclarée inchangée et conserve ses
+    | anciennes fréquences, pendant que la commande affiche fièrement
+    | les nouveaux poids. Après tout changement de cette table :
+    | « php artisan varbaf:indexer --force ».
+    |
     */
     'index' => [
 
@@ -257,6 +265,24 @@ return [
                 'categorie' => 2,
                 'corps_metier' => 2,
                 'description' => 1,
+
+                // Les rubriques de la fiche technique rédigée par
+                // l'artisan, au même poids que la description : elles
+                // sont de même nature — du descriptif en prose — et
+                // beaucoup plus longues. Les hausser ferait qu'un
+                // produit documenté écraserait au classement un produit
+                // qui ne l'est pas, alors que la fiche dit ce qu'est la
+                // pièce, pas qu'elle est plus pertinente.
+                //
+                // **Le champ était déjà indexé sans figurer ici** :
+                // `frequencesDeLaFiche()` retombe sur 1 pour tout champ
+                // non déclaré. Il n'était donc pas ignoré — il était
+                // absent de la ligne « Poids en vigueur » qu'affiche
+                // « varbaf:indexer », qui annonçait cinq champs quand
+                // six étaient indexés. Un instrument qui décrit autre
+                // chose que ce qu'il fait.
+                'caracteristiques' => 1,
+
                 'artisan' => 1,
             ],
 
