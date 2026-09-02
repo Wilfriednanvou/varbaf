@@ -3,6 +3,7 @@
 namespace Modules\Commerce\Providers;
 
 use Illuminate\Support\Facades\Event;
+use Modules\Commerce\Console\BootstrapProduitExercicesCommand;
 use Modules\Commerce\Contracts\JournalDeCaisse;
 use Modules\Commerce\Events\SeuilAlerteFranchi;
 use Modules\Commerce\Listeners\NotifierSeuilAlerte;
@@ -49,5 +50,11 @@ class CommerceServiceProvider extends ModuleServiceProvider
         // doit dire ce qu'il écoute, et cette ligne est la seule à lire
         // pour savoir que l'alerte de rupture part effectivement.
         Event::listen(SeuilAlerteFranchi::class, NotifierSeuilAlerte::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                BootstrapProduitExercicesCommand::class,
+            ]);
+        }
     }
 }

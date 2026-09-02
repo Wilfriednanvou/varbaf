@@ -243,6 +243,11 @@ class Produit extends Model
         return $this->hasMany(LigneDepot::class, 'produit_id');
     }
 
+    public function participationsExercices(): HasMany
+    {
+        return $this->hasMany(ProduitExercice::class, 'produit_id');
+    }
+
     /**
      * Quantité en stock : cumul du journal, jamais une colonne.
      *

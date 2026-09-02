@@ -116,6 +116,11 @@ class Artisan extends Model
         return $this->hasMany(AttributionEspace::class, 'artisan_id');
     }
 
+    public function participationsExercices(): HasMany
+    {
+        return $this->hasMany(ArtisanExercice::class, 'artisan_id');
+    }
+
     public function scopeActif(Builder $requete): Builder
     {
         return $requete->where('actif', true);
