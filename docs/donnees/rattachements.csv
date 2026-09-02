@@ -1,0 +1,56 @@
+ecriture_registre;nb_ventes;total_fcfa;decision;espace_locatif;occupant_parc;similarite;motif
+Chinda sokoudjou;28;290500;RATTACHE;B0801;CHINDA SOKOUDJOU Franck Yanick;0.696;Identite etablie : 2 mot(s) commun(s) (chinda, sokoudjou), similarite 0.70
+Mme Sidonie;22;207050;A ARBITRER;B1203;MINTCHOUGOM SIDONIE;0.667;Le mot « sidonie » designe 2 occupants (MINTCHOUGOM SIDONIE / NJONFANG NGONGANG Sidoni) : il n'identifie personne
+Mme Justina;14;190000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+VARBamenda;16;130000;NON ARTISAN;;;0.0;Village artisanal de Bamenda : acheteur institutionnel, pas un occupant
+Guy Marcel;26;97000;RATTACHE;B0301;NJEUYIM TOUOMO Guy Marcel;0.571;Identite etablie : le mot « marcel » ne designe que cet occupant, et rien ne le contredit
+chic décor;10;85500;RATTACHE;B1001;CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG;0.351;Identite etablie : 2 mot(s) commun(s) (chic, decor), similarite 0.35
+floralis;85;85500;RATTACHE;B0603;GAPIAPSI KUISSU Edwige - Ets Floralis;0.372;Identite etablie : le mot « floralis » ne designe que cet occupant, et rien ne le contredit
+Mambou claude;5;83000;RATTACHE;B1101;MAMBOU Claude;1.0;Identite etablie : 2 mot(s) commun(s) (claude, mambou), similarite 1.00
+nguekam philippe;10;72000;RATTACHE;B0103;GUEKAM Phillipe;0.903;Identite etablie : 0 mot(s) commun(s) (), similarite 0.90
+MBIAKOP;43;70150;RATTACHE;B0901;Bambou House (MBIAKOP Roland);0.412;Identite etablie : le mot « mbiakop » ne designe que cet occupant, et rien ne le contredit
+Mouliom;3;57000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+TSANMAT;19;53000;RATTACHE;B0202;TSANMAT;1.0;Identite etablie : 1 mot(s) commun(s) (tsanmat), similarite 1.00
+Mika perles ( T Fideline);23;51350;A ARBITRER;B1204;YEMGANG NANDJE Fideline;0.578;Mot commun « fideline » unique au parc, mais l'ecriture porte « mika, perles » que l'occupant ne porte pas : probablement une autre personne
+FAFE;31;44700;RATTACHE;B0401;FAFE;1.0;Identite etablie : 1 mot(s) commun(s) (fafe), similarite 1.00
+Mme Mboulé;11;37500;RATTACHE;B0105;MBOULE Simone;0.522;Identite etablie : le mot « mboule » ne designe que cet occupant, et rien ne le contredit
+Floralis;26;35650;RATTACHE;B0603;GAPIAPSI KUISSU Edwige - Ets Floralis;0.372;Identite etablie : le mot « floralis » ne designe que cet occupant, et rien ne le contredit
+Mme Dongmo thérèse;12;33500;RATTACHE;B0102;SCOOPSEMA (Mme DONGMO Thérèse);0.783;Identite etablie : 2 mot(s) commun(s) (dongmo, therese), similarite 0.78
+mouliom ibrahim;1;30000;RATTACHE;B0702;MOULIOUM IBRAHIM;0.968;Identite etablie : 1 mot(s) commun(s) (ibrahim), similarite 0.97
+madi cosmétique;28;29700;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+SOLISTA;29;23450;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+KEMTA;7;22000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+Djoko Pokam Alex;13;21500;RATTACHE;B0201;DJOKO POKAM ALEX;1.0;Identite etablie : 3 mot(s) commun(s) (alex, djoko, pokam), similarite 1.00
+Jonas;5;20500;RATTACHE;B0101;MOUTAPMBEME JONAS;0.455;Identite etablie : le mot « jonas » ne designe que cet occupant, et rien ne le contredit
+Ets SAYA désiré;20;19700;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+Stéphane SONWA;5;18000;RATTACHE;B0701;SONWA KUETE Aimé Stéphane;0.41;Identite etablie : 2 mot(s) commun(s) (sonwa, stephane), similarite 0.41
+Nguekam philippe;5;17500;RATTACHE;B0103;GUEKAM Phillipe;0.903;Identite etablie : 0 mot(s) commun(s) (), similarite 0.90
+shoes factory;1;15000;A ARBITRER;B1201;NSO YONKA   -   Shoe Factory;0.686;Mot commun « factory » unique au parc, mais l'ecriture porte « shoes » que l'occupant ne porte pas : probablement une autre personne
+Nokam dorine;11;15000;RATTACHE;B0602;MAFODJUI NOKAM Dorine;0.727;Identite etablie : 2 mot(s) commun(s) (dorine, nokam), similarite 0.73
+Ngassam crousti;11;12500;A ARBITRER;B0601;NGASSAM Bernadette;0.606;Mot commun « ngassam » unique au parc, mais l'ecriture porte « crousti » que l'occupant ne porte pas : probablement une autre personne
+mme djoko;2;12000;RATTACHE;B0201;DJOKO POKAM ALEX;0.4;Identite etablie : le mot « djoko » ne designe que cet occupant, et rien ne le contredit
+Mme Tchanou;7;11000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+mme Mboulé;1;10500;RATTACHE;B0105;MBOULE Simone;0.522;Identite etablie : le mot « mboule » ne designe que cet occupant, et rien ne le contredit
+Chic décor;1;10000;RATTACHE;B1001;CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG;0.351;Identite etablie : 2 mot(s) commun(s) (chic, decor), similarite 0.35
+titi bio;8;10000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+Mme Solange MANGUE;3;10000;A ARBITRER;B0106;MAMCHE KADJE Rosette Solange;0.478;Mot commun « solange » unique au parc, mais l'ecriture porte « mangue » que l'occupant ne porte pas : probablement une autre personne
+Mintchougom Sidonie;6;9500;RATTACHE;B1203;MINTCHOUGOM SIDONIE;1.0;Identite etablie : 2 mot(s) commun(s) (mintchougom, sidonie), similarite 1.00
+ngassam crousti;15;9500;A ARBITRER;B0601;NGASSAM Bernadette;0.606;Mot commun « ngassam » unique au parc, mais l'ecriture porte « crousti » que l'occupant ne porte pas : probablement une autre personne
+Ngassam Olivier;6;9000;A ARBITRER;B0601;NGASSAM Bernadette;0.606;Mot commun « ngassam » unique au parc, mais l'ecriture porte « olivier » que l'occupant ne porte pas : probablement une autre personne
+Yonka Marcel;1;9000;A ARBITRER;B0301;NJEUYIM TOUOMO Guy Marcel;0.486;Mot commun « marcel » unique au parc, mais l'ecriture porte « yonka » que l'occupant ne porte pas : probablement une autre personne
+Kuemi Jacob;2;8000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+géraldine;8;7600;RATTACHE;B1501;WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH);0.36;Identite etablie : le mot « geraldine » ne designe que cet occupant, et rien ne le contredit
+djoko pokam alex;5;7000;RATTACHE;B0201;DJOKO POKAM ALEX;1.0;Identite etablie : 3 mot(s) commun(s) (alex, djoko, pokam), similarite 1.00
+Kondzou Thomas;3;4500;RATTACHE;B0206;NKONDZOU Thomas;0.966;Identite etablie : 1 mot(s) commun(s) (thomas), similarite 0.97
+mambou claude;1;4000;RATTACHE;B1101;MAMBOU Claude;1.0;Identite etablie : 2 mot(s) commun(s) (claude, mambou), similarite 1.00
+Ngassam Crousti;3;3500;A ARBITRER;B0601;NGASSAM Bernadette;0.606;Mot commun « ngassam » unique au parc, mais l'ecriture porte « crousti » que l'occupant ne porte pas : probablement une autre personne
+Hall;1;3000;NON ARTISAN;;;0.0;Espace du village, pas une personne
+SOH;2;3000;SANS CORRESPONDANCE;;;0.0;Aucun mot distinctif dans l'ecriture
+Mme GUESSONG;1;2500;NON ARTISAN;;;0.0;Mme Guessong, agent du village : l'ecriture ne porte aucun nom d'artisan
+Guy Marcel(Guessong);1;2500;RATTACHE;B0301;NJEUYIM TOUOMO Guy Marcel;0.455;Identite etablie : le mot « marcel » ne designe que cet occupant, et rien ne le contredit (nom d'agent retire : guessong)
+osplame salle innovation;1;2000;NON ARTISAN;;;0.0;Espace du village, pas une personne
+Djoko pokam alex;1;1500;RATTACHE;B0201;DJOKO POKAM ALEX;1.0;Identite etablie : 3 mot(s) commun(s) (alex, djoko, pokam), similarite 1.00
+TCHOMTCHOUA LELE Fadimatou;1;1000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+Mme GUESSONG(payé le 01/09/25);1;1000;NON ARTISAN;;;0.0;Mme Guessong, agent du village : l'ecriture ne porte aucun nom d'artisan
+Mme mboulé;1;1000;RATTACHE;B0105;MBOULE Simone;0.522;Identite etablie : le mot « mboule » ne designe que cet occupant, et rien ne le contredit
+Bassie Mofo Julius;1;500;RATTACHE;B0204;BASSIE MOFO Julius;1.0;Identite etablie : 3 mot(s) commun(s) (bassie, julius, mofo), similarite 1.00

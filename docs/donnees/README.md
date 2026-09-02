@@ -1,139 +1,287 @@
-# Données de reprise du registre de ventes
+# Données de reprise du VARBAF
 
-Ce dossier contient le registre de ventes transcrit par la coordination et
-les rapports produits par `php artisan varbaf:importer`.
+Ce dossier a été **entièrement reconstruit le 2 septembre 2026**. Les
+fichiers antérieurs ont été supprimés à la demande de la coordination du
+projet. Ils restent récupérables dans l'historique Git au commit
+`08b4647` :
+
+```bash
+git show 08b4647:docs/donnees/parc-locatif.csv > /tmp/ancien-parc.csv
+```
+
+---
+
+## Le principe
+
+**Une seule source, et tout le reste en dérive.** L'erreur de la première
+version était de mélanger des fichiers saisis à la main et des fichiers
+produits par traitement, sans que rien ne dise lequel était lequel. Un
+fichier corrigé à la main devenait alors impossible à régénérer, et un
+fichier régénéré écrasait des corrections.
+
+La règle est désormais la suivante :
+
+| Type | Fichiers | Peut-on l'éditer à la main ? |
+|---|---|---|
+| **Source** | `source/*.xlsx` | Non — ce sont les documents du village, tels qu'ils sont |
+| **Script** | `*.py` | Oui — c'est la règle de traitement |
+| **Produit** | `registre.csv`, `parc-locatif.csv`, `produits.csv`, `rattachements.csv` | **Non** — toute édition sera écrasée |
+
+Un fichier produit ne se corrige jamais à la main. Si sa valeur est
+fausse, c'est la source ou le script qui est en cause, et c'est là que la
+correction se fait. Cette discipline est ce qui rend la reprise
+rejouable : à tout moment, effacer les fichiers produits et relancer les
+scripts doit redonner exactement le même résultat.
 
 ---
 
 ## Les fichiers
 
-| Fichier | Ce qu'il est |
+### Sources
+
+| Fichier | Contenu |
 |---|---|
-| `registre.csv` | Le registre de ventes du village, tenu à la main puis transcrit. **Source de vérité de la reprise.** |
-| `rapport-import-20260825-reprise-productive.csv` | Synthèse de la **reprise effective** du 25/08 : ce qui a été lu, importé, rejeté, créé |
-| `rapport-import-20260825-reprise-productive-signalements.csv` | Le détail ligne à ligne de cette même reprise. 734 lignes signalées, dont **705 importées et 29 rejetées** — c'est le seul fichier où les rejets sont identifiables |
-| `rapport-import-20260826-controle-idempotence.csv` | Synthèse d'un **second passage à vide**, lancé pour prouver que la commande est relançable : 0 ligne importée, 1 149 déjà reprises, 0 création |
-| `rapport-import-20260826-controle-idempotence-signalements.csv` | Le détail de ce second passage. Les 734 lignes y sont toutes marquées « Déjà reprise » : ce fichier ne dit rien des rejets |
+| `source/etat-des-ventes-varbaf-20260225.xlsx` | Ventes, commissions, caisse, état de reversement, arrêté au 25/02/2026 |
+| `source/liste-produits-artisanaux-2026.xlsx` | Inventaire des produits **et** état de recouvrement des recettes 2026 |
 
-**Ne pas confondre les deux paires.** Elles portent les mêmes compteurs
-d'anomalies — la lecture du fichier ne dépend pas de l'état de la base —
-mais seule celle du 25/08 porte les compteurs de création et les statuts
-d'import réels. Celle du 26/08 mesure l'idempotence, pas la reprise.
-
----
-
-## Ce que la première transcription a produit
-
-Relevé des tables après la reprise du 25/08, puis après la remise à zéro du
-26/08. La base a été vidée pour repartir sur une transcription améliorée :
-ces chiffres sont la seule trace de ce qu'a donné la première.
-
-| Table | Après reprise | Après `migrate:fresh --seed` |
-|---|---:|---:|
-| `artisans` | 232 | 0 |
-| `boutiques` | 18 | 17 |
-| `espaces_locatifs` | 344 | 17 |
-| `attributions_espaces` | 343 | 0 |
-| `produits` | 837 | 0 |
-| `depots` / `lignes_depot` | 1 120 | 0 |
-| `ventes` / `lignes_vente` | 1 120 | 0 |
-| `mouvements_stock` | 2 240 | 0 |
-| `mouvements_caisse` | 1 120 | 0 |
-| `lignes_registre_importees` | 1 149 | 0 |
-| `journaux_audit` | 2 | 0 |
-| `taux_commissions` | 1 | 1 |
-| `corps_metiers` | 14 | 14 |
-| `categories_produits` | 28 | 28 |
-| `roles` / `permissions` | 8 / 121 | 8 / 121 |
-
-Trois lectures de ce tableau :
-
-`mouvements_stock` vaut exactement le double de `ventes` : chaque ligne du
-registre produit une entrée par le dépôt puis une sortie par la vente, et
-laisse le stock à zéro. C'est le comportement attendu d'une reprise
-historique — le village ne détient plus ces articles.
-
-`taux_commissions` vaut 1 avant comme après : aucun taux n'avait été saisi
-à la main, le seul enregistrement est celui du seeder.
-
-`espaces_locatifs` passe de 17 à 344, et `boutiques` de 17 à 18. Voir
-ci-dessous.
-
----
-
-## Les quatre défauts connus de la première reprise
-
-À corriger avant la prochaine, faute de quoi ils se figeront à nouveau.
-
-### 1. Le taux de commission est un placeholder
-
-`TauxCommissionSeeder` pose 10 % au 01/01/2023 et l'annonce lui-même comme
-provisoire. La règle 1 fige le taux sur chaque vente à l'enregistrement :
-les 1 120 ventes de la première reprise portaient donc un taux inventé, et
-corriger le taux après coup n'en aurait recalculé aucune.
-
-**Saisir les vrais taux et leurs dates d'effet avant de réimporter.** Le
-taux a varié dans le temps ; `TauxCommission` est historisé pour ça.
-
-### 2. La reprise multiplie le parc locatif par vingt
-
-L'import crée un espace locatif par artisan — 327, dont 108 sur une
-boutique technique qu'il fabrique pour les emplacements hors parc. Le parc
-passe de 17 espaces réels à 344.
-
-Or `RapportService::tauxOccupationEspaces()` prend `EspaceLocatif::count()`
-sans filtre. Le taux d'occupation affiche alors un village plein, sur un
-indicateur que la coordination présente à sa tutelle. C'est le miroir exact
-de ce que l'arbitrage A-05 bis de `../dette-technique.md` cherchait à
-éviter : là où sept emprises non louables sous-évaluaient le village d'un
-tiers, trois cent vingt-sept espaces fictifs le déclarent complet.
-
-### 3. Le rapprochement des noms d'artisans bute sur les civilités
-
-232 artisans créés pour 240 écritures restées distinctes. Les 42
-rapprochements écartés se lisent d'un coup d'œil : `M. DJOKO` / `Djoko`,
-`Mme Sidonie` / `Sidonie`, `M. KAMTA` / `KAMTA`, `Mme Noussjou` /
-`Noussjou`, `Pa mambou` / `Mambou`, `en Floralis` / `Floralis`. Ce sont les
-civilités et les mots parasites qui font tomber la similarité sous 85 %.
-
-Normaliser ces préfixes **avant** la comparaison en récupérerait une
-vingtaine, sans toucher au seuil — ce qui est plus sûr que de descendre à
-75 %, car `Dora` / `Nora` / `Doro` et `MEKA` / `MEKO` sont vraisemblablement
-des personnes différentes.
-
-### 4. Des désignations de produits sont dans la colonne artisan
-
-`Cookies manioc`, `Chips manioc`, `croquette`, `fève sur la table`,
-`Vin Therapeutig` apparaissent comme noms d'artisan. Le défaut est dans le
-cahier, pas dans l'import : ces lignes demandent un arbitrage de la
-coordination.
-
----
-
-## Ce que la reprise laisse à compléter à la main
-
-La première reprise a produit 232 artisans sans secteur d'activité, 837
-produits sans catégorie et 343 attributions sans redevance convenue, alors
-que 14 corps de métier et 28 catégories sont en base. Le registre ne porte
-simplement pas ces informations.
-
-Conséquence à connaître avant une démonstration : les filtres du catalogue
-public par catégorie et par métier, ainsi que la ventilation des ventes par
-corps de métier du tableau de bord, restent vides tant que ce rattachement
-n'est pas fait.
-
----
-
-## Relancer la reprise
+Empreintes SHA-256, rappelées à chaque exécution des scripts. Si l'une
+change, c'est que le classeur a été modifié et que les chiffres du
+rapport doivent être régénérés :
 
 ```
-php artisan varbaf:importer                      # docs/donnees/registre.csv par défaut
-php artisan varbaf:importer --rapport=docs/donnees
-php artisan varbaf:importer --seuil=85 --marge=10 # sensibilité du rapprochement des noms
+etat-des-ventes      a3a98a41b91fdab3df5014bd6bc4244b94962c97b21c53b09642d216122ac742
+liste-produits       3f5c7f7a1f515cd3eb829652702a3946827b71839f15056586c49db991e695a1
 ```
 
-La commande est relançable : chaque ligne laisse une empreinte dans
-`lignes_registre_importees` et une ligne déjà reprise est comptée puis
-sautée. **C'est aussi le piège d'une purge partielle** — vider les ventes
-sans vider cette table rendrait tout réimport inopérant, chaque ligne étant
-considérée comme déjà traitée.
+Le second fichier porte un nom trompeur : sa feuille « LISTE OCCUPANTS »
+n'est pas une liste d'occupants mais **l'état de recouvrement des
+recettes 2026**, avec le détail mensuel des versements. C'est la source
+des redevances, que rien d'autre ne porte.
+
+### Scripts
+
+| Script | Ce qu'il fait |
+|---|---|
+| `extraire-registre.py` | Feuille *Ventes* → `registre.csv` |
+| `extraire-parc.py` | Feuille *Liste occupants* → `parc-locatif.csv` |
+| `extraire-produits.py` | Feuille *Dépôt produits* → `produits.csv` |
+| `rattacher-artisans.py` | `registre.csv` + `parc-locatif.csv` → `rattachements.csv` |
+
+```bash
+python3 extraire-registre.py
+python3 extraire-parc.py
+python3 extraire-produits.py
+python3 rattacher-artisans.py     # a besoin des deux premiers
+```
+
+Les scripts n'ont qu'une dépendance, `openpyxl`. Aucun n'extrait les
+numéros de téléphone, présents dans les deux sources.
+
+### Produits
+
+| Fichier | Contenu |
+|---|---|
+| `registre.csv` | 603 lignes de vente |
+| `parc-locatif.csv` | 36 occupants, redevances et recouvrement 2026 |
+| `produits.csv` | 134 produits de 14 artisans |
+| `rattachements.csv` | Une ligne par écriture d'artisan, avec sa décision et son motif |
+
+---
+
+## Ce que l'extraction du registre traite
+
+Deux propriétés du classeur imposent un traitement, et c'est la raison
+d'être du script plutôt que d'un export brut.
+
+**La colonne des dates porte aussi les sous-totaux.** Le registre y
+inscrit « TOTAL AOUT 24 » entre deux mois. Une lecture naïve compte ces
+13 lignes comme des ventes et double les montants du mois. Elles sont
+reconnues et écartées.
+
+**La date n'est pas répétée à chaque ligne.** Le registre la porte une
+fois par journée ; 100 lignes en héritent. Le report est explicite, et la
+colonne `date_lue` indique pour chaque ligne si sa date a été lue dans le
+classeur ou héritée de la précédente — ce qui permet de distinguer ce que
+le registre dit de ce que le traitement a déduit.
+
+Résultat de l'extraction : **603 lignes**, **2 021 350 FCFA** de chiffre
+d'affaires, **234 850 FCFA** de reste à payer.
+
+---
+
+## Ce que le rattachement décide, et ce qu'il refuse de décider
+
+Le registre porte le nom de l'artisan tel qu'il est prononcé au
+comptoir ; le parc porte le nom officiel de l'occupant. Les rapprocher
+est un travail de résolution d'entités.
+
+**La première version rattachait sur un seul mot, et de façon
+incohérente** : « Ngassam Crousti » était rattaché à NGASSAM Bernadette,
+« Ngassam Olivier » ne l'était pas, au même score. Elle comptait en outre
+comme artisans des entités qui n'en sont pas — « Hall » et « osplame
+salle innovation » sont des espaces du village, et Mme Guessong un agent
+du village. La coordination a confirmé les trois.
+
+La règle actuelle repose sur quatre principes.
+
+**Ce n'est pas le nombre de mots communs qui établit une identité, c'est
+leur pouvoir de désignation.** « MBIAKOP » ne partage qu'un mot avec
+« Bambou House (MBIAKOP Roland) », et pourtant l'identité ne fait aucun
+doute : ce mot ne désigne qu'un seul occupant. « Mme Sidonie » partage
+aussi un seul mot, mais deux occupantes se prénomment Sidonie. Le même
+score recouvre une certitude et une ambiguïté ; le critère retenu est
+donc l'unicité du mot dans le parc.
+
+**Un mot supplémentaire qui contredit interdit le rattachement.**
+« Ngassam Olivier » partage « ngassam » avec NGASSAM Bernadette, mot
+unique au parc — mais l'écriture porte « olivier », que le nom de
+l'occupante ne contient pas. Un prénom différent sur un patronyme commun
+désigne une autre personne bien plus souvent qu'une variante d'écriture.
+
+**Le nom d'un agent est un parasite, pas une exclusion.** Mme Guessong
+figure dans 158 des 603 observations du registre : c'est elle qui a
+traité la majorité des décharges. Son nom apparaît donc de deux façons
+dans la colonne artisan. Seul, il désigne un agent et la ligne ne peut
+être reversée à personne. Accolé à un nom d'artisan — « Guy
+Marcel(Guessong) » — il indique seulement qui a remis les fonds, et la
+vente revient bien à Guy Marcel. Traiter les deux cas de la même façon
+coûterait une vente à son bénéficiaire légitime : le nom de l'agent est
+donc retiré de l'écriture avant tout rapprochement, et ce n'est que s'il
+ne reste rien qu'on conclut à un agent.
+
+**Le coût des deux erreurs n'est pas symétrique**, et c'est ce qui fixe
+le curseur. Rattacher à tort revient à verser à un artisan les ventes
+d'un autre : l'erreur est invisible et se paie en argent. Refuser un
+rattachement juste produit un doublon visible, qu'un agent corrige. Le
+seuil est réglé du côté où l'erreur se voit.
+
+D'où quatre issues, dont une qui assume de ne pas trancher :
+
+| Décision | Sens |
+|---|---|
+| `RATTACHE` | L'identité est établie |
+| `A ARBITRER` | Ambiguïté réelle — **décision humaine requise**, jamais tranchée par le script |
+| `SANS CORRESPONDANCE` | Déposant non installé ; la vente reste rattachée à son nom |
+| `NON ARTISAN` | Emplacement ou agent du village, déclaré explicitement avec son motif |
+
+Les non-personnes sont **déclarées et non devinées** : aucun algorithme
+ne peut savoir que « Hall » est un espace du village. La liste figure en tête
+de `rattacher-artisans.py`, chaque entrée porte son motif, et elle
+apparaît dans le fichier produit — une exclusion qu'on ne peut pas
+relire est une donnée perdue.
+
+---
+
+## Ce que la vérification des sources a établi
+
+**Le relevé de recouvrement est cohérent au niveau de ses totaux** : la
+somme des 36 lignes reproduit exactement les totaux qu'il déclare —
+2 558 000 FCFA d'imputation, 395 000 payés, 2 009 000 restant à
+recouvrer. L'« écart interne de 154 000 FCFA » que le rapport signalait
+n'existe pas dans la source : il venait d'une transcription qui avait
+omis un occupant entier, MAKAMTE Bibiane (boutique B13, 80 000 dus,
+30 000 payés, 50 000 restants).
+
+**Cinq lignes du relevé se contredisent pourtant elles-mêmes**, et cet
+écart-là est réel :
+
+| Espace | Occupant | Anomalie |
+|---|---|---|
+| B0102 | SCOOPSEMA | 2 000 F versés en janvier, non repris au total annuel |
+| B0401 | FAFE | 36 000 F versés, aucune imputation ni total annuel |
+| B0402 | SYESIYA BAMBOUS | 10 000 F dus, ni payé ni reste |
+| B0501 | KAMENI Clovis | 72 000 F versés, non repris ; 144 000 dus sans payé ni reste |
+| B0901 | Bambou House | redevance de 3 000 F/mois, imputation nulle |
+
+Les trois premières lignes portent **110 000 FCFA encaissés au mois et
+absents de la synthèse annuelle**. Selon le détail mensuel, le taux de
+recouvrement est de **19,74 %** et non de 15,44 %. Les deux valeurs
+figurent dans `parc-locatif.csv` — `paye_2026` pour la synthèse,
+`paye_mensuel_2026` pour le détail — et la colonne `ecart_paye` porte la
+différence. Trancher laquelle fait foi relève de la coordination.
+
+**L'inventaire des produits est un squelette.** Il déclare dix-neuf
+colonnes de caractérisation et n'en remplit que quatre : matériaux,
+commune et département ne sont renseignés sur aucune des 134 lignes,
+secteur et provenance sur deux. Quatorze artisans y figurent, pour
+36 occupants au parc.
+
+---
+
+## Ce que signifie la colonne « reste à payer »
+
+La question s'est posée pendant la vérification : le reste à payer est-il
+la dette du village envers l'artisan, ou une créance client non encore
+encaissée ? Les deux lectures produisent des constats opposés, et quatre
+tests indépendants tranchent pour la première.
+
+**Le document fait lui-même l'addition.** La feuille des ventes inscrit
+en bas de colonne : reste à payer 234 850, commission retenue 135 275,
+et **« Total des avoirs » 370 125** — soit exactement la somme des deux.
+Un avoir est ce que la structure détient ; on ne détient pas une somme
+qu'on n'a pas reçue. Le reste à payer est donc de l'argent encaissé.
+
+**La commission recoupe le journal.** Les 135 275 FCFA de la ligne
+« % ventes » sont, au franc près, le total de la feuille des commissions
+retenues sur les décharges.
+
+**Les dates concordent.** Sur les 495 lignes dont l'observation porte une
+date, **96 % pointent vers une date qui figure au journal des
+décharges**. Sur 73 couples (date, artisan) retrouvés dans les deux
+documents, **65 portent le même montant au franc près**.
+
+**Le compte se ferme.** Les 77 ventes sans observation totalisent
+229 850 FCFA. Le reste à payer total vaut 234 850. Les 5 000 FCFA
+d'écart s'expliquent entièrement : 3 000 pour la vente du Hall, dont
+l'observation « Artisan inconnu » n'est pas une décharge, et 2 000 pour
+l'anomalie de la ligne 602.
+
+**Conclusion : une observation « payé le … » atteste que l'artisan a reçu
+sa part.** L'article est alors soldé au sens comptable — son compte est
+apuré — ce qui décrit le même événement sous un autre angle.
+
+### Une conséquence sur le montant de la dette
+
+Le reste à payer est inscrit **brut** : il vaut le montant entier de la
+vente, vérifié sur 77 des 78 lignes concernées. Or la commission de 10 %
+n'est prélevée qu'au moment du reversement, comme le montre la feuille
+récapitulative où le « net à percevoir » vaut le montant moins 10 %.
+
+La dette réelle du village envers ses artisans est donc **inférieure de
+10 % au total de la colonne**. Pour l'exercice 2026 : 226 850 FCFA
+inscrits, soit **204 165 FCFA effectivement dus** aux artisans et
+22 685 FCFA de commission revenant au village.
+
+---
+
+## Ce qui reste à faire
+
+**Faire trancher les cinq lignes incohérentes du relevé** par la section
+Administrative et Financière, en particulier les 110 000 FCFA encaissés
+au mois et absents du total annuel. Le taux de recouvrement du rapport
+en dépend : 15,44 % ou 19,74 %.
+
+**Attribuer un code d'espace à MAKAMTE Bibiane**, seule occupante du
+relevé à ne pas en porter. Le contenant est renseigné — boutique B13 —
+mais pas l'espace. Aucun script ne peut l'inventer.
+
+**Trancher l'anomalie de la ligne 602** : le 25 mai 2026, une vente de
+10 000 FCFA de Mme Justina porte un reste à payer de 12 000 FCFA. C'est
+la seule ligne du registre où le reste dépasse le montant.
+
+**Expliquer l'écart de la campagne de reversement.** L'état préparé
+attribue 70 000 FCFA à Mme Justina, quand ses ventes non reversées
+totalisent 81 000 FCFA et son reste à payer 83 000. L'écart de
+11 000 FCFA ne correspond à l'exclusion d'aucune ligne.
+
+**Fixer le vocabulaire.** Le mot « redevance » désigne deux flux opposés
+selon le document : le loyer mensuel que l'artisan verse au village dans
+le relevé de recouvrement, et la part de vente que le village doit à
+l'artisan dans les états de reversement. Les fichiers produits emploient
+« redevance » pour le premier et « part artisan » pour le second.
+
+**Arbitrer les rapprochements ambigus.** Le script les liste à chaque
+exécution. Ils portent sur environ 16 % du chiffre d'affaires et doivent
+être soumis à la coordination — notamment les trois orthographes de
+« Ngassam Crousti », qu'il faut d'abord unifier entre elles avant de
+décider si elles désignent l'occupante NGASSAM Bernadette.

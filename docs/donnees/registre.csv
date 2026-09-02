@@ -1,604 +1,604 @@
-﻿date,code_boutique_source,code_boutique_normalise,espace_locatif,redevance_convenue,corps_metier,nom_artisan_source,nom_artisan_officiel,designation,conditionnement,quantite,prix_unitaire,montant,coherence,vendeur_reference,reste_a_payer
-2024-05-01,B06,B06,B0601,3000,AGR,Ngassam Crousti,NGASSAM Bernadette,biscuit,,,500,500,OK,2025-06-26 00:00:00,0
-2024-07-01,,,,,,Hall,,miel Nord ouest,,,3000,3000,OK,Artisan inconnu,3000
-2024-08-01,B06,B06,B0601,3000,AGR,Ngassam Crousti,NGASSAM Bernadette,farine patate,,,1500,1500,OK,2025-06-26 00:00:00,0
-,B10,B10,B1001,6000,,Chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,chemise,,,10000,10000,OK,20/06/2025 RNF,0
-,B06,B06,B0601,3000,AGR,Ngassam Crousti,NGASSAM Bernadette,farine patate,,,1500,1500,OK,2025-06-26 00:00:00,0
-,,,,,,TCHOMTCHOUA LELE Fadimatou,,bandeau,,,1000,1000,OK,,1000
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,porteclé en bois,,,1500,1500,OK,20/06/2025 RNF,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,bracelet,,,500,500,OK,20/06/2025 RNF,0
-,B07,B07,B0701,3000,SCU,Stéphane SONWA,SONWA KUETE Aimé Stéphane,bracelet,,,1000,1000,OK,2025-06-24 00:00:00,0
-2024-09-01,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,ouvre bière,,,5000,5000,OK,20/06/2025 RNF,0
-,,,,,,osplame salle innovation,,thé camomille,,,2000,2000,OK,Payé le 26/12/2025,0
-2024-10-01,B02,B02,B0206,3000,MED,Kondzou Thomas,NKONDZOU Thomas,anti poison,,,2000,2000,OK,16/07/2025 RNF,0
-2024-11-01,B02,B02,B0201,3000,MED,Djoko pokam alex,DJOKO POKAM ALEX,charbon végétal,,,1500,1500,OK,Payé le 28/08/2025,0
-,B12,B12,B1201,2000,CUI,shoes factory,NSO YONKA   -   Shoe Factory,chaussure,,,15000,15000,OK,Payé le 30/07/2025 Mme Guessong RNF,0
-2024-12-01,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,beurre de karité,,,1000,1000,OK,Payé le 01/04/2026,0
-,B02,B02,B0206,3000,MED,Kondzou Thomas,NKONDZOU Thomas,ginseng,,,1000,1000,OK,16/07/2025 RNF,0
-2025-01-01,B12,B12,B1203,2000,VAN,Mintchougom Sidonie,MINTCHOUGOM SIDONIE,sac en paille,,,1000,1000,OK,17/06/2025 RNF,0
-,B12,B12,B1203,2000,VAN,Mintchougom Sidonie,MINTCHOUGOM SIDONIE,chapeau en paille,,,1000,1000,OK,17/06/2025 RNF,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,babouche,,,3000,3000,OK,2025-06-26 00:00:00,0
-,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),bracelet,,,600,600,OK,Payé le 20/10/2025 à Mme Guessong,0
-,B07,B07,B0701,3000,SCU,Stéphane SONWA,SONWA KUETE Aimé Stéphane,bracelet,,,2000,2000,OK,2025-06-24 00:00:00,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,collier perle,,,9000,9000,OK,20/06/2025 RNF,0
-,B02,B02,B0201,3000,MED,djoko pokam alex,DJOKO POKAM ALEX,"anti,,,",,,1000,1000,OK,Payé le 28/08/2025,0
-,B02,B02,B0206,3000,MED,Kondzou Thomas,NKONDZOU Thomas,médicament,,,1500,1500,OK,16/07/2025 RNF,0
-2025-02-01,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,beurre karité,,,1000,1000,OK,Payé le 01/04/2026,0
-,B02,B02,B0201,3000,MED,djoko pokam alex,DJOKO POKAM ALEX,charbon active,,,1500,1500,OK,Payé le 28/08/2025,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,tableau,,,40000,40000,OK,20/06/2025 RNF,0
-,B11,B11,B1101,14000,,mambou claude,MAMBOU Claude,chapeau,,,4000,4000,OK,20/06/2025 RNF,0
-,,,,,,madi cosmétique,,détergent sachet,,,500,500,OK,ok 19/06/2025,0
-,,,,,,madi cosmétique,,lave vitre,,,1500,1500,OK,ok 19/06/2025,0
-,,,,,,madi cosmétique,,détergent,,,500,500,OK,ok 19/06/2025,0
-,,,,,,madi cosmétique,,savon noir,,,5000,5000,OK,ok 19/06/2025,0
-,,,,,,Mme Tchanou,,césame,,,1000,1000,OK,Payé le 15/07/2025,0
-,,,,,,Mme Tchanou,,ginseng,,,1000,1000,OK,Payé le 15/07/2025,0
-,,,,,,madi cosmétique,,détergent,,,500,500,OK,ok 19/06/2025,0
-2025-03-01,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,savon hibiscus,,,1000,1000,OK,Payé le 01/04/2026,0
-,,,,,,madi cosmétique,,détergent,,,1000,1000,OK,ok 19/06/2025,0
-,B02,B02,B0201,3000,MED,mme djoko,DJOKO POKAM ALEX,collier ndop,,,9000,9000,OK,20/06/2025 RNF,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,queue cheval,,,5000,5000,OK,20/06/2025 RNF,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,sac,,,3000,3000,OK,2025-06-26 00:00:00,0
-,B02,B02,B0201,3000,MED,mme djoko,DJOKO POKAM ALEX,chapeau fil,,,3000,3000,OK,20/06/2025 RNF,0
-,,,,,,madi cosmétique,,menthol,,,500,500,OK,ok 19/06/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,lave vitre,,,1500,1500,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,200,200,OK,Payé le22/07/2025,0
-,,,,,,madi cosmétique,,détergent,,,500,500,OK,ok 19/06/2025,0
-,,,,,,madi cosmétique,,savon noir,,,1000,1000,OK,ok 19/06/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-04-01,,,,,,madi cosmétique,,menthol,,,500,500,OK,ok 19/06/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1500,1500,OK,Payé le22/07/2025,0
-,,,,,,madi cosmétique,,savon noir,,,2000,2000,OK,ok 19/06/2025,0
-,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,bracelet,,,250,250,OK,Payé le 31/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,2200,2200,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1500,1500,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1900,1900,OK,Payé le22/07/2025,0
-,,,,,,madi cosmétique,,détergent,,,500,500,OK,ok 19/06/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,450,450,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,3400,3400,OK,Payé le22/07/2025,0
-,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,savon hibiscus,,,1000,1000,OK,Payé le 01/04/2026,0
-,,,,,,Mme Tchanou,,gingembre,,,1000,1000,OK,Payé le 15/07/2025,0
-,B11,B11,B1101,14000,,Mambou claude,MAMBOU Claude,Eventail,,,8000,8000,OK,20/06/2025 RNF,0
-,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,600,600,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon liquide,,,500,500,OK,Payé le22/07/2025,0
-,,,,,,madi cosmétique,,savon noir,,,1000,1000,OK,ok 19/06/2025,0
-,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,barette,,,500,500,OK,Payé le 31/07/2025,0
-,,,,,,Mme Tchanou,,pygeum,,,3000,3000,OK,Payé le 15/07/2025,0
-,,,,,,madi cosmétique,,savon noir,,,2000,2000,OK,ok 19/06/2025,0
-2025-05-01,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,9000,9000,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,300,300,OK,Payé le22/07/2025,0
-,,,,,,titi bio,,épice titi bio,,,500,500,OK,Payé le 06/03/2026,
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-06-26 00:00:00,0
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de patate,,,500,500,OK,2025-06-26 00:00:00,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,eau de javel,,,350,350,OK,Payé le22/07/2025,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,chapeau,,,2500,2500,OK,2025-06-26 00:00:00,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon liquide,,,500,500,OK,Payé le22/07/2025,0
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit patate,,,500,500,OK,2025-06-26 00:00:00,0
-,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,artémisia,,,4000,4000,OK,Payé le 22/10/2025 à Mme Guessong,0
-,B02,B02,B0201,3000,MED,djoko pokam alex,DJOKO POKAM ALEX,curcuma,,,1500,1500,OK,Payé le 28/08/2025,0
-,B02,B02,B0201,3000,MED,djoko pokam alex,DJOKO POKAM ALEX,charbon active,,,1500,1500,OK,Payé le 28/08/2025,0
-,,,,,,titi bio,,curcuma,,,500,500,OK,Payé le 06/03/2026,
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit patate,,,1000,1000,OK,2025-06-26 00:00:00,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,chapeau,,,5000,5000,OK,2025-06-26 00:00:00,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,chaussure,,,10000,10000,OK,2025-06-26 00:00:00,0
-,B02,B02,B0201,3000,MED,djoko pokam alex,DJOKO POKAM ALEX,charbon active,,,1500,1500,OK,Payé le 28/08/2025,0
-,B07,B07,B0702,14000,SCU,Mouliom,MOULIOUM IBRAHIM,masque,,,15000,15000,OK,Payé le 17/07/2025,0
-,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,barette,,,1500,1500,OK,Payé le 31/07/2025,0
-,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,bague,,,500,500,OK,Payé le 31/07/2025,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,chapeau,,,4000,4000,OK,2025-06-26 00:00:00,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,collier,,,10000,10000,OK,20/06/2025 RNF,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,chapeau,,,5000,5000,OK,2025-06-26 00:00:00,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,450,450,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,eau de javel,,,350,350,OK,Payé le22/07/2025,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,cloche + porte bougie,,,10000,10000,OK,20/06/2025 RNF,0
-2025-06-01,,,,,,madi cosmétique,,vinaigre,,,300,300,OK,ok 19/06/2025,0
-,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,whiscky sachet,,,1000,1000,OK,23/06/25 par Mme GUESSONG,0
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-06-26 00:00:00,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,300,300,OK,Payé le22/07/2025,0
-,,,,,,madi cosmétique,,menthol,,,500,500,OK,ok 19/06/2025,0
-,,,,,,madi cosmétique,,menthol,,,500,500,OK,ok 19/06/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,2900,2900,OK,Payé le22/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,300,300,OK,Payé le22/07/2025,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,pannier,,,9000,9000,OK,2025-06-26 00:00:00,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,boubou,,,10000,10000,OK,2025-06-26 00:00:00,0
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-06-26 00:00:00,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,collier + boucle,,,2500,2500,OK,20/06/2025 RNF,0
-,B10,B10,B1001,6000,,chic décor,CHIC DECOR - FANTE YOUDOM Brunette épse TCHEMBENG,bracelet,,,2000,2000,OK,20/06/2025 RNF,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon liquide,,,4000,4000,OK,Payé le22/07/2025,0
-,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,écharpe en perles,,,5000,5000,OK,Payé le 31/07/2025,0
-,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1000,1000,OK,Payé le22/07/2025,0
-,,,,,,madi cosmétique,,menthol,,,500,500,OK,ok 19/06/2025,0
-,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin de bita cola,,,5000,5000,OK,23/06/25 par Mme GUESSONG,0
-,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,songo,,,9000,9000,OK,2025-06-26 00:00:00,0
-,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-06-26 00:00:00,0
-,,,,,,titi bio,,gingembre,,,500,500,OK,Payé le 06/03/2026,
-2025-06-16,,,,,,Mme Tchanou,,Spécial baume,,,2000,2000,OK,Payé le 15/07/2025,0
-2025-06-16,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,300,300,OK,Payé le22/07/2025,0
-2025-06-16,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Eau de javel,,,2500,2500,OK,Payé le22/07/2025,0
-2025-06-19,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,Huile de coco,,,2000,2000,OK,2025-06-26 00:00:00,0
-2025-06-19,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-06-19,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,cure typhoide,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-06-19,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-06-26 00:00:00,0
-2025-06-19,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1800,1800,OK,Payé le22/07/2025,0
-2025-06-24,,,,,,madi cosmétique,,savon,,,1000,1000,OK,Payé le 16/01/2026,0
-2025-06-24,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,700,700,OK,Payé le22/07/2025,0
-2025-06-24,,,,,,Mme Justina,,tableau de décoration,,,24000,24000,OK,Payé le 30/07/2025,0
-2025-06-26,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-06-26,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus de fruit,,,16000,16000,OK,Payé le 21/07/2025,0
-2025-06-27,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,savon hibiscus,,,1000,1000,OK,Payé le 01/04/2026,0
-2025-06-27,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,whiscky sachet,,,1000,1000,OK,10/07/2025 par Mme Guessong,0
-2025-06-27,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,300,300,OK,Payé le22/07/2025,0
-2025-06-27,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou,,,2500,2500,OK,le 17/07/2025 par Mme Guessong,0
-2025-06-27,B01,B01,B0101,3000,AGR,Jonas,MOUTAPMBEME JONAS,Vin de djindja,,,3000,3000,OK,Payé le 25/08/2025,0
-2025-06-27,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1500,1500,OK,Payé le22/07/2025,0
-2025-06-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,2500,2500,OK,Payé le22/07/2025,0
-2025-07-02,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin bita cola,,,5000,5000,OK,10/07/2025 par Mme Guessong,0
-2025-07-02,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-07-23 00:00:00,0
-2025-07-03,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin bita cola,,,35000,35000,OK,10/07/2025 par Mme Guessong,0
-2025-07-07,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel,,,10000,10000,OK,le 17/07/2025 par Mme Guessong,0
-2025-07-07,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Bol en bois,,,22000,22000,OK,Payé le 02/07/2025,0
-2025-07-08,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin bita cola,,,2500,2500,OK,17/07/2025 par Mme Guessong,0
-2025-07-08,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,300,300,OK,Payé le22/07/2025,0
-2025-07-08,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,700,700,OK,Payé le22/07/2025,0
-2025-07-08,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus de fruit,,,3000,3000,OK,Payé le 21/07/2025,0
-2025-07-10,,,,,,Ets SAYA désiré,,biscuits,,,1500,1500,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-10,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou,,,10000,10000,OK,le 17/07/2025 par Mme Guessong,0
-2025-07-11,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-07-14,,,,,,madi cosmétique,,menthol,,,500,500,OK,Payé le 16/01/2026,0
-2025-07-14,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-07-14,B07,B07,B0701,3000,SCU,Stéphane SONWA,SONWA KUETE Aimé Stéphane,masque,,,5000,5000,OK,Payé le 18/07/2025,0
-2025-07-14,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,objet en bois,,,7500,7500,OK,Payé le 17/07/2025,0
-2025-07-14,B07,B07,B0701,3000,SCU,Stéphane SONWA,SONWA KUETE Aimé Stéphane,statuette en bois,,,9000,9000,OK,Payé le 18/07/2025,0
-2025-07-14,,,,,,Ets SAYA désiré,,Cookies manioc,,,200,200,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-14,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin bita cola,,,2500,2500,OK,17/07/2025 par Mme Guessong,0
-2025-07-14,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-07-15,,,,,,Ets SAYA désiré,,"Cookies manioc, biscuit, choco",,,3700,3700,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-15,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,200,200,OK,Payé le22/07/2025,0
-2025-07-16,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le22/07/2025,0
-2025-07-16,B07,B07,B0702,14000,SCU,Mouliom,MOULIOUM IBRAHIM,masque,,,12000,12000,OK,Payé le 17/07/2025,0
-2025-07-17,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquette,,,1300,1300,OK,Payé le22/07/2025,0
-2025-07-17,,,,,,Ets SAYA désiré,,Cookies de manioc,,,200,200,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-17,,,,,,VARBamenda,,Miel,,,3000,3000,OK,Payé le 20/10/2025 au Coordonnateur,0
-2025-07-17,,,,,,KEMTA,,Vin thérapeutique,,,2500,2500,OK,Payé le 29/07/2025 Mme Guessong,0
-2025-07-18,,,,,,KEMTA,,Vin thérapeutique,,,2500,2500,OK,Payé le 29/07/2025 Mme Guessong,0
-2025-07-18,,,,,,Ets SAYA désiré,,Cookies de manioc,,,400,400,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-18,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,200,200,OK,Payé le22/07/2025,0
-2025-07-18,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,Pot,,,5000,5000,OK,Payé le 09/10/2025,0
-2025-07-18,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,Tige de fleur,,,1750,1750,OK,Payé le 09/10/2025,0
-2025-07-18,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus de fruit,,,1000,1000,OK,Payé le 21/07/2025,0
-2025-07-18,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,800,800,OK,Payé le22/07/2025,0
-2025-07-21,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,charbon végétal,,,1500,1500,OK,Payé le 28/08/2025,0
-2025-07-21,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus naturel,,,500,500,OK,Payé le 21/10/2025,0
-2025-07-21,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,eau de javel,,,700,700,OK,Payé le 04/09/2025,0
-2025-07-21,,,,,,madi cosmétique,,Savon et détergent,,,1500,1500,OK,Payé le 16/01/2026,0
-2025-07-21,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Vin,,,3500,3500,OK,Payé le 21/10/2025,0
-2025-07-21,,,,,,Mme Justina,,Tableau de décoration,,,12000,12000,OK,Payé le 30/07/2025,0
-2025-07-22,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Porte clé,,,1000,1000,OK,Payé le 18/09/2025,0
-2025-07-22,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1200,1200,OK,Payé le 04/09/2025,0
-2025-07-23,,,,,,Ets SAYA désiré,,Chips de manioc,,,1000,1000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-23,,,,,,madi cosmétique,,vinaigre,,,600,600,OK,Payé le 16/01/2026,0
-2025-07-25,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,savon hibiscus,,,1000,1000,OK,Payé le 01/04/2026,0
-2025-07-25,B01,B01,B0106,2000,AGR,Mme Solange MANGUE,MAMCHE KADJE Rosette Solange,café rapha,,,3500,3500,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-07-26,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,2025-07-28 00:00:00,0
-2025-07-26,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus de fruit,,,500,500,OK,Payé le 21/10/2025,0
-2025-07-26,B01,B01,B0101,3000,AGR,Jonas,MOUTAPMBEME JONAS,poudre d'ail,,,1000,1000,OK,Payé le 25/08/2025,0
-2025-07-26,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 04/09/2025,0
-2025-07-26,,,,,,KEMTA,,Vin thérapeutique,,,3000,3000,OK,Payé le 29/07/2025 Mme Guessong,0
-2025-07-26,,,,,,Ets SAYA désiré,,biscuit de manioc,,,200,200,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-26,,,,,,Mme Justina,,tableau décoration,,,10000,10000,OK,Payé le 30/07/2025,0
-2025-07-28,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Antigastrique,,,1000,1000,OK,Payé le 28/08/2025,0
-2025-07-28,,,,,,titi bio,,Gingembre,,,500,500,OK,Payé le 06/03/2026,
-2025-07-28,,,,,,Mme Tchanou,,Rhumargo,,,1000,1000,OK,Payé le 15/07/2025,0
-2025-07-28,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Thé,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-28,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Produit,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-28,,,,,,Mme GUESSONG,,Propolis,,,2500,2500,OK,Payé le 30/07/2025 à Mme Guessong,0
-2025-07-29,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1500,1500,OK,Payé le 04/09/2025,0
-2025-07-29,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Man power,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-07-29,,,,,,Mme Tchanou,,pygeum,,,2000,2000,OK,Payé le 21/11/2025,0
-2025-07-29,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 04/09/2025,0
-2025-07-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon liquide,,,1000,1000,OK,Payé le 04/09/2025,0
-2025-07-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,2700,2700,OK,Payé le 04/09/2025,0
-2025-07-31,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,600,600,OK,Payé le 04/09/2025,0
-2025-07-31,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin de bita cola,,,2500,2500,OK,Payé le 02/10/25 au fils,0
-2025-07-31,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Boucle,,,1000,1000,OK,Payé,0
-2025-07-31,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),Porte clé,,,1000,1000,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-07-31,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),barette,,,1000,1000,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-07-31,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),Bracelet,,,1000,1000,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-07-31,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),Bague,,,300,300,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-07-31,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,900,900,OK,Payé le 04/09/2025,0
-2025-07-31,B01,B01,B0101,3000,AGR,Jonas,MOUTAPMBEME JONAS,vin d'ail,,,6500,6500,OK,Payé le 25/08/2025,0
-2025-08-01,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),Bijou,,,2000,2000,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-08-01,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,sac en perle,,,20000,20000,OK,Payé,0
-2025-08-01,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,700,700,OK,Payé le 04/09/2025,0
-2025-08-04,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,700,700,OK,Payé le 04/09/2025,0
-2025-08-05,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1500,1500,OK,Payé le 04/09/2025,0
-2025-08-05,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),Porte clé,,,500,500,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-08-07,,,,,,Ets SAYA désiré,,biscuit de manioc,,,1000,1000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-08-07,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,Payé le 20/11/2025,0
-2025-08-07,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,600,600,OK,Payé le 04/09/2025,0
-2025-08-07,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,huile d'avocat,,,1500,1500,OK,Payé le 05/09/2025,0
-2025-08-07,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel,,,6000,6000,OK,Payé le 03/09/2025,0
-2025-08-08,B15,B15,B1501,15000,REC,géraldine,WAPPCAM (LUCHOUO NGIA Géraldine Epse SAMOH),bracelet,,,1200,1200,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-08-08,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,boubou,,,18000,18000,OK,Payé le 09/10/2025,0
-2025-08-08,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,colier,,,2000,2000,OK,Payé le 09/10/2025,0
-2025-08-08,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,colier,,,2500,2500,OK,Payé le 09/10/2025,0
-2025-08-08,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,support téléphone,,,300,300,OK,Payé le 09/10/2025,0
-2025-08-08,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,caisse en bambou de chine,,,1000,1000,OK,Payé le 09/10/2025,0
-2025-08-08,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus de fruit,,,500,500,OK,Payé le 21/10/2025,0
-2025-08-08,,,,,,Ets SAYA désiré,,Cookies de manioc,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-08-11,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1100,1100,OK,Payé le 04/09/2025,0
-2025-08-11,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,Vin d'avocat,,,3500,3500,OK,Payé le 05/09/2025,0
-2025-08-11,,,,,,VARBamenda,,Miel,,,3000,3000,OK,Payé le 20/10/2025 au Coordonnateur,0
-2025-08-11,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,Biscuit manioc,,,500,500,OK,Payé le 20/11/2025,0
-2025-08-11,,,,,,Ets SAYA désiré,,cookies de manioc,,,1000,1000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-08-14,B01,B01,B0106,2000,AGR,Mme Solange MANGUE,MAMCHE KADJE Rosette Solange,café rapha,,,3500,3500,OK,Payé le 20/10/2025 à Mme Guessong,0
-2025-08-14,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,Vin d'avaocat,,,2000,2000,OK,Payé le 05/09/2025,0
-2025-08-26,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,2200,2200,OK,Payé le 04/09/2025,0
-2025-08-26,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,Payé le 20/11/2025,0
-2025-08-26,,,,,,Ets SAYA désiré,,cookies de manioc,,,500,500,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-08-26,,,,,,VARBamenda,,Miel,,,3000,3000,OK,Payé le 20/10/2025 au Coordonnateur,0
-2025-08-26,,,,,,titi bio,,Curcuma,,,500,500,OK,Payé le 06/03/2026,0
-2025-08-26,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1000,1000,OK,Payé le 04/09/2025,0
-2025-08-27,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel,,,10000,10000,OK,Payé le 03/09/2025,0
-2025-08-27,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Piment,,,1000,1000,OK,Payé le 03/09/2025,0
-2025-08-27,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,barette,,,500,500,OK,Payé,0
-2025-08-27,,,,,,madi cosmétique,,vinaigre,,,300,300,OK,Payé le 16/01/2026,0
-2025-08-27,B07,B07,B0702,14000,SCU,Mouliom,MOULIOUM IBRAHIM,Chaise,,,30000,30000,OK,Payé le 20/10/2025,0
-2025-08-27,,,,,,Mme Justina,,Tableau décoration,,,24000,24000,OK,Payé le 20/10/2025 Mme Guessong,0
-2025-08-27,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,vin d'avocat,,,1000,1000,OK,Payé le 05/09/2025,0
-2025-08-27,,,,,,Mme GUESSONG(payé le 01/09/25),,clou de giroffle,,,1000,1000,OK,Payé le 01/09/25,0
-2025-08-27,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin de cola,,,2500,2500,OK,Payé le 02/10/25 au fils,0
-2025-08-28,,,,,,Ets SAYA désiré,,Cookies,,,2400,2400,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-08-28,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,Payé le 20/11/2025,0
-2025-08-28,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,400,400,OK,Payé le 04/09/2025,0
-2025-08-28,,,,,,KEMTA,,Vin thérapeutique,,,2500,2500,OK,Payé le 20/10/2025 Mme Guessong,0
-2025-08-28,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 04/09/2025,0
-2025-08-29,,,,,,Mme Justina,,tableau décoration,,,12000,12000,OK,Payé le 20/10/2025 Mme Guessong,0
-2025-08-29,B01,B01,B0103,3000,AGR,nguekam philippe,GUEKAM Phillipe,vin de bita cola et cola,,,15000,15000,OK,Payé le 02/10/25 au fils,0
-2025-08-29,,,,,,Ets SAYA désiré,,cookies,,,500,500,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-08-30,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Piment,,,1500,1500,OK,Payé le 03/09/2025,0
-2025-08-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Détergent liquide,,,1000,1000,OK,Payé le 04/09/2025,0
-2025-08-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,eau de javel,,,700,700,OK,Payé le 04/09/2025,0
-2025-08-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,600,600,OK,Payé le 04/09/2025,0
-2025-09-01,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,Biscuit de manioc,,,500,500,OK,Payé le 20/11/2025,0
-2025-09-04,,,,,,madi cosmétique,,Savon noir,,,2500,2500,OK,Payé le 16/01/2026,0
-2025-09-04,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,3000,3000,OK,Payé le 05/11/2025 au fils,0
-2025-09-04,,,,,,madi cosmétique,,menthol,,,500,500,OK,Payé le 16/01/2026,0
-2025-09-05,,,,,,SOH,,Deux manches en bois,,,1000,1000,OK,,1000
-2025-09-09,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus naturel,,,500,500,OK,Payé le 21/10/2025,0
-2025-09-10,,,,,,SOH,,un carton,,,2000,2000,OK,,2000
-2025-09-10,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon liquide,,,1000,1000,OK,Payé le 05/11/2025 au fils,0
-2025-09-10,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Sac à main,,,5000,5000,OK,Payé le 18/09/2025,0
-2025-09-10,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,2000,2000,OK,Payé le 05/11/2025 au fils,0
-2025-09-10,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel,,,2000,2000,OK,le 20/10/2025 par Mme Guessong,0
-2025-09-15,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Plateau en bois,,,,,OK,Payé le 18/09/2025,0
-2025-09-15,B11,B11,B1101,14000,,Mambou claude,MAMBOU Claude,collier,,,10000,10000,OK,RNF le 27/09/2025,0
-2025-09-15,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1500,1500,OK,Payé le 05/11/2025 au fils,0
-2025-09-10,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Porte clé,,,200,200,OK,Payé le 02/01/2026,0
-2025-09-15,,,,,,SOLISTA,,Shampoing cosmétique,,,1000,1000,OK,Payé en main propre,0
-2025-09-16,,,,,,Ets SAYA désiré,,Ships de manioc,,,500,500,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-09-17,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou,,,5000,5000,OK,le 20/10/2025 par Mme Guessong,0
-2025-09-18,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Piment,,,1000,1000,OK,le 20/10/2025 par Mme Guessong,0
-2025-09-19,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou,,,2000,2000,OK,le 20/10/2025 par Mme Guessong,0
-2025-09-19,,,,,,VARBamenda,,miel blanc,,,8500,8500,OK,Payé le 20/10/2025 au Coordonnateur,0
-2025-09-19,,,,,,VARBamenda,,miel brun,,,3000,3000,OK,Payé le 20/10/2025 au Coordonnateur,0
-2025-09-26,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 05/11/2025 au fils,0
-2025-09-27,B11,B11,B1101,14000,,Mambou claude,MAMBOU Claude,Chapeau Ndop,,,10000,10000,OK,RNF le 27/09/2025,0
-2025-09-25,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,Vin d'avocat,,,2000,2000,OK,payé le 20/10/2025 à Mme Guessong,0
-2025-09-30,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Cure diabète,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-09-01,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,1000,1000,OK,Payé le 20/11/2025,0
-2025-10-01,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,Huile de coco,,,5000,5000,OK,Payé le 20/11/2025,0
-2025-10-01,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Babouche,,,8000,8000,OK,Payé le 10/10/2025,0
-2025-10-01,,,,,,SOLISTA,,savon noir,,,1000,1000,OK,Payé le 20/11/2025,0
-2025-10-01,,,,,,SOLISTA,,lait éclaircissant,,,1000,1000,OK,Payé le 20/11/2025,0
-2025-10-01,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,700,700,OK,Payé le 05/11/2025 au fils,0
-2025-10-02,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel bangou,,,2000,2000,OK,le 20/10/2025 par Mme Guessong,0
-2025-10-02,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel bangou,,,3000,3000,OK,le 20/10/2025 par Mme Guessong,0
-2025-10-04,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,colier,,,7500,7500,OK,Payé le 10/10/2025,0
-2025-10-04,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelet,,,1000,1000,OK,Payé le 22/12/2025,0
-2025-10-04,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelet,,,700,700,OK,Payé le 22/12/2025,0
-2025-10-04,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),boucles,,,1400,1400,OK,Payé le 22/12/2025,0
-2025-10-04,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte clé,,,1000,1000,OK,Payé le 22/12/2025,0
-2025-10-16,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,Vin d'avocat,,,10500,10500,OK,payé le 20/10/2025 à Mme Guessong,0
-2025-10-23,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,cure diabete,,,2000,2000,OK,Payé le 22/10/2025 à Mme Guessong,0
-2025-10-16,,,,,,madi cosmétique,,Baume,,,1000,1000,OK,Payé le 16/01/2026,0
-2025-10-21,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,Biscuit manioc,,,1000,1000,OK,Payé le 20/11/2025,0
-2025-10-21,,,,,,VARBamenda,,miel brun,,,6000,6000,OK,Payé le 11/11/2025 au Coordonnateur,0
-2025-10-24,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,pendule,,,1000,1000,OK,,1000
-2025-10-24,,,,,,Kuemi Jacob,,Tabouret bambou,,,4000,4000,OK,Payé le 24/11/2025,0
-2025-11-03,,,,,,VARBamenda,,Miel brun,,,3000,3000,OK,Payé le 11/11/2025 au Coordonnateur,0
-2025-11-03,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Gastri stop,,,1000,1000,OK,Payé le 06/01/2025 à la fille,0
-2025-11-10,,,,,,VARBamenda,,Miel blanc,,,25500,25500,OK,Payé le 11/11/2025 au Coordonnateur,0
-2025-11-11,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,eau de javel,,,2000,2000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-11,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Piment,,,1500,1500,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-11,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,600,600,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-11,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Gastri stop,,,1000,1000,OK,Payé le 06/01/2025 à la fille,0
-2025-11-14,,,,,,Kuemi Jacob,,tabouret en bambou,,,4000,4000,OK,Payé le 24/11/2025,0
-2025-11-17,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-17,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Gastri stop,,,1000,1000,OK,Payé le 06/01/2025 à la fille,0
-2025-11-17,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,Vin d'avocat,,,7000,7000,OK,payé le 29/12/2025 à Mme Guessong,0
-2025-11-17,,,,,,SOLISTA,,Détergent,,,1000,1000,OK,Payé le 20/11/2025,0
-2025-11-19,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,charbon végétal,,,1000,1000,OK,Payé le 06/01/2025 à la fille,0
-2025-11-19,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Gastri stop,,,1500,1500,OK,Payé le 06/01/2025 à la fille,0
-2025-11-19,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,miel,,,4000,4000,OK,Payé le 06/01/2025 à la fille,0
-2025-11-19,,,,,,VARBamenda,,miel brun,,,3000,3000,OK,Payé le 18/12/2025 au Coordonnateur,0
-2025-11-19,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,cure anti cancéreuse,,,4000,4000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-19,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,anti douleur,,,2000,2000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-19,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus naturel,,,500,500,OK,Payé le 21/10/2025,0
-2025-11-19,,,,,,SOLISTA,,Détergent,,,500,500,OK,Payé le 20/11/2025,0
-2025-11-19,,,,,,SOLISTA,,Lait de toilette,,,1000,1000,OK,Payé le 20/11/2025,0
-2025-11-19,,,,,,Ets SAYA désiré,,biscuit de manioc,,,800,800,OK,Payé le 10/04/2026 à Mme Guessong,0
-2025-11-19,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,200,200,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-20,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1200,1200,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-24,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,lave vitre,,,1500,1500,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-24,B01,B01,B0103,3000,AGR,Nguekam philippe,GUEKAM Phillipe,vin de cola,,,2500,2500,OK,Payé le 29/12/25 à Mme Guessong,0
-2025-11-26,B01,B01,B0101,3000,AGR,Jonas,MOUTAPMBEME JONAS,Vin de gingembre,,,3500,3500,OK,Payé le 31/12/2025,0
-2025-11-26,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,bracelet,,,2000,2000,OK,Payé le 02/01/2026,0
-2025-11-26,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Porte clé,,,1000,1000,OK,Payé le 02/01/2026,0
-2025-11-26,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Porte clé,,,500,500,OK,Payé le 02/01/2026,0
-2025-11-26,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,bague,,,3000,3000,OK,Payé le 02/01/2026,0
-2025-11-26,,,,,,VARBamenda,,miel brun,,,3000,3000,OK,Payé le 18/12/2025 au Coordonnateur,0
-2025-11-27,,,,,,SOLISTA,,Baume sécheresse lèvres,,,500,500,OK,Payé le 29/12/2025,0
-2025-11-27,,,,,,SOLISTA,,Lait éclaircissant,,,1000,1000,OK,Payé le 29/12/2025,0
-2025-11-27,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1000,1000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-11-28,B11,B11,B1101,14000,,Mambou claude,MAMBOU Claude,Tabouret en perles,,,45000,45000,OK,Payé le 16/01/2025,0
-2025-11-28,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Gastri stop,,,1500,1500,OK,Payé le 06/01/2025 à la fille,0
-2025-12-03,B06,B06,B0601,3000,AGR,ngassam crousti,NGASSAM Bernadette,Biscuit manioc,,,500,500,OK,Payé le 25/03/2026,0
-2025-12-03,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-03,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),boucle,,,500,500,OK,Payé le 22/12/2025,0
-2025-12-04,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,petit sac en perle,,,1500,1500,OK,Payé le 02/01/2026,0
-2025-12-08,,,,,,SOLISTA,,Baume,,,500,500,OK,Payé le 29/12/2025,0
-2025-12-08,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,800,800,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-09,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelets,,,5200,5200,OK,Payé le 22/12/2025,0
-2025-12-09,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelets,,,2500,2500,OK,Payé le 22/12/2025,0
-2025-12-09,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelets,,,1000,1000,OK,Payé le 22/12/2025,0
-2025-12-09,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),boucles d'oreilles,,,1500,1500,OK,Payé le 22/12/2025,0
-2025-12-09,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),colier,,,1000,1000,OK,Payé le 22/12/2025,0
-2025-12-09,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,1700,1700,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-10,,,,,,SOLISTA,,Baume,,,250,250,OK,Payé le 29/12/2025,0
-2025-12-12,B01,B01,B0103,3000,AGR,Nguekam philippe,GUEKAM Phillipe,vin de cola,,,2500,2500,OK,Payé le 29/12/25 à Mme Guessong,0
-2025-12-12,B01,B01,B0103,3000,AGR,Nguekam philippe,GUEKAM Phillipe,vin de bita cola,,,2500,2500,OK,Payé le 29/12/25 à Mme Guessong,0
-2025-12-12,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre blanc,,,600,600,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-12,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre 1/2l,,,300,300,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-12,,,,,,Ets SAYA désiré,,biscuit patate,,,1000,1000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2025-12-12,,,,,,Ets SAYA désiré,,chips de pomme,,,1000,1000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2025-12-12,,,,,,KEMTA,,Vin thérapeutique,,,3000,3000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-12,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,100,100,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-12,,,,,,VARBamenda,,Miel blanc,,,17000,17000,OK,Payé le 18/12/2025 au Coordonnateur,0
-2025-12-17,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,300,300,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-19,,,,,,Mme Justina,,tableau décoration,,,15000,15000,OK,Payé le 16/01/2026 à Mme Guessong,0
-2025-12-22,B12,B12,B1203,2000,VAN,Mintchougom Sidonie,MINTCHOUGOM SIDONIE,Chapeau en fibre raphia,,,1000,1000,OK,Payé le 25/03/2026,0
-2025-12-22,B12,B12,B1203,2000,VAN,Mintchougom Sidonie,MINTCHOUGOM SIDONIE,petit sac en fibre raphia,,,500,500,OK,Payé le 25/03/2026,0
-2025-12-22,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Décoration murale,,,3000,3000,OK,Payé le 22/12/2025,0
-2025-12-22,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,100,100,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-23,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),colier,,,1500,1500,OK,Payé le 28/01/2026,0
-2025-12-23,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,bracelets en perle,,,2000,2000,OK,Payé le 02/01/2026,0
-2025-12-23,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),porte clés,,,3500,3500,OK,Payé le 28/01/2026,0
-2025-12-23,,,,,,VARBamenda,,miel blanc et brun,,,20000,20000,OK,Payé le 31/03/2026 au Coordonnateur,0
-2025-12-23,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel bangou,,,2000,2000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-23,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,piment bangou,,,1000,1000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-23,B04,B04,B0401,12000,,FAFE,FAFE,Chips de mais,,,100,100,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-24,,,,,,KEMTA,,Vin thérapeutique,,,6000,6000,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-24,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,1000,1000,OK,Payé le 28/01/2026,0
-2025-12-24,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,2100,2100,OK,Payé le 28/01/2026,0
-2025-12-24,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,2000,2000,OK,Payé le 28/01/2026,0
-2025-12-24,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Stylos,,,2400,2400,OK,Payé le 28/01/2026,0
-2025-12-24,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte téléphone,,,500,500,OK,Payé le 28/01/2026,0
-2025-12-26,,,,,,Ets SAYA désiré,,cookies de manioc,,,800,800,OK,Payé le 10/04/2026 à Mme Guessong,0
-2025-12-26,,,,,,Ets SAYA désiré,,chips de manioc,,,500,500,OK,Payé le 10/04/2026 à Mme Guessong,0
-2025-12-26,B04,B04,B0401,12000,,FAFE,FAFE,caramel,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-29,B04,B04,B0401,12000,,FAFE,FAFE,chips de mais,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-26,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,500,500,OK,Payé le 29/12/2025 à Mme Guessong,0
-2025-12-29,B04,B04,B0401,12000,,FAFE,FAFE,chips de maîs,,,500,500,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-29,B04,B04,B0401,12000,,FAFE,FAFE,chips de maîs,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-29,,,,,,SOLISTA,,savon en boite,,,1500,1500,OK,Payé le 25/02/2026,0
-2025-12-30,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,piment bangou,,,3000,3000,OK,Payé le 16/01/2026 à Mme Guessong,0
-2025-12-30,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquette,,,100,100,OK,Payé le 16/01/2026 à Mme Guessong,0
-2025-12-30,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),Jus oseille,,,500,500,OK,Payé le 21/04/2026,0
-2025-12-31,,,,,,SOLISTA,,savon noir,,,1000,1000,OK,Payé le 25/02/2026,0
-2025-12-31,,,,,,SOLISTA,,Shampoing cosmétique,,,1000,1000,OK,Payé le 25/02/2026,0
-2025-12-31,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,1000,1000,OK,Payé le 25/03/2026,0
-2025-12-31,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,1500,1500,OK,Payé le 28/01/2026,0
-2025-12-31,B01,B01,B0105,2000,AGR,mme Mboulé,MBOULE Simone,Vin d'avocat,,,10500,10500,OK,Payé le 16/01/2026 à Mme GUESSONG,0
-2025-12-31,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquettes,,,5600,5600,OK,Payé le 16/01/2026 à Mme Guessong,0
-2025-12-31,B04,B04,B0401,12000,,FAFE,FAFE,Liqueur de cacao,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-31,B04,B04,B0401,12000,,FAFE,FAFE,chips de maîs,,,100,100,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-31,B04,B04,B0401,12000,,FAFE,FAFE,sirop fer calcium,,,6000,6000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-31,B04,B04,B0401,12000,,FAFE,FAFE,baume multi plante,,,4000,4000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2025-12-31,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,paquet de louche,,,6000,6000,OK,Payé le 16/01/2026 à Mme Guessong,0
-2025-12-31,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,bouteille croquettes,,,1500,1500,OK,Payé le 16/01/2026 à Mme Guessong,0
-2026-01-06,,,,,,Mme Justina,,tableau décoration,,,12000,12000,OK,Payé le 16/01/2026 à Mme Guessong,0
-2026-01-06,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),tableau décoration,,,1500,1500,OK,Payé le 28/01/2026,0
-2026-01-06,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,500,500,OK,Payé le 28/01/2026,0
-2026-01-12,B04,B04,B0401,12000,,FAFE,FAFE,Liqueur de cacao pti modèle,,,2000,2000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-12,B04,B04,B0401,12000,,FAFE,FAFE,Pommade multiplante,,,2000,2000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-12,,,,,,Ngassam Olivier,,Sirop africain,,,1000,1000,OK,Payé le 23/03/2026,0
-2026-01-12,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquettes,,,200,200,OK,Payé le 16/01/2026 à Mme Guessong,0
-2026-01-14,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Porte clés,,,5000,5000,OK,Payé le 16/01/2026 à Mme Guessong,0
-2026-01-19,B01,B01,B0105,2000,AGR,Mme mboulé,MBOULE Simone,Vin d'avocat,,,1000,1000,OK,Payé le 21/05/2026 à Mme GUESSONG,0
-2026-01-19,B04,B04,B0401,12000,,FAFE,FAFE,féves cacao,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-19,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Pygeum africanum cure prostate,,,2000,2000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-01-19,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Pygeum africana,,,9000,9000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-01-19,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,charbon végétal,,,3000,3000,OK,,3000
-2026-01-19,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),la tour des rois,,,3500,3500,OK,Payé le 21/04/2026,0
-2026-01-19,B01,B01,B0102,3000,AGR,Mme Dongmo thérèse,SCOOPSEMA (Mme DONGMO Thérèse),moelleux aux champignons,,,3500,3500,OK,Payé le 21/04/2026,0
-2026-01-19,,,,,,SOLISTA,,Chips plantain,,,200,200,OK,Payé le 25/02/2026,0
-2026-01-20,B07,B07,B0702,14000,SCU,mouliom ibrahim,MOULIOUM IBRAHIM,masques,,,30000,30000,OK,Payé le 27/01/2026,0
-2026-01-20,B07,B07,B0701,3000,SCU,Stéphane SONWA,SONWA KUETE Aimé Stéphane,chaine en perles,,,1000,1000,OK,Payé le 04/05/2026,0
-2026-01-20,B04,B04,B0401,12000,,FAFE,FAFE,chips de mais,,,500,500,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-20,,,,,,SOLISTA,,chips plantain,,,300,300,OK,Payé le 25/02/2026,0
-2026-01-20,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquettes,,,100,100,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-20,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),boucles d'oreilles,,,1500,1500,OK,Payé le 28/01/2026,0
-2026-01-20,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,porte clés,,,4000,4000,OK,Payé le 21/10/2025,0
-2026-01-20,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Louche en paquet,,,6000,6000,OK,Payé le 21/10/2025,0
-2026-01-20,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,louche simple,,,2500,2500,OK,Payé le 21/10/2025,0
-2026-01-20,B04,B04,B0401,12000,,FAFE,FAFE,caramel cacao,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-20,B12,B12,B1203,2000,VAN,Mintchougom Sidonie,MINTCHOUGOM SIDONIE,plateaux en fibre raphia,,,3000,3000,OK,Payé le 25/03/2026,0
-2026-01-20,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),collier en bambou de chine,,,1500,1500,OK,Payé le 28/01/2026,0
-2026-01-20,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelet,,,300,300,OK,Payé le 28/01/2026,0
-2026-01-20,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Cameroun sculpté,,,5000,5000,OK,Payé le 21/10/2025,0
-2026-01-21,B04,B04,B0401,12000,,FAFE,FAFE,sirop multi usage,,,2000,2000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-21,B04,B04,B0401,12000,,FAFE,FAFE,chips de mais,,,1100,1100,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-21,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,charbon végetal,,,1500,1500,OK,,1500
-2026-01-21,B01,B01,B0106,2000,AGR,Mme Solange MANGUE,MAMCHE KADJE Rosette Solange,café rapha,,,3000,3000,OK,,3000
-2026-01-21,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,lave vitre,,,1500,1500,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-21,,,,,,SOLISTA,,savon liquide,,,900,900,OK,Payé le 25/02/2026,0
-2026-01-22,B04,B04,B0401,12000,,FAFE,FAFE,Caramel de cacao,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-22,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Man power,,,4000,4000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-01-22,B04,B04,B0401,12000,,FAFE,FAFE,vinaigre blanc,,,400,400,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-22,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,eau de javel,,,700,700,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-23,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou 850kg,,,9000,9000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-23,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou 650Kg,,,2000,2000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-23,B01,B01,B0103,3000,AGR,Nguekam philippe,GUEKAM Phillipe,Vin de bita cola,,,2500,2500,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-23,,,,,,SOLISTA,,eau de javel 5l,,,2500,2500,OK,Payé le 25/02/2026,0
-2026-01-23,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquette,,,200,200,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-26,B04,B04,B0401,12000,,FAFE,FAFE,Chips de mais,,,500,500,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-26,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte clés bambou de chine,,,250,250,OK,Payé le 28/01/2026,0
-2026-01-26,,,,,,madi cosmétique,,Menthol,,,500,500,OK,Payé le 04/03/2026,0
-2026-01-26,,,,,,SOLISTA,,Baume lèvres,,,500,500,OK,Payé le 25/02/2026,0
-2026-01-26,,,,,,SOLISTA,,Baume lèvres,,,100,100,OK,Payé le 25/02/2026,0
-2026-01-27,,,,,,VARBamenda,,Miel brun,,,6000,6000,OK,Payé le 31/03/2026 au Coordonnateur,0
-2026-01-27,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquettes,,,400,400,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-01-27,B04,B04,B0401,12000,,FAFE,FAFE,Chips de mais,,,500,500,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-27,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Louche,,,2000,2000,OK,Payé le 24/02/2026,0
-2026-01-27,B04,B04,B0401,12000,,FAFE,FAFE,Chips de maîs,,,1000,1000,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-01-27,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Babouche,,,1800,1800,OK,,1800
-2026-02-02,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon 5l,,,8000,8000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-02,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon 1l,,,1000,1000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-02,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,savon 1/2l,,,500,500,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-02,,,,,,SOLISTA,,eau de javel 5l,,,2500,2500,OK,Payé le 25/02/2026,0
-2026-02-02,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,1200,1200,OK,Payé le 01/04/2026,0
-2026-02-02,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Stylos,,,600,600,OK,Payé le 01/04/2026,0
-2026-02-02,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,Payé le 25/03/2026,0
-2026-02-02,,,,,,SOLISTA,,Crème éclaicissante,,,1000,1000,OK,Payé le 25/02/2026,0
-2026-02-02,,,,,,Ngassam Olivier,,Sirop africain,,,500,500,OK,Payé le 23/03/2026,0
-2026-02-02,,,,,,Mme Justina,,tableau décoration,,,12000,12000,OK,,12000
-2026-02-06,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Vinaigre,,,150,150,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-06,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquette,,,300,300,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-06,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,500,500,OK,Payé le 25/03/2026,0
-2026-02-06,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,miel bangou,,,3000,3000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-06,,,,,,SOLISTA,,chips plantain,,,100,100,OK,Payé le 25/02/2026,0
-2026-02-06,B04,B04,B0401,12000,,FAFE,FAFE,chips mais,,,500,500,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-02-09,B01,B01,B0103,3000,AGR,Nguekam philippe,GUEKAM Phillipe,Vins de cola,,,7500,7500,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-10,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Boucles et bracelets,,,2900,2900,OK,Payé le 01/04/2026,0
-2026-02-10,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,anti poison,,,2000,2000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-02-10,,,,,,madi cosmétique,,savon noir,,,2500,2500,OK,Payé le 04/03/2026,0
-2026-02-10,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,bagues et chaines en perles,,,4400,4400,OK,,4400
-2026-02-10,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre,,,150,150,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-10,B04,B04,B0401,12000,,FAFE,FAFE,chips de maîs,,,300,300,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-02-10,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,babouche et sac à main,,,12000,12000,OK,Payé le 24/02/2026,0
-2026-02-10,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,Divers articles,,,107000,107000,OK,Payé le 12/02/2026,0
-2026-02-10,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Cure desintoxication,,,4000,4000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-02-17,,,,,,SOLISTA,,chips plantain,,,200,200,OK,Payé le 25/02/2026,0
-2026-02-17,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquettes,,,200,200,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-12,B12,B12,B1203,2000,VAN,Mintchougom Sidonie,MINTCHOUGOM SIDONIE,Pannier,,,3000,3000,OK,Payé le 25/03/2026,0
-2026-02-19,,,,,,SOLISTA,,Brillant à lèvres,,,300,300,OK,Payé le 25/02/2026,0
-2026-02-19,,,,,,Ngassam Olivier,,Vita tea bio,,,1500,1500,OK,Payé le 23/03/2026,0
-2026-02-19,B04,B04,B0401,12000,,FAFE,FAFE,chips de mais,,,100,100,OK,Payé le 19/02/2026 à Mme GUESSONG,0
-2026-02-19,B02,B02,B0204,3000,MED,Bassie Mofo Julius,BASSIE MOFO Julius,beurre de karité,,,500,500,OK,,500
-2026-02-23,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Cure toux et rhume,,,2000,2000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-02-23,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquettes,,,1000,1000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-24,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Charbon végétal,,,1500,1500,OK,,1500
-2026-02-24,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Eau de javel,,,2800,2800,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-24,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Eau de javel,,,700,700,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-02-26,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,Huile de neem,,,2000,2000,OK,Payé le 01/04/2026,0
-2026-02-26,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,Huile de coco,,,2000,2000,OK,Payé le 01/04/2026,0
-2026-02-26,,,,,,SOLISTA,,Chips plantain,,,1500,1500,OK,Payé le 04/05/2026 par MoMo,0
-2026-02-26,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,1000,1000,OK,Payé le 25/03/2026,0
-2026-03-02,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),"Damier, Collier et tableau avec message",,,10000,10000,OK,Payé le 01/04/2026,0
-2026-03-03,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelet,,,300,300,OK,Payé le 01/04/2026,0
-2026-03-03,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),collier,,,1500,1500,OK,Payé le 01/04/2026,0
-2026-03-03,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel de bangou,,,10000,10000,OK,Payé le 05/03/2026 à Mme Guessong,0
-2026-03-03,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,vin d'avocat,,,3500,3500,OK,Payé le 21/05/2026 à Mme GUESSONG,0
-2026-03-09,,,,,,Ngassam Olivier,,Sirop africain,,,1500,1500,OK,Payé le 23/03/2026,0
-2026-03-09,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Bague en perles,,,200,200,OK,,200
-2026-03-09,,,,,,titi bio,,Curcuma,,,1000,1000,OK,Payé le 01/06/2026,0
-2026-03-09,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquettes,,,400,400,OK,,400
-2026-03-12,B04,B04,B0401,12000,,FAFE,FAFE,Chips de maïs,,,500,500,OK,,500
-2026-03-13,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquettes,,,200,200,OK,,200
-2026-03-13,,,,,,SOLISTA,,Chips plantain,,,1000,1000,OK,Payé le 04/05/2026 par MoMo,0
-2026-03-13,B04,B04,B0401,12000,,FAFE,FAFE,chips mais,,,500,500,OK,,500
-2026-03-16,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Cure désintoxication,,,2000,2000,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-03-16,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,Biscuit manioc,,,500,500,OK,Payé le 25/03/2026,0
-2026-03-16,B03,B03,B0301,3000,AGR,Guy Marcel(Guessong),NJEUYIM TOUOMO Guy Marcel,Propolis,,,2500,2500,OK,Payé le 06/04/2026 à Mme GUESSONG,0
-2026-03-16,,,,,,Ngassam Olivier,,Sirop africain,,,2500,2500,OK,Payé le 23/03/2026,0
-2026-03-16,B01,B01,B0101,3000,AGR,Jonas,MOUTAPMBEME JONAS,Vin d'ail,,,6500,6500,OK,Payé le 30/03/2026,0
-2026-03-16,,,,,,Ngassam Olivier,,Sirop africain,,,2000,2000,OK,Payé le 23/03/2026,0
-2026-03-16,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Table sculptée,,,80000,80000,OK,Payé le 17/03/2026,0
-2026-03-17,,,,,,VARBamenda,,Miel brun,,,3000,3000,OK,Payé le 31/03/2026 au Coordonnateur,0
-2026-03-23,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel 650g,,,2000,2000,OK,,2000
-2026-03-23,,,,,,Ets SAYA désiré,,Chips manioc,,,500,500,OK,Payé le 10/04/2026 à Mme Guessong,0
-2026-03-23,,,,,,SOLISTA,,chips plantain,,,300,300,OK,Payé le 04/05/2026 par MoMo,0
-2026-03-26,B02,B02,B0201,3000,MED,Djoko Pokam Alex,DJOKO POKAM ALEX,Produit dents,,,2000,2000,OK,,2000
-2026-03-26,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,Panniers en paille,,,3000,3000,OK,,3000
-2026-03-26,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,chapeau en paille,,,4000,4000,OK,,4000
-2026-03-26,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,plateau en bois,,,10000,10000,OK,Payé le 30/03/2026,0
-2026-03-26,,,,,,VARBamenda,,miel blanc,,,20000,20000,OK,Payé le 31/03/2026 au Coordonnateur,0
-2026-03-30,B04,B04,B0401,12000,,FAFE,FAFE,Whisky de cacao,,,5000,5000,OK,,5000
-2026-03-30,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquettes,,,200,200,OK,,200
-2026-03-30,,,,,,Mme Justina,,tableau décoration,,,10000,10000,OK,,10000
-2026-03-31,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Eau de javel,,,2500,2500,OK,,2500
-2026-04-02,B06,B06,B0601,3000,AGR,Ngassam crousti,NGASSAM Bernadette,biscuit de manioc,,,1000,1000,OK,Payé le 18/05/2026,0
-2026-04-02,,,,,,SOLISTA,,Chips de plantain,,,300,300,OK,Payé le 04/05/2026 par MoMo,0
-2026-04-02,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,croquettes,,,200,200,OK,,200
-2026-04-06,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Horloge personnalisé,,,50000,50000,OK,Payé le 06/04/2026,0
-2026-04-07,B06,B06,B0603,3000,COS,floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Croquettes,,,400,400,OK,,400
-2026-04-10,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos et stylos,,,900,900,OK,,900
-2026-04-13,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,Vin d'avaocat,,,3500,3500,OK,Payé le 21/05/2026 à Mme GUESSONG,0
-2026-04-13,,,,,,KEMTA,,Vin thérapeutique,,,2500,2500,OK,,2500
-2026-04-13,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,1000,1000,OK,,1000
-2026-04-14,,,,,,titi bio,,Thé de gingembre,,,5000,5000,OK,Payé le 01/06/2026,0
-2026-04-15,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,Savons hybiscus,,,3000,3000,OK,,3000
-2026-04-15,,,,,,SOLISTA,,baume solista,,,500,500,OK,Payé le 04/05/2026 par MoMo,0
-2026-04-15,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),chaine en bambou de chnie,,,500,500,OK,,500
-2026-04-15,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Colier en perles,,,1500,1500,OK,,1500
-2026-04-16,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,beurre de karité,,,1000,1000,OK,,1000
-2026-04-16,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Boucles,,,500,500,OK,,500
-2026-04-16,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Boucles en fil,,,500,500,OK,,500
-2026-04-20,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Ginger tea,,,2000,2000,OK,,2000
-2026-04-20,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Stomach easer,,,2000,2000,OK,,2000
-2026-04-20,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Bagues en perles,,,1000,1000,OK,,1000
-2026-04-20,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,Colier en perles,,,1500,1500,OK,,1500
-2026-04-20,B12,B12,B1204,2000,,Mika perles ( T Fideline),YEMGANG NANDJE Fideline,boucles en perles,,,1000,1000,OK,,1000
-2026-04-27,B04,B04,B0401,12000,,FAFE,FAFE,Whisky de cacao,,,5000,5000,OK,,5000
-2026-04-27,B02,B02,B0202,3000,MED,TSANMAT,TSANMAT,Cure minceur,,,2000,2000,OK,,2000
-2026-04-27,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,Savon liquide,,,1000,1000,OK,,1000
-2026-04-27,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,vin de raphia,,,1000,1000,OK,Payé le 21/05/2026 à Mme GUESSONG,0
-2026-05-07,B06,B06,B0603,3000,COS,Floralis,GAPIAPSI KUISSU Edwige - Ets Floralis,vinaigre blanc,,,150,150,OK,,150
-2026-05-07,,,,,,VARBamenda,,Miel brun,,,3000,3000,OK,,3000
-2026-05-04,,,,,,Mme Justina,,tableau décoration,,,12000,12000,OK,,12000
-2026-05-07,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Stylos en bambou de chine,,,500,500,OK,,500
-2026-05-07,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),bracelets en bambou de chine,,,1000,1000,OK,,1000
-2026-05-07,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte clés bambou de chine,,,500,500,OK,,500
-2026-05-07,,,,,,Mme Justina,,tableau décoration,,,13000,13000,OK,,13000
-2026-05-10,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,cacalight,,,1000,1000,OK,,1000
-2026-05-10,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou,,,3000,3000,OK,,3000
-2026-05-11,B12,B12,B1201,2000,CUI,Yonka Marcel,NSO YONKA   -   Shoe Factory,Chaussure,,,9000,9000,OK,Payé le 21/05/2026 à Mme GUESSONG,0
-2026-05-11,B06,B06,B0602,2000,COS,Nokam dorine,MAFODJUI NOKAM Dorine,savon hibiscus,,,1000,1000,OK,,1000
-2026-05-13,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Miel bangou,,,2000,2000,OK,,2000
-2026-05-25,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Bracelets Ndop,,,2000,2000,OK,Payé le 25/05/2026,0
-2026-05-25,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,barette ndop,,,2000,2000,OK,Payé le 25/05/2026,0
-2026-05-25,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,chapeaux,,,10000,10000,OK,Payé le 25/05/2026,0
-2026-05-25,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,paire babouche,,,6000,6000,OK,Payé le 25/05/2026,0
-2026-05-25,B11,B11,B1101,14000,,Mambou claude,MAMBOU Claude,Eventails,,,10000,10000,OK,,10000
-2026-05-25,B12,B12,B1203,2000,VAN,Mme Sidonie,MINTCHOUGOM SIDONIE,Collier,,,1000,1000,OK,,1000
-2026-05-25,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Bracelet bambou de chine,,,300,300,OK,,300
-2026-05-25,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Boucles,,,700,700,OK,,700
-2026-05-25,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Boucles,,,1500,1500,OK,,1500
-2026-05-25,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),collier,,,6000,6000,OK,,6000
-2026-05-25,,,,,,Mme Justina,,Tableau décoration,,,10000,10000,OK,,12000
-2026-05-29,B04,B04,B0401,12000,,FAFE,FAFE,Whisky de cacao,,,2000,2000,OK,,2000
-2026-05-29,B04,B04,B0401,12000,,FAFE,FAFE,whisky de bita cola,,,3000,3000,OK,,3000
-2026-05-29,B01,B01,B0105,2000,AGR,Mme Mboulé,MBOULE Simone,vin de raphia,,,2000,2000,OK,,2000
-2026-05-29,B04,B04,B0401,12000,,FAFE,FAFE,chips de mais,,,100,100,OK,,100
-2026-05-29,B03,B03,B0301,3000,AGR,Guy Marcel,NJEUYIM TOUOMO Guy Marcel,Bougie,,,1500,1500,OK,,1500
-2026-05-29,,,,,,titi bio,,Poudre de gingembre,,,1500,1500,OK,,1500
-2026-06-01,B09,B09,B0901,3000,MEN,MBIAKOP,Bambou House (MBIAKOP Roland),Porte stylos,,,1400,1400,OK,,1400
-2026-06-03,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Petit plateau en cœur,,,7000,7000,OK,,7000
-2026-06-03,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Plateau figure Cameroun,,,4500,4500,OK,,4500
-2026-06-03,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Plateau figure Afrique,,,4500,4500,OK,,4500
-2026-06-03,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,sac en bandoulière,,,4000,4000,OK,,4000
-2026-06-03,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,sac ndop en bandoulière,,,5000,5000,OK,,5000
-2026-06-03,B08,B08,B0801,6000,SCU,Chinda sokoudjou,CHINDA SOKOUDJOU Franck Yanick,Sac dame en pochette,,,12000,12000,OK,,12000
-2026-06-03,,,,,,Mme Justina,,Grand tableau déco,,,12000,12000,OK,,12000
-2026-06-03,,,,,,Mme Justina,,Petit tableau déco,,,12000,12000,OK,,12000
+ligne_source;date;date_lue;designation;montant;artisan;type_artisanat;observation;reste_a_payer
+4;2024-05-01;oui;biscuit;500;Ngassam Crousti;500;2025-06-26 00:00:00;0
+5;2024-07-01;oui;miel Nord ouest;3000;Hall;3000;Artisan inconnu;3000
+6;2024-08-01;oui;farine patate;1500;Ngassam Crousti;;2025-06-26 00:00:00;0
+7;2024-08-01;non;chemise;10000;Chic décor;;20/06/2025 RNF;0
+8;2024-08-01;non;farine patate;1500;Ngassam Crousti;;2025-06-26 00:00:00;0
+9;2024-08-01;non;bandeau;1000;TCHOMTCHOUA LELE Fadimatou;;;1000
+10;2024-08-01;non;porteclé en bois;1500;chic décor;;20/06/2025 RNF;0
+11;2024-08-01;non;bracelet;500;chic décor;;20/06/2025 RNF;0
+12;2024-08-01;non;bracelet;1000;Stéphane SONWA;;2025-06-24 00:00:00;0
+14;2024-09-01;oui;ouvre bière;5000;chic décor;;20/06/2025 RNF;0
+15;2024-09-01;non;thé camomille;2000;osplame salle innovation;;Payé le 26/12/2025;0
+17;2024-10-01;oui;anti poison;2000;Kondzou Thomas;;16/07/2025 RNF;0
+19;2024-11-01;oui;charbon végétal;1500;Djoko pokam alex;;Payé le 28/08/2025;0
+20;2024-11-01;non;chaussure;15000;shoes factory;;Payé le 30/07/2025 Mme Guessong RNF;0
+22;2024-12-01;oui;beurre de karité;1000;Nokam dorine;;Payé le 01/04/2026;0
+23;2024-12-01;non;ginseng;1000;Kondzou Thomas;;16/07/2025 RNF;0
+25;2025-01-01;oui;sac en paille;1000;Mintchougom Sidonie;;17/06/2025 RNF;0
+26;2025-01-01;non;chapeau en paille;1000;Mintchougom Sidonie;;17/06/2025 RNF;0
+27;2025-01-01;non;babouche;3000;Mme Sidonie;;2025-06-26 00:00:00;0
+28;2025-01-01;non;bracelet;600;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+29;2025-01-01;non;bracelet;2000;Stéphane SONWA;;2025-06-24 00:00:00;0
+30;2025-01-01;non;collier perle;9000;chic décor;;20/06/2025 RNF;0
+31;2025-01-01;non;anti,,,;1000;djoko pokam alex;;Payé le 28/08/2025;0
+32;2025-01-01;non;médicament;1500;Kondzou Thomas;;16/07/2025 RNF;0
+34;2025-02-01;oui;beurre karité;1000;Nokam dorine;;Payé le 01/04/2026;0
+35;2025-02-01;non;charbon active;1500;djoko pokam alex;;Payé le 28/08/2025;0
+36;2025-02-01;non;tableau;40000;chic décor;;20/06/2025 RNF;0
+37;2025-02-01;non;chapeau;4000;mambou claude;;20/06/2025 RNF;0
+38;2025-02-01;non;détergent sachet;500;madi cosmétique;;ok 19/06/2025;0
+39;2025-02-01;non;lave vitre;1500;madi cosmétique;;ok 19/06/2025;0
+40;2025-02-01;non;détergent;500;madi cosmétique;;ok 19/06/2025;0
+41;2025-02-01;non;savon noir;5000;madi cosmétique;;ok 19/06/2025;0
+42;2025-02-01;non;césame;1000;Mme Tchanou;;Payé le 15/07/2025;0
+43;2025-02-01;non;ginseng;1000;Mme Tchanou;;Payé le 15/07/2025;0
+44;2025-02-01;non;détergent;500;madi cosmétique;;ok 19/06/2025;0
+46;2025-03-01;oui;savon hibiscus;1000;Nokam dorine;;Payé le 01/04/2026;0
+47;2025-03-01;non;détergent;1000;madi cosmétique;;ok 19/06/2025;0
+48;2025-03-01;non;collier ndop;9000;mme djoko;;20/06/2025 RNF;0
+49;2025-03-01;non;queue cheval;5000;chic décor;;20/06/2025 RNF;0
+50;2025-03-01;non;sac;3000;Mme Sidonie;;2025-06-26 00:00:00;0
+51;2025-03-01;non;chapeau fil;3000;mme djoko;;20/06/2025 RNF;0
+52;2025-03-01;non;menthol;500;madi cosmétique;;ok 19/06/2025;0
+53;2025-03-01;non;lave vitre;1500;floralis;;Payé le22/07/2025;0
+54;2025-03-01;non;croquette;200;floralis;;Payé le22/07/2025;0
+55;2025-03-01;non;détergent;500;madi cosmétique;;ok 19/06/2025;0
+56;2025-03-01;non;savon noir;1000;madi cosmétique;;ok 19/06/2025;0
+57;2025-03-01;non;croquette;500;floralis;;Payé le22/07/2025;0
+59;2025-04-01;oui;menthol;500;madi cosmétique;;ok 19/06/2025;0
+60;2025-04-01;non;croquette;1500;floralis;;Payé le22/07/2025;0
+61;2025-04-01;non;savon noir;2000;madi cosmétique;;ok 19/06/2025;0
+62;2025-04-01;non;bracelet;250;Mika perles ( T Fideline);;Payé le 31/07/2025;0
+63;2025-04-01;non;croquette;2200;floralis;;Payé le22/07/2025;0
+64;2025-04-01;non;croquette;1500;floralis;;Payé le22/07/2025;0
+65;2025-04-01;non;croquette;1900;floralis;;Payé le22/07/2025;0
+66;2025-04-01;non;détergent;500;madi cosmétique;;ok 19/06/2025;0
+67;2025-04-01;non;vinaigre;450;floralis;;Payé le22/07/2025;0
+68;2025-04-01;non;croquette;3400;floralis;;Payé le22/07/2025;0
+69;2025-04-01;non;savon hibiscus;1000;Nokam dorine;;Payé le 01/04/2026;0
+70;2025-04-01;non;gingembre;1000;Mme Tchanou;;Payé le 15/07/2025;0
+71;2025-04-01;non;Eventail;8000;Mambou claude;;20/06/2025 RNF;0
+72;2025-04-01;non;croquette;600;Floralis;;Payé le22/07/2025;0
+73;2025-04-01;non;savon liquide;500;floralis;;Payé le22/07/2025;0
+74;2025-04-01;non;savon noir;1000;madi cosmétique;;ok 19/06/2025;0
+75;2025-04-01;non;barette;500;Mika perles ( T Fideline);;Payé le 31/07/2025;0
+76;2025-04-01;non;pygeum;3000;Mme Tchanou;;Payé le 15/07/2025;0
+77;2025-04-01;non;savon noir;2000;madi cosmétique;;ok 19/06/2025;0
+79;2025-05-01;oui;croquette;9000;floralis;;Payé le22/07/2025;0
+80;2025-05-01;non;vinaigre;300;floralis;;Payé le22/07/2025;0
+81;2025-05-01;non;épice titi bio;500;titi bio;;Payé le 06/03/2026;0
+82;2025-05-01;non;biscuit de manioc;500;ngassam crousti;;2025-06-26 00:00:00;0
+83;2025-05-01;non;biscuit de patate;500;ngassam crousti;;2025-06-26 00:00:00;0
+84;2025-05-01;non;eau de javel;350;floralis;;Payé le22/07/2025;0
+85;2025-05-01;non;chapeau;2500;Mme Sidonie;;2025-06-26 00:00:00;0
+86;2025-05-01;non;savon liquide;500;floralis;;Payé le22/07/2025;0
+87;2025-05-01;non;biscuit patate;500;ngassam crousti;;2025-06-26 00:00:00;0
+88;2025-05-01;non;artémisia;4000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+89;2025-05-01;non;curcuma;1500;djoko pokam alex;;Payé le 28/08/2025;0
+90;2025-05-01;non;charbon active;1500;djoko pokam alex;;Payé le 28/08/2025;0
+91;2025-05-01;non;curcuma;500;titi bio;;Payé le 06/03/2026;0
+92;2025-05-01;non;biscuit patate;1000;ngassam crousti;;2025-06-26 00:00:00;0
+93;2025-05-01;non;chapeau;5000;Mme Sidonie;;2025-06-26 00:00:00;0
+94;2025-05-01;non;chaussure;10000;Mme Sidonie;;2025-06-26 00:00:00;0
+95;2025-05-01;non;charbon active;1500;djoko pokam alex;;Payé le 28/08/2025;0
+96;2025-05-01;non;masque;15000;Mouliom;;Payé le 17/07/2025;0
+97;2025-05-01;non;barette;1500;Mika perles ( T Fideline);;Payé le 31/07/2025;0
+98;2025-05-01;non;bague;500;Mika perles ( T Fideline);;Payé le 31/07/2025;0
+99;2025-05-01;non;chapeau;4000;Mme Sidonie;;2025-06-26 00:00:00;0
+100;2025-05-01;non;collier;10000;chic décor;;20/06/2025 RNF;0
+101;2025-05-01;non;chapeau;5000;Mme Sidonie;;2025-06-26 00:00:00;0
+102;2025-05-01;non;vinaigre;450;floralis;;Payé le22/07/2025;0
+103;2025-05-01;non;eau de javel;350;floralis;;Payé le22/07/2025;0
+104;2025-05-01;non;cloche + porte bougie;10000;chic décor;;20/06/2025 RNF;0
+106;2025-06-01;oui;vinaigre;300;madi cosmétique;;ok 19/06/2025;0
+107;2025-06-01;non;whiscky sachet;1000;nguekam philippe;;23/06/25 par Mme GUESSONG;0
+108;2025-06-01;non;biscuit de manioc;500;ngassam crousti;;2025-06-26 00:00:00;0
+109;2025-06-01;non;vinaigre;300;floralis;;Payé le22/07/2025;0
+110;2025-06-01;non;menthol;500;madi cosmétique;;ok 19/06/2025;0
+111;2025-06-01;non;menthol;500;madi cosmétique;;ok 19/06/2025;0
+112;2025-06-01;non;croquette;2900;floralis;;Payé le22/07/2025;0
+113;2025-06-01;non;croquette;300;floralis;;Payé le22/07/2025;0
+114;2025-06-01;non;pannier;9000;Mme Sidonie;;2025-06-26 00:00:00;0
+115;2025-06-01;non;boubou;10000;Mme Sidonie;;2025-06-26 00:00:00;0
+116;2025-06-01;non;biscuit de manioc;500;ngassam crousti;;2025-06-26 00:00:00;0
+117;2025-06-01;non;collier + boucle;2500;chic décor;;20/06/2025 RNF;0
+118;2025-06-01;non;bracelet;2000;chic décor;;20/06/2025 RNF;0
+119;2025-06-01;non;savon liquide;4000;floralis;;Payé le22/07/2025;0
+120;2025-06-01;non;écharpe en perles;5000;Mika perles ( T Fideline);;Payé le 31/07/2025;0
+121;2025-06-01;non;croquette;1000;floralis;;Payé le22/07/2025;0
+122;2025-06-01;non;menthol;500;madi cosmétique;;ok 19/06/2025;0
+123;2025-06-01;non;vin de bita cola;5000;nguekam philippe;;23/06/25 par Mme GUESSONG;0
+124;2025-06-01;non;songo;9000;Mme Sidonie;;2025-06-26 00:00:00;0
+125;2025-06-01;non;biscuit de manioc;500;ngassam crousti;;2025-06-26 00:00:00;0
+126;2025-06-01;non;gingembre;500;titi bio;;Payé le 06/03/2026;0
+128;2025-06-16;oui;Spécial baume;2000;Mme Tchanou;;Payé le 15/07/2025;0
+129;2025-06-16;oui;croquette;300;Floralis;;Payé le22/07/2025;0
+130;2025-06-16;oui;Eau de javel;2500;floralis;;Payé le22/07/2025;0
+131;2025-06-19;oui;Huile de coco;2000;ngassam crousti;;2025-06-26 00:00:00;0
+132;2025-06-19;oui;croquette;500;floralis;;Payé le22/07/2025;0
+133;2025-06-19;oui;cure typhoide;2000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+134;2025-06-19;oui;biscuit de manioc;500;Ngassam crousti;;2025-06-26 00:00:00;0
+135;2025-06-19;oui;croquette;1800;floralis;;Payé le22/07/2025;0
+136;2025-06-24;oui;savon;1000;madi cosmétique;;Payé le 16/01/2026;0
+137;2025-06-24;oui;croquette;700;floralis;;Payé le22/07/2025;0
+138;2025-06-24;oui;tableau de décoration;24000;Mme Justina;;Payé le 30/07/2025;0
+139;2025-06-26;oui;croquette;500;floralis;;Payé le22/07/2025;0
+140;2025-06-26;oui;Jus de fruit;16000;Mme Dongmo thérèse;;Payé le 21/07/2025;0
+141;2025-06-27;oui;savon hibiscus;1000;Nokam dorine;;Payé le 01/04/2026;0
+142;2025-06-27;oui;whiscky sachet;1000;nguekam philippe;;10/07/2025 par Mme Guessong;0
+143;2025-06-27;oui;croquette;300;floralis;;Payé le22/07/2025;0
+144;2025-06-27;oui;Miel bangou;2500;Guy Marcel;;le 17/07/2025 par Mme Guessong;0
+145;2025-06-27;oui;Vin de djindja;3000;Jonas;;Payé le 25/08/2025;0
+146;2025-06-27;oui;croquette;1500;floralis;;Payé le22/07/2025;0
+147;2025-06-30;oui;croquette;2500;floralis;65600;Payé le22/07/2025;0
+148;2025-07-02;oui;vin bita cola;5000;nguekam philippe;;10/07/2025 par Mme Guessong;0
+149;2025-07-02;oui;biscuit de manioc;500;ngassam crousti;;2025-07-23 00:00:00;0
+150;2025-07-03;oui;vin bita cola;35000;nguekam philippe;;10/07/2025 par Mme Guessong;0
+151;2025-07-07;oui;miel;10000;Guy Marcel;;le 17/07/2025 par Mme Guessong;0
+152;2025-07-07;oui;Bol en bois;22000;Chinda sokoudjou;;Payé le 02/07/2025;0
+153;2025-07-08;oui;vin bita cola;2500;nguekam philippe;;17/07/2025 par Mme Guessong;0
+154;2025-07-08;oui;vinaigre;300;floralis;;Payé le22/07/2025;0
+155;2025-07-08;oui;croquette;700;floralis;;Payé le22/07/2025;0
+156;2025-07-08;oui;Jus de fruit;3000;Mme Dongmo thérèse;;Payé le 21/07/2025;0
+157;2025-07-10;oui;biscuits;1500;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+158;2025-07-10;oui;Miel bangou;10000;Guy Marcel;;le 17/07/2025 par Mme Guessong;0
+159;2025-07-11;oui;croquette;500;floralis;;Payé le22/07/2025;0
+160;2025-07-14;oui;menthol;500;madi cosmétique;;Payé le 16/01/2026;0
+161;2025-07-14;oui;croquette;500;floralis;;Payé le22/07/2025;0
+162;2025-07-14;oui;masque;5000;Stéphane SONWA;;Payé le 18/07/2025;0
+163;2025-07-14;oui;objet en bois;7500;Chinda sokoudjou;;Payé le 17/07/2025;0
+164;2025-07-14;oui;statuette en bois;9000;Stéphane SONWA;;Payé le 18/07/2025;0
+165;2025-07-14;oui;Cookies manioc;200;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+166;2025-07-14;oui;vin bita cola;2500;nguekam philippe;;17/07/2025 par Mme Guessong;0
+167;2025-07-14;oui;croquette;500;floralis;;Payé le22/07/2025;0
+168;2025-07-15;oui;Cookies manioc, biscuit, choco;3700;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+169;2025-07-15;oui;croquette;200;floralis;120600;Payé le22/07/2025;0
+170;2025-07-16;oui;croquette;500;floralis;;Payé le22/07/2025;0
+171;2025-07-16;oui;masque;12000;Mouliom;12500;Payé le 17/07/2025;0
+172;2025-07-17;oui;Croquette;1300;Floralis;;Payé le22/07/2025;0
+173;2025-07-17;oui;Cookies de manioc;200;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+174;2025-07-17;oui;Miel;3000;VARBamenda;;Payé le 20/10/2025 au Coordonnateur;0
+175;2025-07-17;oui;Vin thérapeutique;2500;KEMTA;;Payé le 29/07/2025 Mme Guessong;0
+176;2025-07-18;oui;Vin thérapeutique;2500;KEMTA;;Payé le 29/07/2025 Mme Guessong;0
+177;2025-07-18;oui;Cookies de manioc;400;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+178;2025-07-18;oui;croquette;200;floralis;;Payé le22/07/2025;0
+179;2025-07-18;oui;Pot;5000;Mme Sidonie;;Payé le 09/10/2025;0
+180;2025-07-18;oui;Tige de fleur;1750;Mme Sidonie;;Payé le 09/10/2025;0
+181;2025-07-18;oui;Jus de fruit;1000;Mme Dongmo thérèse;;Payé le 21/07/2025;0
+182;2025-07-18;oui;croquette;800;floralis;;Payé le22/07/2025;0
+183;2025-07-21;oui;charbon végétal;1500;Djoko Pokam Alex;;Payé le 28/08/2025;0
+184;2025-07-21;oui;Jus naturel;500;Mme Dongmo thérèse;;Payé le 21/10/2025;0
+185;2025-07-21;oui;eau de javel;700;floralis;;Payé le 04/09/2025;0
+186;2025-07-21;oui;Savon et détergent;1500;madi cosmétique;;Payé le 16/01/2026;0
+187;2025-07-21;oui;Vin;3500;Mme Dongmo thérèse;;Payé le 21/10/2025;0
+188;2025-07-21;oui;Tableau de décoration;12000;Mme Justina;;Payé le 30/07/2025;0
+189;2025-07-22;oui;Porte clé;1000;Chinda sokoudjou;;Payé le 18/09/2025;0
+190;2025-07-22;oui;croquette;1200;floralis;;Payé le 04/09/2025;0
+191;2025-07-23;oui;Chips de manioc;1000;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+192;2025-07-23;oui;vinaigre;600;madi cosmétique;;Payé le 16/01/2026;0
+193;2025-07-25;oui;savon hibiscus;1000;Nokam dorine;;Payé le 01/04/2026;0
+194;2025-07-25;oui;café rapha;3500;Mme Solange MANGUE;;Payé le 20/10/2025 à Mme Guessong;0
+195;2025-07-26;oui;biscuit de manioc;500;ngassam crousti;;2025-07-28 00:00:00;0
+196;2025-07-26;oui;Jus de fruit;500;Mme Dongmo thérèse;;Payé le 21/10/2025;0
+197;2025-07-26;oui;poudre d'ail;1000;Jonas;;Payé le 25/08/2025;0
+198;2025-07-26;oui;croquette;500;floralis;;Payé le 04/09/2025;0
+199;2025-07-26;oui;Vin thérapeutique;3000;KEMTA;;Payé le 29/07/2025 Mme Guessong;0
+200;2025-07-26;oui;biscuit de manioc;200;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+201;2025-07-26;oui;tableau décoration;10000;Mme Justina;;Payé le 30/07/2025;0
+202;2025-07-28;oui;Antigastrique;1000;Djoko Pokam Alex;;Payé le 28/08/2025;0
+203;2025-07-28;oui;Gingembre;500;titi bio;;Payé le 06/03/2026;0
+204;2025-07-28;oui;Rhumargo;1000;Mme Tchanou;;Payé le 15/07/2025;0
+205;2025-07-28;oui;Thé;2000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+206;2025-07-28;oui;Produit;2000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+207;2025-07-28;oui;Propolis;2500;Mme GUESSONG;;Payé le 30/07/2025 à Mme Guessong;0
+208;2025-07-29;oui;croquette;1500;floralis;;Payé le 04/09/2025;0
+209;2025-07-29;oui;Man power;2000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+210;2025-07-29;oui;pygeum;2000;Mme Tchanou;;Payé le 21/11/2025;0
+211;2025-07-29;oui;croquette;500;floralis;;Payé le 04/09/2025;0
+212;2025-07-30;oui;savon liquide;1000;floralis;;Payé le 04/09/2025;0
+213;2025-07-30;oui;croquette;2700;floralis;;Payé le 04/09/2025;0
+214;2025-07-31;oui;croquette;600;floralis;;Payé le 04/09/2025;0
+215;2025-07-31;oui;vin de bita cola;2500;nguekam philippe;;Payé le 02/10/25 au fils;0
+216;2025-07-31;oui;Boucle;1000;Mika perles ( T Fideline);;Payé;0
+217;2025-07-31;oui;Porte clé;1000;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+218;2025-07-31;oui;barette;1000;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+219;2025-07-31;oui;Bracelet;1000;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+220;2025-07-31;oui;Bague;300;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+221;2025-07-31;oui;croquette;900;floralis;;Payé le 04/09/2025;0
+222;2025-07-31;oui;vin d'ail;6500;Jonas;;Payé le 25/08/2025;0
+223;2025-08-01;oui;Bijou;2000;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+224;2025-08-01;oui;sac en perle;20000;Mika perles ( T Fideline);;Payé;0
+225;2025-08-01;oui;croquette;700;Floralis;;Payé le 04/09/2025;0
+226;2025-08-04;oui;croquette;700;Floralis;;Payé le 04/09/2025;0
+227;2025-08-05;oui;croquette;1500;Floralis;;Payé le 04/09/2025;0
+228;2025-08-05;oui;Porte clé;500;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+229;2025-08-07;oui;biscuit de manioc;1000;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+230;2025-08-07;oui;biscuit de manioc;500;Ngassam crousti;;Payé le 20/11/2025;0
+231;2025-08-07;oui;vinaigre;600;floralis;;Payé le 04/09/2025;0
+232;2025-08-07;oui;huile d'avocat;1500;Mme Mboulé;;Payé le 05/09/2025;0
+233;2025-08-07;oui;miel;6000;Guy Marcel;;Payé le 03/09/2025;0
+234;2025-08-08;oui;bracelet;1200;géraldine;;Payé le 20/10/2025 à Mme Guessong;0
+235;2025-08-08;oui;boubou;18000;Mme Sidonie;;Payé le 09/10/2025;0
+236;2025-08-08;oui;colier;2000;Mme Sidonie;;Payé le 09/10/2025;0
+237;2025-08-08;oui;colier;2500;Mme Sidonie;;Payé le 09/10/2025;0
+238;2025-08-08;oui;support téléphone;300;Mme Sidonie;;Payé le 09/10/2025;0
+239;2025-08-08;oui;caisse en bambou de chine;1000;Mme Sidonie;;Payé le 09/10/2025;0
+240;2025-08-08;oui;Jus de fruit;500;Mme Dongmo thérèse;;Payé le 21/10/2025;0
+241;2025-08-08;oui;Cookies de manioc;2000;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+242;2025-08-11;oui;croquette;1100;floralis;;Payé le 04/09/2025;0
+243;2025-08-11;oui;Vin d'avocat;3500;Mme Mboulé;;Payé le 05/09/2025;0
+244;2025-08-11;oui;Miel;3000;VARBamenda;;Payé le 20/10/2025 au Coordonnateur;0
+245;2025-08-11;oui;Biscuit manioc;500;ngassam crousti;;Payé le 20/11/2025;0
+246;2025-08-11;oui;cookies de manioc;1000;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+247;2025-08-14;oui;café rapha;3500;Mme Solange MANGUE;;Payé le 20/10/2025 à Mme Guessong;0
+248;2025-08-14;oui;Vin d'avaocat;2000;Mme Mboulé;;Payé le 05/09/2025;0
+249;2025-08-26;oui;croquette;2200;floralis;;Payé le 04/09/2025;0
+250;2025-08-26;oui;biscuit de manioc;500;ngassam crousti;;Payé le 20/11/2025;0
+251;2025-08-26;oui;cookies de manioc;500;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+252;2025-08-26;oui;Miel;3000;VARBamenda;;Payé le 20/10/2025 au Coordonnateur;0
+253;2025-08-26;oui;Curcuma;500;titi bio;;Payé le 06/03/2026;0
+254;2025-08-26;oui;croquette;1000;floralis;;Payé le 04/09/2025;0
+255;2025-08-27;oui;miel;10000;Guy Marcel;;Payé le 03/09/2025;0
+256;2025-08-27;oui;Piment;1000;Guy Marcel;;Payé le 03/09/2025;0
+257;2025-08-27;oui;barette;500;Mika perles ( T Fideline);;Payé;0
+258;2025-08-27;oui;vinaigre;300;madi cosmétique;;Payé le 16/01/2026;0
+259;2025-08-27;oui;Chaise;30000;Mouliom;;Payé le 20/10/2025;0
+260;2025-08-27;oui;Tableau décoration;24000;Mme Justina;;Payé le 20/10/2025 Mme Guessong;0
+261;2025-08-27;oui;vin d'avocat;1000;Mme Mboulé;;Payé le 05/09/2025;0
+262;2025-08-27;oui;clou de giroffle;1000;Mme GUESSONG(payé le 01/09/25);;Payé le 01/09/25;0
+263;2025-08-27;oui;vin de cola;2500;nguekam philippe;;Payé le 02/10/25 au fils;0
+264;2025-08-28;oui;Cookies;2400;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+265;2025-08-28;oui;biscuit de manioc;500;ngassam crousti;;Payé le 20/11/2025;0
+266;2025-08-28;oui;croquette;400;floralis;;Payé le 04/09/2025;0
+267;2025-08-28;oui;Vin thérapeutique;2500;KEMTA;;Payé le 20/10/2025 Mme Guessong;0
+268;2025-08-28;oui;croquette;500;floralis;;Payé le 04/09/2025;0
+269;2025-08-29;oui;tableau décoration;12000;Mme Justina;;Payé le 20/10/2025 Mme Guessong;0
+270;2025-08-29;oui;vin de bita cola et cola;15000;nguekam philippe;;Payé le 02/10/25 au fils;0
+271;2025-08-29;oui;cookies;500;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+272;2025-08-30;oui;Piment;1500;Guy Marcel;;Payé le 03/09/2025;0
+273;2025-08-30;oui;Détergent liquide;1000;floralis;;Payé le 04/09/2025;0
+274;2025-08-30;oui;eau de javel;700;floralis;;Payé le 04/09/2025;0
+275;2025-08-30;oui;croquette;600;floralis;;Payé le 04/09/2025;0
+276;2025-09-01;oui;Biscuit de manioc;500;ngassam crousti;;Payé le 20/11/2025;0
+277;2025-09-04;oui;Savon noir;2500;madi cosmétique;;Payé le 16/01/2026;0
+278;2025-09-04;oui;croquette;3000;floralis;;Payé le 05/11/2025 au fils;0
+279;2025-09-04;oui;menthol;500;madi cosmétique;;Payé le 16/01/2026;0
+280;2025-09-05;oui;Deux manches en bois;1000;SOH;;;1000
+281;2025-09-09;oui;Jus naturel;500;Mme Dongmo thérèse;;Payé le 21/10/2025;0
+282;2025-09-10;oui;un carton;2000;SOH;;;2000
+283;2025-09-10;oui;savon liquide;1000;floralis;;Payé le 05/11/2025 au fils;0
+284;2025-09-10;oui;Sac à main;5000;Chinda sokoudjou;;Payé le 18/09/2025;0
+285;2025-09-10;oui;croquette;2000;Floralis;;Payé le 05/11/2025 au fils;0
+286;2025-09-10;oui;Miel;2000;Guy Marcel;;le 20/10/2025 par Mme Guessong;0
+287;2025-09-15;oui;Plateau en bois;;Chinda sokoudjou;;Payé le 18/09/2025;0
+288;2025-09-15;oui;collier;10000;Mambou claude;;RNF le 27/09/2025;0
+289;2025-09-15;oui;croquette;1500;floralis;;Payé le 05/11/2025 au fils;0
+290;2025-09-10;oui;Porte clé;200;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+291;2025-09-15;oui;Shampoing cosmétique;1000;SOLISTA;;Payé en main propre;0
+292;2025-09-16;oui;Ships de manioc;500;Ets SAYA désiré;;Payé le 22/10/2025 à Mme Guessong;0
+293;2025-09-17;oui;Miel bangou;5000;Guy Marcel;;le 20/10/2025 par Mme Guessong;0
+294;2025-09-18;oui;Piment;1000;Guy Marcel;;le 20/10/2025 par Mme Guessong;0
+295;2025-09-19;oui;Miel bangou;2000;Guy Marcel;;le 20/10/2025 par Mme Guessong;0
+296;2025-09-19;oui;miel blanc;8500;VARBamenda;;Payé le 20/10/2025 au Coordonnateur;0
+297;2025-09-19;oui;miel brun;3000;VARBamenda;;Payé le 20/10/2025 au Coordonnateur;0
+298;2025-09-26;oui;croquette;500;floralis;;Payé le 05/11/2025 au fils;0
+299;2025-09-27;oui;Chapeau Ndop;10000;Mambou claude;;RNF le 27/09/2025;0
+300;2025-09-25;oui;Vin d'avocat;2000;Mme Mboulé;;payé le 20/10/2025 à Mme Guessong;0
+301;2025-09-30;oui;Cure diabète;2000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+302;2025-09-01;oui;biscuit de manioc;1000;Ngassam crousti;;Payé le 20/11/2025;0
+303;2025-10-01;oui;Huile de coco;5000;Ngassam crousti;;Payé le 20/11/2025;0
+304;2025-10-01;oui;Babouche;8000;Chinda sokoudjou;;Payé le 10/10/2025;0
+305;2025-10-01;oui;savon noir;1000;SOLISTA;;Payé le 20/11/2025;0
+306;2025-10-01;oui;lait éclaircissant;1000;SOLISTA;;Payé le 20/11/2025;0
+307;2025-10-01;oui;croquette;700;floralis;;Payé le 05/11/2025 au fils;0
+308;2025-10-02;oui;miel bangou;2000;Guy Marcel;;le 20/10/2025 par Mme Guessong;0
+309;2025-10-02;oui;miel bangou;3000;Guy Marcel;;le 20/10/2025 par Mme Guessong;0
+310;2025-10-04;oui;colier;7500;Chinda sokoudjou;;Payé le 10/10/2025;0
+311;2025-10-04;oui;bracelet;1000;MBIAKOP;;Payé le 22/12/2025;0
+312;2025-10-04;oui;bracelet;700;MBIAKOP;;Payé le 22/12/2025;0
+313;2025-10-04;oui;boucles;1400;MBIAKOP;;Payé le 22/12/2025;0
+314;2025-10-04;oui;Porte clé;1000;MBIAKOP;;Payé le 22/12/2025;0
+315;2025-10-16;oui;Vin d'avocat;10500;Mme Mboulé;;payé le 20/10/2025 à Mme Guessong;0
+316;2025-10-23;oui;cure diabete;2000;TSANMAT;;Payé le 22/10/2025 à Mme Guessong;0
+317;2025-10-16;oui;Baume;1000;madi cosmétique;;Payé le 16/01/2026;0
+318;2025-10-21;oui;Biscuit manioc;1000;Ngassam crousti;;Payé le 20/11/2025;0
+319;2025-10-21;oui;miel brun;6000;VARBamenda;;Payé le 11/11/2025 au Coordonnateur;0
+320;2025-10-24;oui;pendule;1000;Mme Sidonie;;;1000
+321;2025-10-24;oui;Tabouret bambou;4000;Kuemi Jacob;;Payé le 24/11/2025;0
+322;2025-11-03;oui;Miel brun;3000;VARBamenda;;Payé le 11/11/2025 au Coordonnateur;0
+323;2025-11-03;oui;Gastri stop;1000;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+324;2025-11-10;oui;Miel blanc;25500;VARBamenda;;Payé le 11/11/2025 au Coordonnateur;0
+325;2025-11-11;oui;eau de javel;2000;Floralis;;Payé le 29/12/2025 à Mme Guessong;0
+326;2025-11-11;oui;Piment;1500;Guy Marcel;;Payé le 29/12/2025 à Mme Guessong;0
+327;2025-11-11;oui;croquette;600;Floralis;;Payé le 29/12/2025 à Mme Guessong;0
+328;2025-11-11;oui;Gastri stop;1000;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+329;2025-11-14;oui;tabouret en bambou;4000;Kuemi Jacob;;Payé le 24/11/2025;0
+330;2025-11-17;oui;croquette;500;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+331;2025-11-17;oui;Gastri stop;1000;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+332;2025-11-17;oui;Vin d'avocat;7000;Mme Mboulé;;payé le 29/12/2025 à Mme Guessong;0
+333;2025-11-17;oui;Détergent;1000;SOLISTA;;Payé le 20/11/2025;0
+334;2025-11-19;oui;charbon végétal;1000;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+335;2025-11-19;oui;Gastri stop;1500;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+336;2025-11-19;oui;miel;4000;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+337;2025-11-19;oui;miel brun;3000;VARBamenda;;Payé le 18/12/2025 au Coordonnateur;0
+338;2025-11-19;oui;cure anti cancéreuse;4000;TSANMAT;;Payé le 29/12/2025 à Mme Guessong;0
+339;2025-11-19;oui;anti douleur;2000;TSANMAT;;Payé le 29/12/2025 à Mme Guessong;0
+340;2025-11-19;oui;Jus naturel;500;Mme Dongmo thérèse;;Payé le 21/10/2025;0
+341;2025-11-19;oui;Détergent;500;SOLISTA;;Payé le 20/11/2025;0
+342;2025-11-19;oui;Lait de toilette;1000;SOLISTA;;Payé le 20/11/2025;0
+343;2025-11-19;oui;biscuit de manioc;800;Ets SAYA désiré;;Payé le 10/04/2026 à Mme Guessong;0
+344;2025-11-19;oui;croquette;200;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+345;2025-11-20;oui;croquette;1200;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+346;2025-11-24;oui;lave vitre;1500;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+347;2025-11-24;oui;vin de cola;2500;Nguekam philippe;;Payé le 29/12/25 à Mme Guessong;0
+348;2025-11-26;oui;Vin de gingembre;3500;Jonas;;Payé le 31/12/2025;0
+349;2025-11-26;oui;bracelet;2000;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+350;2025-11-26;oui;Porte clé;1000;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+351;2025-11-26;oui;Porte clé;500;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+352;2025-11-26;oui;bague;3000;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+353;2025-11-26;oui;miel brun;3000;VARBamenda;;Payé le 18/12/2025 au Coordonnateur;0
+354;2025-11-27;oui;Baume sécheresse lèvres;500;SOLISTA;;Payé le 29/12/2025;0
+355;2025-11-27;oui;Lait éclaircissant;1000;SOLISTA;;Payé le 29/12/2025;0
+356;2025-11-27;oui;croquette;1000;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+357;2025-11-28;oui;Tabouret en perles;45000;Mambou claude;;Payé le 16/01/2025;0
+358;2025-11-28;oui;Gastri stop;1500;Djoko Pokam Alex;;Payé le 06/01/2025 à la fille;0
+359;2025-12-03;oui;Biscuit manioc;500;ngassam crousti;;Payé le 25/03/2026;0
+360;2025-12-03;oui;croquette;500;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+361;2025-12-03;oui;boucle;500;MBIAKOP;;Payé le 22/12/2025;0
+362;2025-12-04;oui;petit sac en perle;1500;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+363;2025-12-08;oui;Baume;500;SOLISTA;;Payé le 29/12/2025;0
+364;2025-12-08;oui;croquette;800;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+365;2025-12-09;oui;bracelets;5200;MBIAKOP;;Payé le 22/12/2025;0
+366;2025-12-09;oui;bracelets;2500;MBIAKOP;;Payé le 22/12/2025;0
+367;2025-12-09;oui;bracelets;1000;MBIAKOP;;Payé le 22/12/2025;0
+368;2025-12-09;oui;boucles d'oreilles;1500;MBIAKOP;;Payé le 22/12/2025;0
+369;2025-12-09;oui;colier;1000;MBIAKOP;;Payé le 22/12/2025;0
+370;2025-12-09;oui;croquette;1700;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+371;2025-12-10;oui;Baume;250;SOLISTA;;Payé le 29/12/2025;0
+372;2025-12-12;oui;vin de cola;2500;Nguekam philippe;;Payé le 29/12/25 à Mme Guessong;0
+373;2025-12-12;oui;vin de bita cola;2500;Nguekam philippe;;Payé le 29/12/25 à Mme Guessong;0
+374;2025-12-12;oui;vinaigre blanc;600;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+375;2025-12-12;oui;vinaigre 1/2l;300;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+376;2025-12-12;oui;biscuit patate;1000;Ets SAYA désiré;;Payé le 10/04/2026 à Mme Guessong;0
+377;2025-12-12;oui;chips de pomme;1000;Ets SAYA désiré;;Payé le 10/04/2026 à Mme Guessong;0
+378;2025-12-12;oui;Vin thérapeutique;3000;KEMTA;;Payé le 29/12/2025 à Mme Guessong;0
+379;2025-12-12;oui;croquette;100;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+380;2025-12-12;oui;Miel blanc;17000;VARBamenda;;Payé le 18/12/2025 au Coordonnateur;0
+381;2025-12-17;oui;croquette;300;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+382;2025-12-19;oui;tableau décoration;15000;Mme Justina;;Payé le 16/01/2026 à Mme Guessong;0
+383;2025-12-22;oui;Chapeau en fibre raphia;1000;Mintchougom Sidonie;;Payé le 25/03/2026;0
+384;2025-12-22;oui;petit sac en fibre raphia;500;Mintchougom Sidonie;;Payé le 25/03/2026;0
+385;2025-12-22;oui;Décoration murale;3000;MBIAKOP;;Payé le 22/12/2025;0
+386;2025-12-22;oui;croquette;100;Floralis;;Payé le 29/12/2025 à Mme Guessong;0
+387;2025-12-23;oui;colier;1500;MBIAKOP;;Payé le 28/01/2026;0
+388;2025-12-23;oui;bracelets en perle;2000;Mika perles ( T Fideline);;Payé le 02/01/2026;0
+389;2025-12-23;oui;porte clés;3500;MBIAKOP;;Payé le 28/01/2026;0
+390;2025-12-23;oui;miel blanc et brun;20000;VARBamenda;;Payé le 31/03/2026 au Coordonnateur;0
+391;2025-12-23;oui;miel bangou;2000;Guy Marcel;;Payé le 29/12/2025 à Mme Guessong;0
+392;2025-12-23;oui;piment bangou;1000;Guy Marcel;;Payé le 29/12/2025 à Mme Guessong;0
+393;2025-12-23;oui;Chips de mais;100;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+394;2025-12-24;oui;Vin thérapeutique;6000;KEMTA;;Payé le 29/12/2025 à Mme Guessong;0
+395;2025-12-24;oui;Porte stylos;1000;MBIAKOP;;Payé le 28/01/2026;0
+396;2025-12-24;oui;Porte stylos;2100;MBIAKOP;;Payé le 28/01/2026;0
+397;2025-12-24;oui;Porte stylos;2000;MBIAKOP;;Payé le 28/01/2026;0
+398;2025-12-24;oui;Stylos;2400;MBIAKOP;;Payé le 28/01/2026;0
+399;2025-12-24;oui;Porte téléphone;500;MBIAKOP;;Payé le 28/01/2026;0
+400;2025-12-26;oui;cookies de manioc;800;Ets SAYA désiré;;Payé le 10/04/2026 à Mme Guessong;0
+401;2025-12-26;oui;chips de manioc;500;Ets SAYA désiré;;Payé le 10/04/2026 à Mme Guessong;0
+402;2025-12-26;oui;caramel;1000;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+403;2025-12-29;oui;chips de mais;1000;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+404;2025-12-26;oui;croquette;500;floralis;;Payé le 29/12/2025 à Mme Guessong;0
+405;2025-12-29;oui;chips de maîs;500;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+406;2025-12-29;oui;chips de maîs;1000;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+407;2025-12-29;oui;savon en boite;1500;SOLISTA;;Payé le 25/02/2026;0
+408;2025-12-30;oui;piment bangou;3000;Guy Marcel;;Payé le 16/01/2026 à Mme Guessong;0
+409;2025-12-30;oui;croquette;100;Floralis;;Payé le 16/01/2026 à Mme Guessong;0
+410;2025-12-30;oui;Jus oseille;500;Mme Dongmo thérèse;;Payé le 21/04/2026;0
+411;2025-12-31;oui;savon noir;1000;SOLISTA;;Payé le 25/02/2026;0
+412;2025-12-31;oui;Shampoing cosmétique;1000;SOLISTA;;Payé le 25/02/2026;0
+413;2025-12-31;oui;biscuit de manioc;1000;Ngassam crousti;;Payé le 25/03/2026;0
+414;2025-12-31;oui;Porte stylos;1500;MBIAKOP;;Payé le 28/01/2026;0
+415;2025-12-31;oui;Vin d'avocat;10500;mme Mboulé;;Payé le 16/01/2026 à Mme GUESSONG;0
+416;2025-12-31;oui;croquettes;5600;Floralis;;Payé le 16/01/2026 à Mme Guessong;0
+417;2025-12-31;oui;Liqueur de cacao;1000;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+418;2025-12-31;oui;chips de maîs;100;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+419;2025-12-31;oui;sirop fer calcium;6000;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+420;2025-12-31;oui;baume multi plante;4000;FAFE;;Payé le 19/02/2026 à Mme GUESSONG;0
+421;2025-12-31;oui;paquet de louche;6000;Chinda sokoudjou;;Payé le 16/01/2026 à Mme Guessong;0
+422;2025-12-31;oui;bouteille croquettes;1500;Floralis;;Payé le 16/01/2026 à Mme Guessong;0
+423;2026-01-06;oui;tableau décoration;12000;Mme Justina;AA;Payé le 16/01/2026 à Mme Guessong;0
+424;2026-01-06;oui;tableau décoration;1500;MBIAKOP;AA;Payé le 28/01/2026;0
+425;2026-01-06;oui;Porte stylos;500;MBIAKOP;AA;Payé le 28/01/2026;0
+426;2026-01-12;oui;Liqueur de cacao pti modèle;2000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+427;2026-01-12;oui;Pommade multiplante;2000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+428;2026-01-12;oui;Sirop africain;1000;Ngassam Olivier;AP;Payé le 23/03/2026;0
+429;2026-01-12;oui;Croquettes;200;Floralis;AP;Payé le 16/01/2026 à Mme Guessong;0
+430;2026-01-14;oui;Porte clés;5000;Chinda sokoudjou;AA;Payé le 16/01/2026 à Mme Guessong;0
+431;2026-01-19;oui;Vin d'avocat;1000;Mme mboulé;AP;Payé le 21/05/2026 à Mme GUESSONG;0
+432;2026-01-19;oui;féves cacao;1000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+433;2026-01-19;oui;Pygeum africanum cure prostate;2000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+434;2026-01-19;oui;Pygeum africana;9000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+435;2026-01-19;oui;charbon végétal;3000;Djoko Pokam Alex;AP;;3000
+436;2026-01-19;oui;la tour des rois;3500;Mme Dongmo thérèse;AP;Payé le 21/04/2026;0
+437;2026-01-19;oui;moelleux aux champignons;3500;Mme Dongmo thérèse;AP;Payé le 21/04/2026;0
+438;2026-01-19;oui;Chips plantain;200;SOLISTA;AP;Payé le 25/02/2026;0
+439;2026-01-20;oui;masques;30000;mouliom ibrahim;AA;Payé le 27/01/2026;0
+440;2026-01-20;oui;chaine en perles;1000;Stéphane SONWA;AA;Payé le 04/05/2026;0
+441;2026-01-20;oui;chips de mais;500;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+442;2026-01-20;oui;chips plantain;300;SOLISTA;AP;Payé le 25/02/2026;0
+443;2026-01-20;oui;croquettes;100;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+444;2026-01-20;oui;boucles d'oreilles;1500;MBIAKOP;AA;Payé le 28/01/2026;0
+445;2026-01-20;oui;porte clés;4000;Chinda sokoudjou;AA;Payé le 21/10/2025;0
+446;2026-01-20;oui;Louche en paquet;6000;Chinda sokoudjou;AA;Payé le 21/10/2025;0
+447;2026-01-20;oui;louche simple;2500;Chinda sokoudjou;AA;Payé le 21/10/2025;0
+448;2026-01-20;oui;caramel cacao;1000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+449;2026-01-20;oui;plateaux en fibre raphia;3000;Mintchougom Sidonie;AA;Payé le 25/03/2026;0
+450;2026-01-20;oui;collier en bambou de chine;1500;MBIAKOP;AA;Payé le 28/01/2026;0
+451;2026-01-20;oui;bracelet;300;MBIAKOP;AA;Payé le 28/01/2026;0
+452;2026-01-20;oui;Cameroun sculpté;5000;Chinda sokoudjou;AA;Payé le 21/10/2025;0
+453;2026-01-21;oui;sirop multi usage;2000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+454;2026-01-21;oui;chips de mais;1100;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+455;2026-01-21;oui;charbon végetal;1500;Djoko Pokam Alex;AP;;1500
+456;2026-01-21;oui;café rapha;3000;Mme Solange MANGUE;AP;;3000
+457;2026-01-21;oui;lave vitre;1500;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+458;2026-01-21;oui;savon liquide;900;SOLISTA;AP;Payé le 25/02/2026;0
+459;2026-01-22;oui;Caramel de cacao;1000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+460;2026-01-22;oui;Man power;4000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+461;2026-01-22;oui;vinaigre blanc;400;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+462;2026-01-22;oui;eau de javel;700;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+463;2026-01-23;oui;Miel bangou 850kg;9000;Guy Marcel;AP;Payé le 05/03/2026 à Mme Guessong;0
+464;2026-01-23;oui;Miel bangou 650Kg;2000;Guy Marcel;AP;Payé le 05/03/2026 à Mme Guessong;0
+465;2026-01-23;oui;Vin de bita cola;2500;Nguekam philippe;AP;Payé le 05/03/2026 à Mme Guessong;0
+466;2026-01-23;oui;eau de javel 5l;2500;SOLISTA;AP;Payé le 25/02/2026;0
+467;2026-01-23;oui;Croquette;200;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+468;2026-01-26;oui;Chips de mais;500;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+469;2026-01-26;oui;Porte clés bambou de chine;250;MBIAKOP;AA;Payé le 28/01/2026;0
+470;2026-01-26;oui;Menthol;500;madi cosmétique;AP;Payé le 04/03/2026;0
+471;2026-01-26;oui;Baume lèvres;500;SOLISTA;AP;Payé le 25/02/2026;0
+472;2026-01-26;oui;Baume lèvres;100;SOLISTA;AP;Payé le 25/02/2026;0
+473;2026-01-27;oui;Miel brun;6000;VARBamenda;AP;Payé le 31/03/2026 au Coordonnateur;0
+474;2026-01-27;oui;Croquettes;400;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+475;2026-01-27;oui;Chips de mais;500;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+476;2026-01-27;oui;Louche;2000;Chinda sokoudjou;AA;Payé le 24/02/2026;0
+477;2026-01-27;oui;Chips de maîs;1000;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+478;2026-01-27;oui;Babouche;1800;Mika perles ( T Fideline);AA;;1800
+479;2026-02-02;oui;savon 5l;8000;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+480;2026-02-02;oui;savon 1l;1000;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+481;2026-02-02;oui;savon 1/2l;500;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+482;2026-02-02;oui;eau de javel 5l;2500;SOLISTA;AP;Payé le 25/02/2026;0
+483;2026-02-02;oui;Porte stylos;1200;MBIAKOP;AA;Payé le 01/04/2026;0
+484;2026-02-02;oui;Stylos;600;MBIAKOP;AA;Payé le 01/04/2026;0
+485;2026-02-02;oui;biscuit de manioc;500;Ngassam crousti;AP;Payé le 25/03/2026;0
+486;2026-02-02;oui;Crème éclaicissante;1000;SOLISTA;AP;Payé le 25/02/2026;0
+487;2026-02-02;oui;Sirop africain;500;Ngassam Olivier;AP;Payé le 23/03/2026;0
+488;2026-02-02;oui;tableau décoration;12000;Mme Justina;AA;;12000
+489;2026-02-06;oui;Vinaigre;150;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+490;2026-02-06;oui;Croquette;300;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+491;2026-02-06;oui;biscuit de manioc;500;Ngassam crousti;AP;Payé le 25/03/2026;0
+492;2026-02-06;oui;miel bangou;3000;Guy Marcel;AP;Payé le 05/03/2026 à Mme Guessong;0
+493;2026-02-06;oui;chips plantain;100;SOLISTA;AP;Payé le 25/02/2026;0
+494;2026-02-06;oui;chips mais;500;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+495;2026-02-09;oui;Vins de cola;7500;Nguekam philippe;AP;Payé le 05/03/2026 à Mme Guessong;0
+496;2026-02-10;oui;Boucles et bracelets;2900;MBIAKOP;AA;Payé le 01/04/2026;0
+497;2026-02-10;oui;anti poison;2000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+498;2026-02-10;oui;savon noir;2500;madi cosmétique;AP;Payé le 04/03/2026;0
+499;2026-02-10;oui;bagues et chaines en perles;4400;Mika perles ( T Fideline);AA;;4400
+500;2026-02-10;oui;vinaigre;150;floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+501;2026-02-10;oui;chips de maîs;300;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+502;2026-02-10;oui;babouche et sac à main;12000;Chinda sokoudjou;AA;Payé le 24/02/2026;0
+503;2026-02-10;oui;Divers articles;107000;Mme Sidonie;AA;Payé le 12/02/2026;0
+504;2026-02-10;oui;Cure desintoxication;4000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+505;2026-02-17;oui;chips plantain;200;SOLISTA;AP;Payé le 25/02/2026;0
+506;2026-02-17;oui;croquettes;200;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+507;2026-02-12;oui;Pannier;3000;Mintchougom Sidonie;AA;Payé le 25/03/2026;0
+508;2026-02-19;oui;Brillant à lèvres;300;SOLISTA;AP;Payé le 25/02/2026;0
+509;2026-02-19;oui;Vita tea bio;1500;Ngassam Olivier;AP;Payé le 23/03/2026;0
+510;2026-02-19;oui;chips de mais;100;FAFE;AP;Payé le 19/02/2026 à Mme GUESSONG;0
+511;2026-02-19;oui;beurre de karité;500;Bassie Mofo Julius;AP;;500
+512;2026-02-23;oui;Cure toux et rhume;2000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+513;2026-02-23;oui;croquettes;1000;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+514;2026-02-24;oui;Charbon végétal;1500;Djoko Pokam Alex;AP;;1500
+515;2026-02-24;oui;Eau de javel;2800;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+516;2026-02-24;oui;Eau de javel;700;Floralis;AP;Payé le 05/03/2026 à Mme Guessong;0
+517;2026-02-26;oui;Huile de neem;2000;Nokam dorine;AP;Payé le 01/04/2026;0
+518;2026-02-26;oui;Huile de coco;2000;Nokam dorine;AP;Payé le 01/04/2026;0
+519;2026-02-26;oui;Chips plantain;1500;SOLISTA;AP;Payé le 04/05/2026 par MoMo;0
+520;2026-02-26;oui;biscuit de manioc;1000;Ngassam crousti;AP;Payé le 25/03/2026;0
+521;2026-03-02;oui;Damier, Collier et tableau avec message;10000;MBIAKOP;AA;Payé le 01/04/2026;0
+522;2026-03-03;oui;bracelet;300;MBIAKOP;AA;Payé le 01/04/2026;0
+523;2026-03-03;oui;collier;1500;MBIAKOP;AA;Payé le 01/04/2026;0
+524;2026-03-03;oui;Miel de bangou;10000;Guy Marcel;AP;Payé le 05/03/2026 à Mme Guessong;0
+525;2026-03-03;oui;vin d'avocat;3500;Mme Mboulé;AP;Payé le 21/05/2026 à Mme GUESSONG;0
+526;2026-03-09;oui;Sirop africain;1500;Ngassam Olivier;AP;Payé le 23/03/2026;0
+527;2026-03-09;oui;Bague en perles;200;Mika perles ( T Fideline);AA;;200
+528;2026-03-09;oui;Curcuma;1000;titi bio;AP;Payé le 01/06/2026;0
+529;2026-03-09;oui;Croquettes;400;Floralis;AP;;400
+530;2026-03-12;oui;Chips de maïs;500;FAFE;AP;;500
+531;2026-03-13;oui;Croquettes;200;Floralis;AP;;200
+532;2026-03-13;oui;Chips plantain;1000;SOLISTA;AP;Payé le 04/05/2026 par MoMo;0
+533;2026-03-13;oui;chips mais;500;FAFE;AP;;500
+534;2026-03-16;oui;Cure désintoxication;2000;TSANMAT;AP;Payé le 10/04/2026 à Mme Guessong;0
+535;2026-03-16;oui;Biscuit manioc;500;Ngassam crousti;AP;Payé le 25/03/2026;0
+536;2026-03-16;oui;Propolis;2500;Guy Marcel(Guessong);AP;Payé le 06/04/2026 à Mme GUESSONG;0
+537;2026-03-16;oui;Sirop africain;2500;Ngassam Olivier;AP;Payé le 23/03/2026;0
+538;2026-03-16;oui;Vin d'ail;6500;Jonas;AP;Payé le 30/03/2026;0
+539;2026-03-16;oui;Sirop africain;2000;Ngassam Olivier;AP;Payé le 23/03/2026;0
+540;2026-03-16;oui;Table sculptée;80000;Chinda sokoudjou;AA;Payé le 17/03/2026;0
+541;2026-03-17;oui;Miel brun;3000;VARBamenda;AP;Payé le 31/03/2026 au Coordonnateur;0
+542;2026-03-23;oui;Miel 650g;2000;Guy Marcel;AP;;2000
+543;2026-03-23;oui;Chips manioc;500;Ets SAYA désiré;AP;Payé le 10/04/2026 à Mme Guessong;0
+544;2026-03-23;oui;chips plantain;300;SOLISTA;AP;Payé le 04/05/2026 par MoMo;0
+545;2026-03-26;oui;Produit dents;2000;Djoko Pokam Alex;AP;;2000
+546;2026-03-26;oui;Panniers en paille;3000;Mme Sidonie;AA;;3000
+547;2026-03-26;oui;chapeau en paille;4000;Mme Sidonie;AA;;4000
+548;2026-03-26;oui;plateau en bois;10000;Chinda sokoudjou;AA;Payé le 30/03/2026;0
+549;2026-03-26;oui;miel blanc;20000;VARBamenda;AP;Payé le 31/03/2026 au Coordonnateur;0
+550;2026-03-30;oui;Whisky de cacao;5000;FAFE;AP;;5000
+551;2026-03-30;oui;croquettes;200;floralis;AP;;200
+552;2026-03-30;oui;tableau décoration;10000;Mme Justina;AA;;10000
+553;2026-03-31;oui;Eau de javel;2500;Floralis;AP;;2500
+554;2026-04-02;oui;biscuit de manioc;1000;Ngassam crousti;AP;Payé le 18/05/2026;0
+555;2026-04-02;oui;Chips de plantain;300;SOLISTA;AP;Payé le 04/05/2026 par MoMo;0
+556;2026-04-02;oui;croquettes;200;floralis;AP;;200
+557;2026-04-06;oui;Horloge personnalisé;50000;Chinda sokoudjou;AA;Payé le 06/04/2026;0
+558;2026-04-07;oui;Croquettes;400;floralis;AP;;400
+559;2026-04-10;oui;Porte stylos et stylos;900;MBIAKOP;AA;;900
+560;2026-04-13;oui;Vin d'avaocat;3500;Mme Mboulé;AP;Payé le 21/05/2026 à Mme GUESSONG;0
+561;2026-04-13;oui;Vin thérapeutique;2500;KEMTA;AP;;2500
+562;2026-04-13;oui;Porte stylos;1000;MBIAKOP;AA;;1000
+563;2026-04-14;oui;Thé de gingembre;5000;titi bio;AP;Payé le 01/06/2026;0
+564;2026-04-15;oui;Savons hybiscus;3000;Nokam dorine;AP;;3000
+565;2026-04-15;oui;baume solista;500;SOLISTA;AP;Payé le 04/05/2026 par MoMo;0
+566;2026-04-15;oui;chaine en bambou de chnie;500;MBIAKOP;AA;;500
+567;2026-04-15;oui;Colier en perles;1500;Mika perles ( T Fideline);AA;;1500
+568;2026-04-16;oui;beurre de karité;1000;Nokam dorine;AP;;1000
+569;2026-04-16;oui;Boucles;500;MBIAKOP;AA;;500
+570;2026-04-16;oui;Boucles en fil;500;Mika perles ( T Fideline);AA;;500
+571;2026-04-20;oui;Ginger tea;2000;TSANMAT;AP;;2000
+572;2026-04-20;oui;Stomach easer;2000;TSANMAT;AP;;2000
+573;2026-04-20;oui;Bagues en perles;1000;Mika perles ( T Fideline);AA;;1000
+574;2026-04-20;oui;Colier en perles;1500;Mika perles ( T Fideline);AA;;1500
+575;2026-04-20;oui;boucles en perles;1000;Mika perles ( T Fideline);AA;;1000
+576;2026-04-27;oui;Whisky de cacao;5000;FAFE;AP;;5000
+577;2026-04-27;oui;Cure minceur;2000;TSANMAT;AP;;2000
+578;2026-04-27;oui;Savon liquide;1000;Floralis;AP;;1000
+579;2026-04-27;oui;vin de raphia;1000;Mme Mboulé;AP;Payé le 21/05/2026 à Mme GUESSONG;0
+580;2026-05-07;oui;vinaigre blanc;150;Floralis;AP;;150
+581;2026-05-07;oui;Miel brun;3000;VARBamenda;AP;;3000
+582;2026-05-04;oui;tableau décoration;12000;Mme Justina;AA;;12000
+583;2026-05-07;oui;Stylos en bambou de chine;500;MBIAKOP;AA;;500
+584;2026-05-07;oui;bracelets en bambou de chine;1000;MBIAKOP;AA;;1000
+585;2026-05-07;oui;Porte clés bambou de chine;500;MBIAKOP;AA;;500
+586;2026-05-07;oui;tableau décoration;13000;Mme Justina;AA;;13000
+587;2026-05-10;oui;cacalight;1000;Guy Marcel;AP;;1000
+588;2026-05-10;oui;Miel bangou;3000;Guy Marcel;AP;;3000
+589;2026-05-11;oui;Chaussure;9000;Yonka Marcel;AA;Payé le 21/05/2026 à Mme GUESSONG;0
+590;2026-05-11;oui;savon hibiscus;1000;Nokam dorine;AP;;1000
+591;2026-05-13;oui;Miel bangou;2000;Guy Marcel;AP;;2000
+592;2026-05-25;oui;Bracelets Ndop;2000;Chinda sokoudjou;AA;Payé le 25/05/2026;0
+593;2026-05-25;oui;barette ndop;2000;Chinda sokoudjou;AA;Payé le 25/05/2026;0
+594;2026-05-25;oui;chapeaux;10000;Chinda sokoudjou;AA;Payé le 25/05/2026;0
+595;2026-05-25;oui;paire babouche;6000;Chinda sokoudjou;AA;Payé le 25/05/2026;0
+596;2026-05-25;oui;Eventails;10000;Mambou claude;AA;;10000
+597;2026-05-25;oui;Collier;1000;Mme Sidonie;AA;;1000
+598;2026-05-25;oui;Bracelet bambou de chine;300;MBIAKOP;AA;;300
+599;2026-05-25;oui;Boucles;700;MBIAKOP;AA;;700
+600;2026-05-25;oui;Boucles;1500;MBIAKOP;AA;;1500
+601;2026-05-25;oui;collier;6000;MBIAKOP;AA;;6000
+602;2026-05-25;oui;Tableau décoration;10000;Mme Justina;AA;;12000
+603;2026-05-29;oui;Whisky de cacao;2000;FAFE;AP;;2000
+604;2026-05-29;oui;whisky de bita cola;3000;FAFE;AP;;3000
+605;2026-05-29;oui;vin de raphia;2000;Mme Mboulé;AP;;2000
+606;2026-05-29;oui;chips de mais;100;FAFE;AP;;100
+607;2026-05-29;oui;Bougie;1500;Guy Marcel;AP;;1500
+608;2026-05-29;oui;Poudre de gingembre;1500;titi bio;AP;;1500
+609;2026-06-01;oui;Porte stylos;1400;MBIAKOP;AA;;1400
+610;2026-06-03;oui;Petit plateau en cœur;7000;Chinda sokoudjou;AA;;7000
+611;2026-06-03;oui;Plateau figure Cameroun;4500;Chinda sokoudjou;AA;;4500
+612;2026-06-03;oui;Plateau figure Afrique;4500;Chinda sokoudjou;AA;;4500
+613;2026-06-03;oui;sac en bandoulière;4000;Chinda sokoudjou;AA;;4000
+614;2026-06-03;oui;sac ndop en bandoulière;5000;Chinda sokoudjou;AA;;5000
+615;2026-06-03;oui;Sac dame en pochette;12000;Chinda sokoudjou;AA;;12000
+616;2026-06-03;oui;Grand tableau déco;12000;Mme Justina;AA;;12000
+617;2026-06-03;oui;Petit tableau déco;12000;Mme Justina;AA;;12000

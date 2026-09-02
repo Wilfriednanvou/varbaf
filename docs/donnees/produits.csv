@@ -1,0 +1,135 @@
+ligne_source;produit;secteur;provenance;materiaux;hauteur;largeur;poids;capacite;longueur;perissable;date_fabrication;peremption;quantite;prix_unitaire;artisan;commune;departement;artisan_lu
+17;Vin d'orange;;;;;;;75 cl;;;;;6;3500;MOUTAPMBEME Jonas;;;oui
+18;Vin blanc de persil;;;;;;;75 cl;;;;;2;4500;MOUTAPMBEME Jonas;;;oui
+19;Vin d'ail (6500 F);;;;;;;75 cl;;;;;2;6500;MOUTAPMBEME Jonas;;;oui
+20;Vin de petit cola;;;;;;;75 cl;;;;;3;4000;MOUTAPMBEME Jonas;;;oui
+21;Vin de lemon;;;;;;;75 cl;;;;;4;4500;MOUTAPMBEME Jonas;;;oui
+22;Coffee Wine;;;;;;;75 cl;;;;;4;4500;MOUTAPMBEME Jonas;;;non
+23;Vin de gingembre;;;;;;;75 cl;;;;;1;4500;MOUTAPMBEME Jonas;;;oui
+24;Vin d'avocat;;;;;;;75 cl;;;;;9;4000;MOUTAPMBEME Jonas;;;oui
+25;Vin d'oignon;;;;;;;75 cl;;;;;3;4500;MOUTAPMBEME Jonas;;;oui
+26;Vin de Pomme;;;;;;;75 cl;;;;;4;4500;MOUTAPMBEME Jonas;;;oui
+27;Yanis;;;;;;;75 cl;;;;;1;4000;MOUTAPMBEME Jonas;;;oui
+28;Huille de Centella;;;;;;;;;;;;4;3500;MOUTAPMBEME Jonas;;;oui
+29;Huile d'orange;;;;;;;;;;;;1;3500;MOUTAPMBEME Jonas;;;oui
+30;Huile de gengimbre;;;;;;;;;;;;1;3000;MOUTAPMBEME Jonas;;;oui
+31;Huile de romarin;;;;;;;;;;;;6;3500;MOUTAPMBEME Jonas;;;oui
+32;Boite de curcuma;;;;;;;800g;;;;;3;3000;MOUTAPMBEME Jonas;;;oui
+33;Bitter cola en poudre;;;;;;;;;;;;1;2500;MOUTAPMBEME Jonas;;;oui
+34;Thé Yanis;;;;;;;;;;;;4;2000;MOUTAPMBEME Jonas;;;oui
+35;Tour des rois;;;;;;;75 cl;;;;;5;3500;SCOOPSEMA (Mme Dongmo Thérèse);;;oui
+36;Moelleux champignons blancs;;;;;;;75 cl;;;;;6;3500;SCOOPSEMA (Mme Dongmo Thérèse);;;oui
+37;Kombucha;;;;;;;75 cl;;;;;6;3500;SCOOPSEMA (Mme Dongmo Thérèse);;;oui
+38;Vin de Bitacola;;;;;;;75 cl;;;;;12;2500;GUEKAM PHILIPPE;;;oui
+39;Vin de Cola;;;;;;;75 cl;;;;;12;2500;GUEKAM PHILIPPE;;;oui
+40;Savon gommant;;;;;;;200g;;;;;10;1250;OLY Nature (Mme KUATE Judith);;;oui
+41;Savon Hydratant;;;;;;;200g;;;;;8;1000;OLY Nature (Mme KUATE Judith);;;oui
+42;Gel de douche gommant;;;;;;;500 ml;;;;;7;3000;OLY Nature (Mme KUATE Judith);;;oui
+43;Gel de douche Hydratant;;;;;;;500 ml;;;;;3;2500;OLY Nature (Mme KUATE Judith);;;oui
+44;Vin miel moelleux;;;;;;;75 cl;;;;;6;5000;OLY Nature (Mme KUATE Judith);;;oui
+45;Vin miel sec;;;;;;;75 cl;;;;;2;5000;OLY Nature (Mme KUATE Judith);;;oui
+46;Vin d'avocat;;;;;;;75 cl;;;;;12;3500;MBOULE Simone;;;oui
+47;Huile d'avocat;;;;;;;0,5cl;;;;;2;10000;MBOULE Simone;;;oui
+48;Huile d'avocat;;;;;;;60 ml;;;;;4;1500;MBOULE Simone;;;oui
+49;Vin de Raphia;;;;;;;0,5cl;;;;;24;350;MBOULE Simone;;;oui
+50;Café rapha;;;;;;;250g;;;;;20;3500;MAMCHE KADJE Rosette Solange;;;oui
+51;Skin biochar;;;;;;;;;;;;2;;DJOKO POKAM Alex;;;oui
+52;Anti gastrique et anti-cancer;;;;;;;;;;;;4;1000;DJOKO POKAM Alex;;;oui
+53;Curccuma longa;;;;;;;;;;;;3;;DJOKO POKAM Alex;;;oui
+54;Probiochar;;;;;;;;;;;;7;1500;DJOKO POKAM Alex;;;oui
+55;Magic Saop;;;;;;;;;;;;2;1500;DJOKO POKAM Alex;;;oui
+56;Bissobo;;;;;;;;;;;;1;;DJOKO POKAM Alex;;;oui
+57;Bondo;;;;;;;;;;;;1;1500;DJOKO POKAM Alex;;;oui
+58;Sokmesonma;;;;;;;;;;;;1;2000;DJOKO POKAM Alex;;;oui
+59;Huile neem;;;;;;;;;;;;1;;DJOKO POKAM Alex;;;oui
+60;Voacanga;;;;;;;;;;;;1;6000;TCHANOU;;;oui
+61;Voacanga;;;;;;;;;;;;2;3000;TCHANOU;;;oui
+62;Voacanga;;;;;;;;;;;;2;2500;TCHANOU;;;oui
+63;Voacanga;;;;;;;;;;;;3;1000;TCHANOU;;;oui
+64;Pyguem;;;;;;;;;;;;2;1500;TCHANOU;;;oui
+65;Cannelle;;;;;;;;;;;;2;2000;TCHANOU;;;oui
+66;Cannelle;;;;;;;;;;;;2;1000;TCHANOU;;;oui
+67;Maigrir;;;;;;;;;;;;2;3500;TCHANOU;;;oui
+68;Anti infectieux;;;;;;;;;;;;1;3500;TCHANOU;;;oui
+69;Anti infectieux;;;;;;;;;;;;1;1500;TCHANOU;;;oui
+70;Anti infectieux;;;;;;;;;;;;1;1000;TCHANOU;;;oui
+71;Baume;;;;;;;;;;;;4;500;TCHANOU;;;oui
+72;Baume;;;;;;;;;;;;3;1000;TCHANOU;;;oui
+73;Moringa;;;;;;;;;;;;2;2000;TCHANOU;;;oui
+74;Clou de girofle;;;;;;;;;;;;1;2000;TCHANOU;;;oui
+75;Clou de girofle;;;;;;;;;;;;1;1000;TCHANOU;;;oui
+76;Demafi;;;;;;;;;;;;1;3000;TCHANOU;;;oui
+77;Rhumarga;;;;;;;;;;;;1;5000;TCHANOU;;;oui
+78;Rhumarga;;;;;;;;;;;;1;1000;TCHANOU;;;oui
+79;Nigelle;;;;;;;;;;;;1;1000;TCHANOU;;;oui
+80;Calcedra;;;;;;;;;;;;1;1000;TCHANOU;;;oui
+81;Calcedra;;;;;;;;;;;;1;3500;TCHANOU;;;oui
+82;Rhunecram;;;;;;;;;;;;1;1500;TCHANOU;;;oui
+83;Spiruline;;;;;;;;;;;;2;2500;TCHANOU;;;oui
+84;Spiruline;;;;;;;;;;;;1;1500;TCHANOU;;;oui
+85;Chia;;;;;;;;;;;;1;3000;TCHANOU;;;oui
+86;Curmin;;;;;;;;;;;;1;2000;TCHANOU;;;oui
+87;Mouofo -4m;;;;;;;;;;;;20;3500;BASSIE MOFO Julius;;;oui
+88;Nymofo - 3;;;;;;;;;;;;11;5500;BASSIE MOFO Julius;;;oui
+89;Motchouo - 5m;;;;;;;;;;;;12;3500;BASSIE MOFO Julius;;;oui
+90;Hepagel;;;;;;;;;;;;17;5500;BASSIE MOFO Julius;;;oui
+91;Curccuma;;;;;;;;;;;;1;2000;BASSIE MOFO Julius;;;oui
+92;Huile de Neem;;;;;;;;;;;;1;3000;BASSIE MOFO Julius;;;oui
+93;Huile de Neem;;;;;;;;;;;;1;2000;BASSIE MOFO Julius;;;oui
+94;Huile de Neem 1/3 de litre;;;;;;;;;;;;1;;BASSIE MOFO Julius;;;oui
+95;Beure de karité;;;;;;;;;;;;10;500;BASSIE MOFO Julius;;;oui
+96;Tisane anti-hémoroïde;;;;;;;;;;;;2;2500;NKONDZOU Thomas;;;oui
+97;Sérinité;;;;;;;;;;;;14;2000;TSANMAT;;;oui
+98;Lemon grass;;;;;;;;;;;;8;2000;TSANMAT;;;oui
+99;Cure de diabète;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+100;Pydgeum;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+101;Baume;;;;;;;;;;;;4;2000;TSANMAT;;;oui
+102;Petit baume;;;;;;;;;;;;2;1000;TSANMAT;;;oui
+103;Artémesia;;;;;;;;;;;;20;2000;TSANMAT;;;oui
+104;Menthe poivrée;;;;;;;;;;;;3;2000;TSANMAT;;;oui
+105;Huile de clou girofle;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+106;Huile de neem;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+107;Infusion Neem;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+108;Infusion d'ail;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+109;Giuseng roi;;;;;;;;;;;;6;2000;TSANMAT;;;oui
+110;Tisane minceure;;;;;;;;;;;;5;2000;TSANMAT;;;oui
+111;Tinane nettoyage;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+112;Antibiotique;;;;;;;;;;;;3;2000;TSANMAT;;;oui
+113;Man power;;;;;;;;;;;;5;2000;TSANMAT;;;oui
+114;Cure Covid;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+115;Charbon Sachet;;;;;;;;;;;;20;2000;TSANMAT;;;oui
+116;Renfort;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+117;Relax;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+118;Cure d'estomac;;;;;;;;;;;;4;2000;TSANMAT;;;oui
+119;cure de désintox;;;;;;;;;;;;11;2000;TSANMAT;;;oui
+120;Anti-Cancer;;;;;;;;;;;;5;2000;TSANMAT;;;oui
+121;Antidouleur;;;;;;;;;;;;2;2000;TSANMAT;;;oui
+122;Cure typhoïde;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+123;Ginger Tea;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+124;Aloes Tea;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+125;Stomach lase;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+126;Apetissant;;;;;;;;;;;;1;2000;TSANMAT;;;oui
+127;Ortie grande;;;;;;;;;;;;8;2000;TSANMAT;;;oui
+128;Cure Toux;;;;;;;;;;;;6;2000;TSANMAT;;;oui
+129;Poudre de 7 épices;;;;;;;;;;;;3;500;TITI BIO Nature;;;oui
+130;Thé titi bio nature;;;;;;;;;;;;8;1500;TITI BIO Nature;;;oui
+131;Poudre de gingembre;;;;;;;500 ml;;;;;2;5000;TITI BIO Nature;;;oui
+132;Poudre de Curccuma;;;;;;;500 ml;;;;;4;5000;TITI BIO Nature;;;oui
+133;Pot de Miel;;;;;;;1,60 kg;;;;;3;5000;NJEUYIM TOUOMO Guy Marcel;;;oui
+134;Pot de Miel;;;;;;;850 g;;;;;17;3000;NJEUYIM TOUOMO Guy Marcel;;;oui
+135;Pot de Miel;;;;;;;650 g;;;;;10;2000;NJEUYIM TOUOMO Guy Marcel;;;oui
+136;Cire d'abeille;;;;;;;700g;;;;;1;3500;NJEUYIM TOUOMO Guy Marcel;;;oui
+137;Cire d'abeille;;;;;;;600 g;;;;;1;3000;NJEUYIM TOUOMO Guy Marcel;;;oui
+138;Cire d'abeille;;;;;;;550 g;;;;;1;3000;NJEUYIM TOUOMO Guy Marcel;;;oui
+139;Cire d'abeille;;;;;;;450 g;;;;;1;2250;NJEUYIM TOUOMO Guy Marcel;;;oui
+140;Cire d'abeille;;;;;;;300 g;;;;;2;1500;NJEUYIM TOUOMO Guy Marcel;;;oui
+141;Bougie de 1500 f;;;;;;;;;;;;1;1500;NJEUYIM TOUOMO Guy Marcel;;;oui
+142;Bougie de 500 f;;;;;;;;;;;;1;500;NJEUYIM TOUOMO Guy Marcel;;;oui
+143;Piment liquide;;;;;;;200 ml;;;;;5;1500;NJEUYIM TOUOMO Guy Marcel;;;oui
+144;Piment liquide;;;;;;;125 ml;;;;;3;1000;NJEUYIM TOUOMO Guy Marcel;;;oui
+177;Eau de Javel 1 l;Cosmétique;Ouest - Cameroun;;;;;;;oui;2023-01-30 00:00:00;2026-01-30 00:00:00;;650;NGAMI GIULIA, Epse KEPNDO;;;oui
+178;Eau de Javel 500 ml;;;;;;;;;;;;;300;NGAMI GIULIA, Epse KEPNDO;;;non
+179;Eau de Javel 250 ml;Cosmétique;Ouest - Cameroun;;;;;;;oui;2023-01-30 00:00:00;2025-01-30 00:00:00;;225;NGAMI GIULIA, Epse KEPNDO;;;non
+180;Vinaigre Ménager 7°;;;;;;;;;;;;;;NGAMI GIULIA, Epse KEPNDO;;;non
+181;Savon Liquide;;;;;;;;;;;2026-01-30 00:00:00;;;NGAMI GIULIA, Epse KEPNDO;;;non
+182;Lave Vitre;;;;;;;;;;;;;;NGAMI GIULIA, Epse KEPNDO;;;non
