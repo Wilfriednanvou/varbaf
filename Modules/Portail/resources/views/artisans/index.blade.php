@@ -1,51 +1,77 @@
 @extends('portail::layouts.portail')
 
-@section('titre', 'Les artisans — Village Artisanal de Bafoussam')
+@section('titre', 'Les artisans — Village Artisanal Régional de Bafoussam')
+@section('description', 'L\'annuaire des artisans du Village Artisanal Régional de Bafoussam qui ont donné leur accord pour être présentés : leur métier, leurs créations, et où les rencontrer.')
 
 @section('contenu')
-    <h1 class="text-2xl font-semibold tracking-tight text-stone-900">Les artisans</h1>
-    <p class="mt-2 max-w-2xl text-stone-600">
-        Seuls figurent ici les artisans qui ont donné leur accord pour être présentés sur ce site.
-    </p>
+    <x-portail::entete
+        titre="Les artisans"
+        courant="Artisans"
+        chapo="Seuls figurent ici les artisans qui ont donné leur accord pour être présentés sur ce site. Chacun travaille dans l'une des boutiques du village." />
 
-    <form method="GET" action="{{ route('portail.artisans') }}"
-          class="mt-6 flex flex-wrap items-end gap-3 rounded-lg border border-stone-200 bg-white p-4">
-        <label class="flex flex-col gap-1 text-sm">
-            <span class="font-medium text-stone-700">Corps de métier</span>
-            <select name="metier" class="rounded-md border-stone-300 text-sm">
-                <option value="">Tous les corps de métier</option>
-                @foreach ($corpsMetiers as $metier)
-                    <option value="{{ $metier->id }}" @selected($corpsMetierChoisi === $metier->id)>
-                        {{ $metier->libelle }}
-                    </option>
-                @endforeach
-            </select>
-        </label>
+    <div class="mx-auto max-w-6xl px-4 py-12 sm:py-14">
+        <form method="GET" action="{{ route('portail.artisans') }}"
+              class="flex flex-wrap items-end gap-4 rounded-lg border border-craie-200 bg-white p-5">
+            <label class="flex flex-col gap-1.5 text-sm">
+                <span class="font-medium text-craie-800">Corps de métier</span>
+                <select name="metier"
+                        class="rounded-md border border-craie-300 bg-white px-3 py-2 text-sm text-nuit-900 focus:border-terre-400 focus:ring-1 focus:ring-terre-400 focus:outline-none">
+                    <option value="">Tous les corps de métier</option>
+                    @foreach ($corpsMetiers as $metier)
+                        <option value="{{ $metier->id }}" @selected($corpsMetierChoisi === $metier->id)>
+                            {{ $metier->libelle }}
+                        </option>
+                    @endforeach
+                </select>
+            </label>
 
-        <button type="submit"
-                class="rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-800">
-            Filtrer
-        </button>
-    </form>
+            <button type="submit"
+                    class="rounded-md bg-terre-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-terre-700">
+                Filtrer
+            </button>
 
-    @if ($artisans->isEmpty())
-        <p class="mt-8 rounded-lg border border-dashed border-stone-300 p-8 text-center text-stone-500">
-            Aucun artisan à présenter pour le moment.
-        </p>
-    @else
-        <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach ($artisans as $artisan)
-                <a href="{{ route('portail.artisan', $artisan->matricule) }}"
-                   class="rounded-lg border border-stone-200 bg-white p-5 transition hover:border-amber-300">
-                    <h2 class="font-medium text-stone-900">{{ $artisan->nom_complet }}</h2>
-                    <p class="mt-1 text-sm text-stone-500">{{ $artisan->corpsMetier?->libelle }}</p>
-                    <span class="mt-3 inline-block text-sm font-medium text-amber-700">Voir sa fiche</span>
+            @if ($corpsMetierChoisi)
+                <a href="{{ route('portail.artisans') }}"
+                   class="rounded-md border border-craie-300 px-4 py-2.5 text-sm font-medium text-craie-700 transition hover:border-terre-300 hover:text-terre-700">
+                    Tout voir
                 </a>
-            @endforeach
-        </div>
+            @endif
+        </form>
 
-        <div class="mt-8">
-            {{ $artisans->links() }}
-        </div>
-    @endif
+        @if ($artisans->isEmpty())
+            <p class="mt-10 rounded-lg border border-dashed border-craie-300 bg-white p-12 text-center text-craie-600">
+                Aucun artisan à présenter pour le moment.
+            </p>
+        @else
+            <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach ($artisans as $artisan)
+                    <li>
+                        <a href="{{ route('portail.artisan', $artisan->matricule) }}"
+                           class="group flex h-full flex-col overflow-hidden rounded-lg border border-craie-200 bg-white transition hover:border-terre-300 hover:shadow-md">
+                            <x-portail::illustration
+                                :photo="$artisan->photo"
+                                :source="$artisan->corpsMetier ? config('portail.visuels.metiers.'.$artisan->corpsMetier->code) : null"
+                                :alt="'Portrait de '.$artisan->nom_complet"
+                                :motif="$artisan->nom_complet"
+                                ratio="paysage" />
+
+                            <div class="flex flex-1 flex-col p-5">
+                                <h2 class="font-titre text-lg font-semibold text-nuit-900 group-hover:text-terre-700">
+                                    {{ $artisan->nom_complet }}
+                                </h2>
+                                <p class="mt-1 text-sm text-terre-700">{{ $artisan->corpsMetier?->libelle }}</p>
+                                <span class="mt-auto pt-4 text-sm font-semibold text-craie-600 group-hover:text-terre-700">
+                                    Voir sa fiche &rarr;
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="mt-10">
+                {{ $artisans->links() }}
+            </div>
+        @endif
+    </div>
 @endsection

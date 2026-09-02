@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Artisanat\Database\Seeders\ArtisanatDatabaseSeeder;
 use Modules\Commerce\Database\Seeders\CommerceDatabaseSeeder;
+use Modules\Portail\Database\Seeders\PortailDatabaseSeeder;
 use Modules\Socle\Database\Seeders\SocleDatabaseSeeder;
 use Modules\Tresorerie\Database\Seeders\TresorerieDatabaseSeeder;
 
@@ -24,6 +25,7 @@ class DatabaseSeeder extends Seeder
             ArtisanatDatabaseSeeder::class,
             CommerceDatabaseSeeder::class,
             TresorerieDatabaseSeeder::class,
+            PortailDatabaseSeeder::class,
         ]);
     }
 }

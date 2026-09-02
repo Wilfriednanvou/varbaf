@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as RequeteBrute;
 use Illuminate\Support\Facades\DB;
+use Modules\Artisanat\Enums\NatureContenant;
 use Modules\Artisanat\Models\Artisan;
+use Modules\Artisanat\Models\Boutique;
 use Modules\Artisanat\Models\CorpsMetier;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Models\CategorieProduit;
@@ -16,6 +18,7 @@ use Modules\Portail\Models\ArtisanVedette;
 use Modules\Portail\Models\ContenuPage;
 use Modules\Portail\Models\DemandeContact;
 use Modules\Portail\Models\PublicationProduit;
+use Modules\Socle\Models\VillageArtisanal;
 
 /**
  * Point de lecture unique du site public.
@@ -206,6 +209,60 @@ class ServicePortail
     }
 
     // =================================================================
+    //  REPÈRES ET PARC
+    // =================================================================
+
+    /**
+     * Les quatre repères affichés en accueil.
+     *
+     * **Un compte, jamais un montant.** Le portail ne publie ni chiffre
+     * d'affaires, ni stock, ni redevance : ce sont des données de
+     * gestion, et le site est une vitrine. Ce qui sort d'ici est ce
+     * qu'un visiteur constaterait en marchant dans le village — combien
+     * d'artisans, combien de locaux, combien de métiers, combien de
+     * pièces en vitrine.
+     *
+     * Les artisans et les créations sont comptés sous les mêmes trois
+     * conditions que le catalogue : un chiffre plus large que ce que le
+     * visiteur peut réellement parcourir annoncerait un catalogue qui
+     * n'existe pas.
+     *
+     * @return array{artisans: int, locaux: int, metiers: int, creations: int}
+     */
+    public function reperes(): array
+    {
+        return once(fn (): array => [
+            'artisans' => Artisan::query()
+                ->whereIn('id', $this->identifiantsProduitsVisibles()->select('artisans.id'))
+                ->count(),
+            'locaux' => Boutique::query()
+                ->where('nature', NatureContenant::BOUTIQUE)
+                ->count(),
+            'metiers' => $this->corpsMetiersDuCatalogue()->count(),
+            'creations' => PublicationProduit::query()->visible()->count(),
+        ]);
+    }
+
+    /**
+     * Les locaux de vente du village, dans l'ordre de leur numéro.
+     *
+     * Filtré sur `NatureContenant::BOUTIQUE` : le sous-sol et l'espace
+     * vert sont loués et font partie du parc, mais ce ne sont pas des
+     * lieux où un visiteur entre pour regarder des créations — les
+     * présenter sur la page des boutiques enverrait quelqu'un devant une
+     * emprise sans vitrine.
+     *
+     * @return Collection<int, Boutique>
+     */
+    public function locauxDeVente(): Collection
+    {
+        return Boutique::query()
+            ->where('nature', NatureContenant::BOUTIQUE)
+            ->orderBy('numero')
+            ->get();
+    }
+
+    // =================================================================
     //  DISPONIBILITÉ
     // =================================================================
 
@@ -233,6 +290,28 @@ class ServicePortail
     // =================================================================
     //  CONTENUS ÉDITORIAUX
     // =================================================================
+
+    /**
+     * Le village lui-même : raison sociale, adresse, téléphone, courriel.
+     *
+     * Ces quatre valeurs sont saisies une fois dans le panneau et
+     * doivent apparaître au pied de chaque page du site. Les recopier
+     * dans le gabarit ferait du site public la seule source d'une
+     * information que la base détient déjà — et le jour où la
+     * coordination change de numéro, le panneau serait à jour et le
+     * site faux.
+     *
+     * Le résultat est mémorisé pour la durée de la requête : le pied de
+     * page est rendu une fois, mais un gabarit qui appellerait deux fois
+     * ne doit pas coûter deux requêtes.
+     */
+    public function village(): ?VillageArtisanal
+    {
+        return once(fn (): ?VillageArtisanal => VillageArtisanal::query()
+            ->where('actif', true)
+            ->orderBy('id')
+            ->first());
+    }
 
     public function contenu(string $cle): ?ContenuPage
     {

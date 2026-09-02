@@ -16,7 +16,7 @@ use Modules\Portail\Http\Controllers\ContactController;
 | `portail.` en nom. Aucun middleware d'authentification : un visiteur du
 | portail n'a pas de compte et n'en aura pas.
 |
-| Sept routes en lecture, une seule en écriture : l'envoi du formulaire de
+| Huit routes en lecture, une seule en écriture : l'envoi du formulaire de
 | contact. Le portail ne vend pas, ne commande pas, n'encaisse pas.
 |
 | Les identifiants exposés sont la référence du produit et le matricule
@@ -29,6 +29,7 @@ use Modules\Portail\Http\Controllers\ContactController;
 Route::get('/', [AccueilController::class, 'index'])->name('accueil');
 
 Route::get('/le-village', [AccueilController::class, 'village'])->name('village');
+Route::get('/les-boutiques', [AccueilController::class, 'boutiques'])->name('boutiques');
 
 Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue');
 Route::get('/catalogue/{reference}', [CatalogueController::class, 'show'])->name('produit');

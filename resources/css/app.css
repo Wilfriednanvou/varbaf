@@ -12,7 +12,114 @@
    style inline, seulement les utilitaires du projet. */
 @source '../../Modules/**/*.blade.php';
 
+/* =====================================================================
+ | Police de texte — servie par le poste, jamais par un CDN.
+ |
+ | Le fichier declarait « Instrument Sans » sans jamais charger la
+ | fonte : aucun @font-face, aucun <link>, donc un repli silencieux sur
+ | la police systeme. Le symptome est le meme que celui du theme absent
+ | du panneau — quelque chose qui a l'air de faire et qui regarde
+ | ailleurs.
+ |
+ | Inter est deja dans le depot, publiee par « filament:assets ». Le
+ | fichier est recopie sous public/fonts/portail/ pour que le portail
+ | n'en depende pas : une republication des assets de Filament ne doit
+ | pas pouvoir emporter la typographie du site public.
+ |
+ | Aucune requete vers Google Fonts : le poste du village peut n'avoir
+ | aucune connexion le jour de la demonstration, et une police qui
+ | n'arrive pas change toute la mise en page.
+ ==================================================================== */
+@font-face {
+    font-family: 'Inter Variable';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/portail/inter-latin-variable.woff2') format('woff2-variations');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+        U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+        U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Inter Variable';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/portail/inter-latin-ext-variable.woff2') format('woff2-variations');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+        U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+        U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* =====================================================================
+ | Palette — relevee sur les photographies du village, pas choisie.
+ |
+ | Quatre familles, chacune tiree d'une matiere presente sur place :
+ |
+ |   nuit     l'indigo du ndop, l'etoffe bleu-nuit a motifs jaunes sur
+ |            laquelle les creations sont exposees. Couleur d'ancrage :
+ |            en-tete, pied de page, texte.
+ |   terre    l'ocre des murs et des colonnes du batiment. Accent, et
+ |            seule couleur d'appel a l'action.
+ |   craie    le blanc casse chaud des murs interieurs des boutiques.
+ |            Fonds et neutres — un gris froid jurerait avec les photos.
+ |   feuille  le vert du blason du village. Reserve aux etats positifs
+ |            (« en boutique »), jamais decoratif.
+ |
+ | Le rouge et le jaune du blason ne sont pas repris en aplats : trois
+ | couleurs nationales sur un site marchand tournent au drapeau, et le
+ | sujet du site est l'artisanat, pas l'institution.
+ ==================================================================== */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Titrage en serif. Aucune fonte a telecharger : la pile s'appuie
+       sur ce que porte deja le systeme, et le contraste avec Inter
+       suffit a distinguer un titre d'un paragraphe. */
+    --font-titre: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia,
+        'Times New Roman', serif;
+
+    --color-nuit-50: #f4f6fb;
+    --color-nuit-100: #e5e9f5;
+    --color-nuit-200: #c7cfe8;
+    --color-nuit-300: #9ca9d3;
+    --color-nuit-400: #6c7cb5;
+    --color-nuit-500: #4a5a96;
+    --color-nuit-600: #37457a;
+    --color-nuit-700: #2a3663;
+    --color-nuit-800: #1e2749;
+    --color-nuit-900: #151b36;
+    --color-nuit-950: #0d1124;
+
+    --color-terre-50: #fdf6f1;
+    --color-terre-100: #fae9dc;
+    --color-terre-200: #f3d0b4;
+    --color-terre-300: #e9b084;
+    --color-terre-400: #dc8d54;
+    --color-terre-500: #c97133;
+    --color-terre-600: #ac5a28;
+    --color-terre-700: #8a4623;
+    --color-terre-800: #6f3a22;
+    --color-terre-900: #5b311f;
+    --color-terre-950: #31170e;
+
+    --color-craie-50: #fbfaf7;
+    --color-craie-100: #f5f2ec;
+    --color-craie-200: #e9e4da;
+    --color-craie-300: #d6cfc1;
+    --color-craie-400: #b4aa98;
+    --color-craie-500: #918777;
+    --color-craie-600: #746b5d;
+    --color-craie-700: #5c544a;
+    --color-craie-800: #443e37;
+    --color-craie-900: #2c2823;
+    --color-craie-950: #1a1714;
+
+    --color-feuille-50: #eff8f1;
+    --color-feuille-100: #d8eedd;
+    --color-feuille-500: #17803d;
+    --color-feuille-600: #12652f;
+    --color-feuille-700: #0f5126;
 }

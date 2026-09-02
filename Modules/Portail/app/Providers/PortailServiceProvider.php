@@ -3,6 +3,8 @@
 namespace Modules\Portail\Providers;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Modules\Portail\Services\ServicePortail;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 /**
@@ -26,11 +28,53 @@ class PortailServiceProvider extends ModuleServiceProvider
 
     protected string $nameLower = 'portail';
 
+    /**
+     * La configuration du module est fusionnee des l'enregistrement.
+     *
+     * `config('portail.visuels.*')` doit repondre avant tout rendu de vue,
+     * y compris sous `config:cache` : un `config()` qui rend null ne leve
+     * rien, il affiche une page sans ses images.
+     */
+    public function register(): void
+    {
+        parent::register();
+
+        $this->mergeConfigFrom(module_path($this->name, 'config/config.php'), $this->nameLower);
+    }
+
     public function boot(): void
     {
         parent::boot();
 
         $this->chargerLesRoutesPubliques();
+        $this->partagerLeVillageAvecLeGabarit();
+    }
+
+    /**
+     * Les coordonnées du village, attachées au seul gabarit.
+     *
+     * Un compositeur plutôt qu'un passage par chaque contrôleur : le
+     * pied de page appartient au gabarit, pas aux pages, et huit
+     * contrôleurs qui passeraient la même variable finiraient par en
+     * oublier un — la page concernée perdrait son pied de page sans que
+     * rien n'échoue.
+     *
+     * Il est posé sur `portail::*` et non sur le seul gabarit. Blade
+     * rend la vue enfant **avant** la mise en page : une variable
+     * attachée au seul gabarit existe dans son pied de page et manque
+     * dans le corps de la page de contact, qui affiche les mêmes
+     * coordonnées. Le motif est le même que celui du thème absent — la
+     * page ne tombe pas, elle affiche moins.
+     *
+     * Le coût reste d'une requête : `village()` mémorise son résultat
+     * pour la durée de la requête, et les partiels rendus en boucle
+     * relisent la valeur déjà en main.
+     */
+    protected function partagerLeVillageAvecLeGabarit(): void
+    {
+        View::composer('portail::*', function ($vue): void {
+            $vue->with('village', app(ServicePortail::class)->village());
+        });
     }
 
     /**

@@ -28,6 +28,25 @@ class AccueilController extends Controller
             'vedettes' => $this->portail->artisansVedettes(),
             'nouveautes' => $catalogue,
             'disponibilites' => $this->disponibilites($catalogue->items()),
+            'reperes' => $this->portail->reperes(),
+            'corpsMetiers' => $this->portail->corpsMetiersDuCatalogue(),
+        ]);
+    }
+
+    /**
+     * Les locaux de vente, un par vignette.
+     *
+     * La page ne dit pas qui occupe quel local : l'attribution est une
+     * donnée de gestion, elle change, et un visiteur qui viendrait
+     * chercher un artisan devant une porte reattribuee la veille aurait
+     * ete trompe par le site. Elle montre les lieux ; les artisans ont
+     * leur propre annuaire.
+     */
+    public function boutiques(): View
+    {
+        return view('portail::boutiques', [
+            'locaux' => $this->portail->locauxDeVente(),
+            'visuels' => config('portail.visuels.boutiques', []),
         ]);
     }
 
