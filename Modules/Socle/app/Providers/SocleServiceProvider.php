@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use Modules\Socle\Models\Utilisateur;
 use Modules\Socle\Services\ContexteExercice;
+use Modules\Socle\Services\RegistreDeReconduction;
 use Modules\Socle\Services\VerrousDeCloture;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
@@ -24,6 +25,11 @@ class SocleServiceProvider extends ModuleServiceProvider
         // vient y déposer leur verrou : tous les `register()` passent
         // avant tous les `boot()`.
         $this->app->singleton(VerrousDeCloture::class);
+
+        // Même raison que VerrousDeCloture, lié ici pour que les
+        // modules fournisseurs le trouvent déjà en place dans leur
+        // propre boot().
+        $this->app->singleton(RegistreDeReconduction::class);
 
         // Singleton par requête : la session sous-jacente persiste
         // d'elle-même entre les requêtes, l'objet n'a besoin d'être

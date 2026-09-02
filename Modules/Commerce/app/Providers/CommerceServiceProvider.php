@@ -8,6 +8,8 @@ use Modules\Commerce\Contracts\JournalDeCaisse;
 use Modules\Commerce\Events\SeuilAlerteFranchi;
 use Modules\Commerce\Listeners\NotifierSeuilAlerte;
 use Modules\Commerce\Services\JournalDeCaisseEnAttente;
+use Modules\Commerce\Services\ReconducteurProduits;
+use Modules\Socle\Services\RegistreDeReconduction;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class CommerceServiceProvider extends ModuleServiceProvider
@@ -56,5 +58,10 @@ class CommerceServiceProvider extends ModuleServiceProvider
                 BootstrapProduitExercicesCommand::class,
             ]);
         }
+
+        // Meme raison que dans l'Artisanat : depose apres que le Socle
+        // a lie le registre.
+        $this->app->make(RegistreDeReconduction::class)
+            ->ajouter('produits', $this->app->make(ReconducteurProduits::class));
     }
 }
