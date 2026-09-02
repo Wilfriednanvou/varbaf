@@ -10,11 +10,15 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Modules\Artisanat\Enums\StatutParticipationArtisan;
 use Modules\Artisanat\Filament\Resources\ArtisanResource\Pages;
 use Modules\Artisanat\Models\Artisan;
+use Modules\Artisanat\Models\ArtisanExercice;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Enums\Sexe;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 class ArtisanResource extends Resource
 {
@@ -56,6 +60,37 @@ class ArtisanResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()->can('lister_artisans');
+    }
+
+    /**
+     * Porte la liste sur les artisans dont la participation à
+     * l'exercice consulté est active — au sens d'`ArtisanExercice`, pas
+     * de la question « existe-t-il ». Un artisan désactivé pour cet
+     * exercice n'y a pas sa place, même s'il redevient actif ailleurs.
+     *
+     * **Ne filtre rien tant que la table de jonction n'a rien à dire
+     * pour cet exercice.** Contrairement à Depot/Vente/Section/
+     * Campagne/Attribution, qui portent `exercice_id` depuis l'origine,
+     * `artisan_exercices` peut être vide pour un exercice qui n'a
+     * jamais été bootstrappé (`varbaf:bootstrap-artisan-exercices`) —
+     * filtrer quand même viderait la liste entière plutôt que de la
+     * laisser telle qu'avant l'introduction de cette table.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $exerciceId = app(ContexteExercice::class)->exerciceConsulte()?->getKey();
+
+        if ($exerciceId === null || ! ArtisanExercice::query()->where('exercice_id', $exerciceId)->exists()) {
+            return parent::getEloquentQuery();
+        }
+
+        return parent::getEloquentQuery()
+            ->whereHas('participationsExercices', fn (Builder $requete) => $requete
+                ->where('exercice_id', $exerciceId)
+                ->whereIn('statut', [
+                    StatutParticipationArtisan::ACTIF->value,
+                    StatutParticipationArtisan::RECONDUIT->value,
+                ]));
     }
 
     public static function form(Schema $form): Schema

@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Artisanat\Models\Boutique;
+use Modules\Commerce\Enums\StatutParticipationProduit;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Exceptions\ProduitInvalideException;
 use Modules\Commerce\Services\ServiceMouvementStock;
+use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\Utilisateur;
 
 /**
@@ -75,8 +77,14 @@ class Produit extends Model
         'boutique_id',
     ];
 
+    /**
+     * `actif` vaut `true` par défaut en base, mais reste `null` en
+     * mémoire pour un attribut absent du tableau de création — voir le
+     * même motif sur `Artisan`, dont dépend `created()` ci-dessous.
+     */
     protected $attributes = [
         'statut_validation' => 'SOUMIS',
+        'actif' => true,
     ];
 
     protected function casts(): array
@@ -106,6 +114,19 @@ class Produit extends Model
             }
 
             $produit->garantirTransitionValide();
+        });
+
+        // Même motif que sur Artisan::created() — voir son commentaire.
+        static::created(function (self $produit): void {
+            if ($exercice = Exercice::courant()) {
+                ProduitExercice::create([
+                    'produit_id' => $produit->id,
+                    'exercice_id' => $exercice->id,
+                    'statut' => $produit->actif
+                        ? StatutParticipationProduit::ACTIF
+                        : StatutParticipationProduit::DESACTIVE,
+                ]);
+            }
         });
     }
 

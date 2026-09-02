@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Modules\Artisanat\Enums\StatutAttribution;
+use Modules\Artisanat\Enums\StatutParticipationArtisan;
 use Modules\Socle\Enums\Sexe;
+use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\VillageArtisanal;
 
 /**
@@ -58,6 +60,17 @@ class Artisan extends Model
         'village_id',
     ];
 
+    /**
+     * `actif` vaut `true` par défaut en base (voir la migration), mais
+     * un attribut absent du tableau de création reste `null` en
+     * mémoire tant que le modèle n'a pas été relu — `created()`
+     * ci-dessous en dépend pour décider du statut de la participation
+     * automatique, avant toute relecture.
+     */
+    protected $attributes = [
+        'actif' => true,
+    ];
+
     protected function casts(): array
     {
         return [
@@ -72,6 +85,32 @@ class Artisan extends Model
         static::creating(function (self $artisan): void {
             if (blank($artisan->matricule)) {
                 $artisan->matricule = static::genererMatricule();
+            }
+        });
+
+        // Sans cette ligne, un artisan créé après l'introduction
+        // d'`artisan_exercices` n'aurait de participation nulle part :
+        // ArtisanResource::getEloquentQuery() le ferait disparaître de
+        // tout exercice, y compris l'actif. `varbaf:bootstrap-artisan-
+        // exercices` rattrape les artisans antérieurs à cette table ;
+        // ce crochet couvre tous ceux qui viennent après, quel que soit
+        // le chemin de création (écran, seeder, import).
+        static::created(function (self $artisan): void {
+            if ($exercice = Exercice::courant()) {
+                ArtisanExercice::create([
+                    'artisan_id' => $artisan->id,
+                    'exercice_id' => $exercice->id,
+                    // Même lecture que la commande de bascule : `actif`
+                    // reste, pour l'instant, le seul signal disponible
+                    // à la création. Un artisan créé `actif = false`
+                    // (cas rare, mais permis par le formulaire) ne
+                    // doit pas obtenir une participation ACTIF que rien
+                    // ne viendrait jamais corriger.
+                    'statut' => $artisan->actif
+                        ? StatutParticipationArtisan::ACTIF
+                        : StatutParticipationArtisan::DESACTIVE,
+                    'date_activation' => now(),
+                ]);
             }
         });
     }

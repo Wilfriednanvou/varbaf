@@ -18,13 +18,16 @@ use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Modules\Artisanat\Models\Artisan;
 use Modules\Commerce\Fiches\AnalyseurFicheTechnique;
+use Modules\Commerce\Enums\StatutParticipationProduit;
 use Modules\Commerce\Enums\StatutValidationProduit;
 use Modules\Commerce\Filament\Resources\ProduitResource\Pages;
 use Modules\Commerce\Models\Produit;
+use Modules\Commerce\Models\ProduitExercice;
 use Modules\Commerce\Services\ServiceMouvementStock;
 use Modules\Commerce\Services\ServiceValidationProduit;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 /**
  * Catalogue des produits déposés.
@@ -57,6 +60,28 @@ class ProduitResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()->can('lister_produits');
+    }
+
+    /**
+     * Même principe que ArtisanResource::getEloquentQuery() — voir son
+     * commentaire, y compris pour le repli quand la table de jonction
+     * n'a rien à dire sur l'exercice consulté.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $exerciceId = app(ContexteExercice::class)->exerciceConsulte()?->getKey();
+
+        if ($exerciceId === null || ! ProduitExercice::query()->where('exercice_id', $exerciceId)->exists()) {
+            return parent::getEloquentQuery();
+        }
+
+        return parent::getEloquentQuery()
+            ->whereHas('participationsExercices', fn (Builder $requete) => $requete
+                ->where('exercice_id', $exerciceId)
+                ->whereIn('statut', [
+                    StatutParticipationProduit::ACTIF->value,
+                    StatutParticipationProduit::RECONDUIT->value,
+                ]));
     }
 
     /**
