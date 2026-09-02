@@ -35,3 +35,10 @@ Thumbs.db
 # Sorties d'execution de la mesure. La serie versee au depot vit
 # dans docs/donnees/evaluation/, citee par le rapport.
 /storage/evaluation/
+
+# Photographies d'origine du village (dump WhatsApp, ~20 Mo).
+# Les versions servies par le site sont derivees dans
+# public/images/portail/ et sont, elles, versionnees : un clone neuf
+# affiche le portail complet sans ce dossier. Retirer cette ligne si
+# l'on veut versionner les originaux.
+/image
