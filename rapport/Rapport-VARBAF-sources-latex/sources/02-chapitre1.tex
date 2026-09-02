@@ -1,0 +1,279 @@
+\chapter{Contexte de l'entreprise et cadres d'étude}
+\label{chap:un}
+
+Ce chapitre situe le cadre dans lequel s'inscrit l'étude. Il présente d'abord la structure d'accueil, son cadre juridique, son organisation et ses missions, puis le déroulement du stage et les tâches qui y ont été confiées. Il établit ensuite le cadre conceptuel, en définissant les notions mobilisées et en examinant les travaux comparables, dont deux ont été conduits au sein même de la structure. Il expose enfin le cadre théorique et discute la place des techniques d'intelligence artificielle et de traitement de données dans le secteur artisanal.
+
+\section{Présentation de l'entreprise}
+\label{sec:1-1}
+
+\subsection{Organisation de l'entreprise}
+
+\subsubsection{Historique et cadre juridique}
+
+Les villages artisanaux du Cameroun procèdent du décret n\textsuperscript{o}~2013/0009/PM du 7~janvier~2013, qui en fixe la création et l'organisation. Ce texte s'inscrit dans un programme national visant à doter chaque région d'une infrastructure dédiée à l'artisanat, afin d'offrir aux artisans un cadre structuré pour produire, exposer et commercialiser leurs œuvres.
+
+Le déploiement du réseau s'est échelonné sur plusieurs années. Le Village Artisanal Régional de Bafoussam a été inauguré le 10~mars~2021 par le Ministre des Petites et Moyennes Entreprises, de l'Économie Sociale et de l'Artisanat. Il constitue le dernier né des villages artisanaux régionaux.
+
+L'édifice a été construit sur une superficie de 4~000~mètres carrés, pour un investissement de l'État évalué à 700~millions de francs~CFA. Il comprend un sous-sol, un rez-de-chaussée et un étage, et regroupe des boutiques d'exposition, des salles de réunion, des salles d'apprentissage, des bureaux et un bloc technique.
+
+\begin{table}[H]
+\centering
+\caption{Fiche signalétique du Village Artisanal Régional de Bafoussam}
+\singlespacing
+\begin{tabularx}{\textwidth}{@{}p{4.6cm}X@{}}
+\toprule
+\entete{Élément} & \entete{Contenu}\\
+\midrule
+Dénomination & Village Artisanal Régional de Bafoussam (VARBAF)\\
+Catégorie & Village artisanal régional\\
+Texte de création & Décret n\textsuperscript{o}~2013/0009/PM du 7 janvier 2013\\
+Date d'inauguration & 10 mars 2021\\
+Tutelle & MINPMEESA\\
+Localisation & Quartier Toket, arrondissement de Bafoussam~I\\
+Ressort territorial & Région de l'Ouest\\
+Superficie & 4~000~m\textsuperscript{2}\\
+Investissement public & 700 millions de francs CFA\\
+Comité de gestion & Présidé par le Gouverneur de la région de l'Ouest\\
+Coordonnateur & M. NANA EDDY Merlin\\
+Effectif du personnel & 9 membres\\
+Espaces locatifs relevés en 2026 & 36, répartis sur 18 contenants\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{élaboré à partir des documents internes du VARBAF et des textes réglementaires.}
+\end{table}
+
+\subsubsection{Structure organisationnelle}
+
+L'administration du village relève d'un comité de gestion présidé par le Gouverneur de la région de l'Ouest. La conduite quotidienne des activités est assurée par un Coordonnateur, assisté d'un Coordonnateur adjoint. L'activité opérationnelle est répartie entre cinq sections, dont les attributions sont les suivantes.
+
+\begin{itemize}[leftmargin=1.4em,itemsep=0.3em]
+\item \textbf{Production} : encadrement technique des artisans ; collecte des échantillons ; validation et contrôle qualité des produits avant exposition ; élaboration des catalogues d'artisans ; alerte des artisans en cas de rupture de stock.
+\item \textbf{Formation} : identification des besoins en formation ; élaboration des plans de formation par filière ; organisation et suivi des sessions ; information des artisans sur les ateliers à venir.
+\item \textbf{Administrative et Financière} : gestion administrative, comptable et financière ; suivi des redevances ; gestion des ressources humaines et matérielles.
+\item \textbf{Promotion et Commercialisation} : exposition et commercialisation des produits ; suivi des statistiques de vente ; organisation des ventes promotionnelles ; alerte des artisans en cas de rupture de stock.
+\item \textbf{Orientation, Information et Documentation} : accueil et orientation des visiteurs et des artisans ; gestion de la documentation ; communication interne et externe.
+\end{itemize}
+
+Cette répartition n'est pas seulement descriptive : elle constitue le modèle des rôles applicatifs définis au chapitre~3. Le système reproduit l'organigramme plutôt que d'inventer une nomenclature de profils, de sorte qu'une habilitation se justifie par une fonction existante.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  boite/.style={draw,rounded corners=2pt,align=center,inner sep=4pt,minimum height=8mm,fill=black!4},
+  chef/.style={boite,text width=2.3cm,minimum height=13mm},
+  lien/.style={draw,-}]
+
+\node[boite,text width=6cm,fill=black!12] (comite) {\textbf{Comité de gestion}\\[1pt]{\scriptsize présidé par le Gouverneur de la région de l'Ouest}};
+\node[boite,text width=4.2cm,below=8mm of comite,fill=black!8] (coord) {\textbf{Coordonnateur}};
+\node[boite,text width=3.4cm,right=12mm of coord] (adj) {Coordonnateur adjoint};
+
+\draw[lien] (comite) -- (coord);
+\draw[lien] (coord) -- (adj);
+
+\coordinate (bus) at ($(coord.south)+(0,-7mm)$);
+\draw[lien] (coord.south) -- (bus);
+
+\node[chef] (s1) at ($(bus)+(-5.4cm,-14mm)$) {Section\\\textbf{Production}};
+\node[chef] (s2) at ($(bus)+(-2.7cm,-14mm)$) {Section\\\textbf{Formation}};
+\node[chef] (s3) at ($(bus)+(0,-14mm)$) {Section\\\textbf{Administrative et Financière}};
+\node[chef] (s4) at ($(bus)+(2.7cm,-14mm)$) {Section\\\textbf{Promotion et Commercialisation}};
+\node[chef] (s5) at ($(bus)+(5.4cm,-14mm)$) {Section\\\textbf{Orientation, Information et Documentation}};
+
+\draw[lien] (s1.north) -- ++(0,5mm) -| (bus);
+\draw[lien] (s2.north) -- ++(0,5mm) -| (bus);
+\draw[lien] (s3.north) -- (bus);
+\draw[lien] (s4.north) -- ++(0,5mm) -| (bus);
+\draw[lien] (s5.north) -- ++(0,5mm) -| (bus);
+\draw[lien] ($(s1.north)+(0,5mm)$) -- ($(s5.north)+(0,5mm)$);
+\end{tikzpicture}
+\caption{Organigramme administratif du Village Artisanal Régional de Bafoussam}
+\source{élaboré par l'auteur d'après les documents internes de la structure.}
+\end{figure}
+
+\subsubsection{Missions et vocation}
+
+Les missions assignées aux villages artisanaux régionaux sont l'accueil et l'orientation du public, la formation des artisans et de leurs organisations professionnelles, la production, l'exposition, la promotion et la commercialisation des produits artisanaux. Y sont rattachées des activités collectives, parmi lesquelles la conception de catalogues des meilleurs produits, l'amélioration de la qualité et de la productivité des artisans logés, l'identification de nouvelles technologies susceptibles d'améliorer leur travail, ainsi que l'organisation de concours et de ventes promotionnelles.
+
+Trois de ces attributions intéressent directement la présente étude. La conception de catalogues fonde le module de gestion des produits et le portail de consultation publique. L'identification de nouvelles technologies inscrit explicitement une démarche d'innovation numérique dans le mandat de la structure. Les villages artisanaux sont enfin appelés à générer des recettes non fiscales susceptibles d'être inscrites au budget des exercices suivants, mission qui fonde le suivi des redevances des espaces locatifs.
+
+\subsection{Secteur d'activité et positionnement}
+
+\subsubsection{Secteurs artisanaux représentés}
+
+L'activité du village couvre quatorze secteurs, présentés au tableau~\ref{tab:secteurs}. Cette diversité reflète la richesse artisanale de la région de l'Ouest, chaque département étant reconnu pour une spécialité : les objets en bronze dans le Noun, les tabourets et calebasses perlés dans les Hauts-Plateaux, la sculpture sur bois dans la Menoua, le mobilier en bambou dans la Mifi et le Koung-Khi, la poterie dans les Bamboutos, ainsi que les tissus traditionnels tissés à la main.
+
+À l'artisanat d'art s'ajoute une activité de transformation agroalimentaire en plein essor, favorisée par le dynamisme agricole de la région. L'inventaire des produits fait apparaître une majorité d'articles issus de cette filière : miel, vins de fruits, liqueurs, chocolat, beurre et fèves de cacao, vinaigres, biscuits et croquettes de manioc, chips de maïs et de plantain, ainsi que des cosmétiques et produits d'entretien élaborés localement.
+
+\begin{table}[H]
+\centering
+\caption{Secteurs d'activité représentés au VARBAF}
+\label{tab:secteurs}
+\singlespacing
+\begin{tabularx}{0.92\textwidth}{@{}XXX@{}}
+\toprule
+Sculpture & Bronze & Agroalimentaire\\
+Textile & Cosmétiques & Décoration\\
+Peau et cuir & Broderie traditionnelle & Arts plastiques\\
+Produits médicinaux & Recyclage des objets & Menuiserie\\
+Tissage & Vannerie & \\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{nomenclature officielle de la structure.}
+\end{table}
+
+\subsubsection{Organisation des espaces}
+
+Les sources officielles font état de vingt-quatre boutiques à la livraison de l'ouvrage. Le relevé d'occupation de l'exercice~2026 recense pour sa part dix-huit contenants effectivement identifiés --- quinze boutiques, deux emprises au sous-sol et une sur l'espace vert --- portant au total 36~espaces locatifs.
+
+L'observation établit par ailleurs un point déterminant pour la modélisation : \textbf{l'unité louée n'est pas la boutique mais l'espace locatif}. Une boutique peut être occupée simultanément par plusieurs artisans, chacun disposant de son espace propre et acquittant sa propre redevance. Le relevé~2026 fait apparaître jusqu'à sept occupants pour une même boutique. Les redevances mensuelles observées s'échelonnent de 2~000 à 60~000~francs~CFA et ne présentent aucune relation avec la superficie occupée.
+
+Ce constat a une conséquence directe sur le calcul des indicateurs. Rapporter le taux d'occupation au nombre de boutiques revient à compter pour une seule occupation un local partagé par six artisans. L'indicateur pertinent se rapporte donc au parc d'espaces locatifs, et le modèle de données doit porter cette distinction avant que tout chiffre n'en soit tiré.
+
+\subsubsection{Produits et services offerts}
+
+Le village propose aux artisans un ensemble de services qui dépassent la seule mise à disposition d'espaces : espaces de vente et d'exposition, organisation d'événements et de concours, salles d'apprentissage pour la formation continue, appui à la commercialisation et accompagnement administratif. Il accueille enfin les visiteurs, touristes et populations locales, favorisant la rencontre avec le patrimoine artistique des Grassfields.
+
+\capture{Plan de localisation du Village Artisanal Régional de Bafoussam}{Extrait cartographique situant le Village au quartier Toket, arrondissement de Bafoussam~I, avec les voies d'accès principales.}
+
+\subsection{Cadre de travail et périmètre du stage}
+
+Le stage s'est déroulé au sein de la structure du 23~juin au 23~août~2026, soit une durée de deux mois. Les premières semaines ont été consacrées à la découverte du fonctionnement général : des visites successives des cinq sections ont permis d'appréhender les tâches propres à chaque service et d'identifier les difficultés rencontrées dans l'exercice de leurs missions. Cette immersion a donné accès aux réalités du terrain et aux supports d'information effectivement utilisés, condition nécessaire à l'analyse conduite au chapitre suivant.
+
+Les missions confiées ont porté sur trois axes. Le premier a consisté à collecter, observer et exploiter les données issues des documents et registres utilisés par la structure, en particulier celles relatives aux activités commerciales et à la gestion des produits ; ce travail a donné lieu à la transcription du registre manuscrit et à l'extraction des classeurs de suivi. Le deuxième a porté sur la participation à un atelier de formation en informatique destiné au personnel administratif, qui a permis d'identifier les besoins liés à l'usage des outils numériques ainsi que le niveau de familiarité des utilisateurs avec ces outils --- élément déterminant pour les choix d'ergonomie retenus ultérieurement. Le troisième a consisté à formaliser les constats issus de cette immersion et à concevoir une solution répondant aux difficultés observées.
+
+\section{Cadre conceptuel et état de l'art}
+\label{sec:1-2}
+
+\subsection{Présentation des concepts}
+
+\subsubsection{Système d'information}
+
+Un système d'information est un ensemble organisé de ressources --- matériels, logiciels, données, procédures et personnes --- qui acquiert, traite, mémorise et diffuse de l'information au sein d'une organisation (Reix, Fallery, Kalika \& Rowe, 2016).
+
+Cette définition appelle deux remarques pour le cas étudié. La première est que le système d'information existe indépendamment de son informatisation : le Village en possède déjà un, dont le registre manuscrit, les classeurs de suivi et la mémoire du personnel sont les supports. Le problème posé n'est donc pas l'absence de système, mais la dispersion de ses supports. La seconde est que, dans une structure qui manipule des recettes publiques, la fonction de mémorisation ne se réduit pas à conserver une valeur : elle suppose de conserver aussi qui a saisi quoi et quand, faute de quoi l'information ne fonde aucune reddition de comptes.
+
+\subsubsection{Intelligence artificielle et modèles de langage}
+
+L'intelligence artificielle regroupe les méthodes permettant à un système de percevoir son environnement, de raisonner et d'agir en vue d'atteindre un objectif (Russell \& Norvig, 2021). Les modèles de langage de grande taille en constituent une catégorie particulière, capable de traiter et de générer du texte à partir d'un contexte fourni. Ils permettent d'interroger un système en langage naturel, sans connaître la structure technique des données.
+
+Ces modèles peuvent toutefois produire des énoncés plausibles mais faux, phénomène désigné sous le terme d'\guillemotleft~hallucination~\guillemotright. Cette limite interdit de leur confier un calcul ou la restitution d'un montant. Dans le présent travail, leur emploi est en conséquence borné : le modèle ne reçoit que des extraits déjà retrouvés et n'a accès à aucun indicateur. Il ne peut donc produire un montant, non parce qu'une consigne le lui interdit, mais parce qu'il n'a accès à rien d'où un montant pourrait venir.
+
+\subsubsection{Représentation vectorielle et recherche d'information}
+
+La représentation vectorielle transforme un texte en vecteur numérique afin de le comparer à d'autres. Deux familles s'y distinguent.
+
+La représentation \textbf{creuse}, dont la pondération TF-IDF est l'exemple canonique, attribue à chaque terme un poids croissant avec sa fréquence dans le document et décroissant avec sa fréquence dans le corpus (Salton \& Buckley, 1988). Elle est interprétable et calculable localement, sans service externe.
+
+La représentation \textbf{dense}, produite par des modèles pré-entraînés, place les textes dans un espace où les proximités reflètent le sens plutôt que le vocabulaire (Mikolov, Chen, Corrado \& Dean, 2013). Elle promet de rapprocher un savon gommant et un beurre de karité d'une requête portant sur les soins corporels, malgré l'absence de terme commun.
+
+Cette promesse est ordinairement présentée comme acquise. Le présent travail la traite comme une hypothèse à éprouver : elle suppose que le modèle ait été entraîné sur une langue et un registre proches de ceux du corpus, condition qui n'est pas garantie lorsque les fiches à indexer font trois mots de français. Le protocole et le résultat figurent au chapitre~4.
+
+\subsubsection{Génération augmentée par la recherche}
+
+La génération augmentée par la recherche associe une recherche documentaire à un modèle de langage (Lewis et al., 2020) : les documents pertinents sont d'abord récupérés dans un corpus indexé, puis fournis au modèle qui formule sa réponse à partir d'eux. L'architecture réduit le risque d'énoncé non fondé et permet de citer ses sources.
+
+Elle demeure inadaptée aux agrégations, qui relèvent du calcul et non de la similarité : une somme ne se récupère pas par voisinage vectoriel. Cette inadéquation n'est pas marginale dans le cas étudié, où les questions les plus attendues portent précisément sur des montants. Elle fonde le partage de responsabilité exposé à la section~\ref{sec:1-2-2}.
+
+\subsubsection{Qualité des données et résolution d'entités}
+
+La qualité des données se mesure selon plusieurs dimensions, parmi lesquelles l'exactitude, la complétude, la cohérence et l'unicité (Wang \& Strong, 1996). Elle conditionne tout traitement analytique : un indicateur calculé sur des données erronées propage l'erreur sans la signaler.
+
+La résolution d'entités désigne le rapprochement des désignations multiples d'une même entité réelle (Christen, 2012). Le cas étudié l'exige, un même artisan apparaissant sous plusieurs formes selon les sources : nom commercial, nom de personne, forme abrégée ou variante orthographique.
+
+\subsubsection{Entrepôt de données et modèle dimensionnel}
+
+Le modèle en étoile organise les données analytiques autour d'une table de faits, dont chaque ligne correspond à un événement mesurable au grain retenu, et de tables de dimensions qui en portent les axes de lecture (Kimball \& Ross, 2013). Dans le cas étudié, le grain naturel est la ligne de vente, et les dimensions pertinentes sont l'artisan, le produit, l'espace locatif, le vendeur et le temps. Cette organisation, sans supposer une base distincte que la volumétrie ne justifie pas, structure les requêtes d'agrégation du tableau de bord.
+
+\subsection{Relation entre les concepts}
+\label{sec:1-2-2}
+
+Les concepts présentés s'articulent en une chaîne dont chaque maillon conditionne le suivant. Les données brutes, issues de supports hétérogènes, sont d'abord qualifiées par normalisation et résolution d'entités ; sans cette étape, les traitements ultérieurs opéreraient sur des artisans dédoublés. Ces données qualifiées alimentent une base structurée, dont une organisation dimensionnelle permet de dériver les indicateurs. Une représentation vectorielle des informations textuelles autorise enfin une interrogation en langage naturel.
+
+La répartition des rôles entre ces deux derniers usages constitue le point central de la conception. Les questions d'agrégation sont résolues par calcul déterministe sur la base ; les questions descriptives le sont par recherche documentaire, sans accès aux indicateurs. Cette séparation n'est pas un détail d'implémentation : elle garantit que le système ne produira jamais un montant inventé. Sa traduction technique est décrite à la section~\ref{sec:3-3}.
+
+\subsection{Solutions et applications existantes}
+
+L'examen des solutions existantes distingue trois familles, dont la pertinence au regard du cas étudié est inégale.
+
+Les \textbf{places de marché artisanales} --- Etsy, Amazon Handmade, Un Grand Marché, ou NOVICA qui cible les artisans des pays en développement et a noué un partenariat de renforcement des capacités numériques avec le Centre du Commerce International (International Trade Centre, 2021) --- répondent à un besoin de commercialisation et de visibilité. Elles n'assurent en revanche ni le suivi des dépôts, ni celui de la caisse, des redevances ou des sommes dues aux artisans.
+
+Les \textbf{logiciels de dépôt-vente} --- SimpleConsign, ConsignCloud, ConsignPro, Bravo --- correspondent bien plus étroitement au fonctionnement du Village : gestion des déposants, suivi des stocks, calcul des commissions, consultation des soldes. Cette convergence confirme la pertinence du modèle métier retenu. Trois limites écartent cependant leur adoption directe : un abonnement récurrent en devise étrangère, incompatible avec les contraintes budgétaires ; un périmètre limité au commerce de détail, qui ne couvre ni les espaces locatifs ni les redevances, soit précisément la mission de recettes non fiscales assignée à la structure ; et une dépendance à une connexion permanente.
+
+L'\textbf{interrogation de données organisationnelles en langage naturel} constitue une troisième famille, plus récente. Les architectures de génération augmentée par la recherche sont aujourd'hui appliquées à des corpus d'entreprise et d'institutions culturelles ; leur transposition à une structure de la taille du village artisanal demeure peu documentée, ce qui constitue l'un des apports possibles de la présente étude.
+
+\begin{table}[H]
+\centering
+\caption{Positionnement de l'étude au regard des solutions examinées}
+\label{tab:positionnement}
+\singlespacing
+\begin{tabularx}{\textwidth}{@{}p{4.4cm}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}p{2.4cm}@{}}
+\toprule
+\entete{Critère} & \entete{Places de marché} & \entete{Dépôt-vente} & \entete{Présente étude}\\
+\midrule
+Gestion des dépôts confiés & Non & Oui & Oui\\
+Calcul de la commission & Non & Oui & Oui\\
+Suivi des sommes dues aux artisans & Non & Oui & Oui\\
+Attribution d'espaces locatifs & Non & Non & Oui\\
+Suivi des redevances & Non & Non & Oui\\
+Tenue d'une caisse et arrêté journalier & Non & Partiel & Oui\\
+Visibilité publique des produits & Oui & Partielle & Oui, en consultation\\
+Interrogation en langage naturel & Non & Non & Oui\\
+Fonctionnement hors connexion & Non & Rarement & Oui\\
+Coût récurrent & Commissions & Abonnement & Nul pour le socle\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{élaboré par l'auteur.}
+\end{table}
+
+\subsection{Antécédents numériques dans la structure d'accueil}
+
+Deux projets numériques ont été conduits au Village avant la présente étude. Ils ne constituent pas des solutions en fonctionnement, mais ils éclairent les conditions de réussite d'une intervention numérique dans cette structure.
+
+Le premier portait sur une application d'archivage documentaire destinée aux dossiers d'artisans, contrats et factures. Achevée sur le plan technique, elle n'a pas été déployée, faute de budget d'hébergement et de maintenance. Le second, dénommé ArtiZone, portait sur une plateforme de commerce électronique avec catalogue, panier d'achat et paiement mobile.
+
+Ces antécédents orientent le présent travail sur deux points. Le premier établit que la contrainte de déploiement constitue un risque avéré et non théorique : une solution techniquement achevée peut demeurer inutilisée si son fonctionnement suppose une dépense récurrente non budgétée. Ce constat conduit à retenir une architecture dont le cœur est déployable localement, sans coût récurrent. Le second délimite le positionnement de la présente étude, centrée sur la gestion interne, la trésorerie et le pilotage, à l'exclusion de la vente en ligne.
+
+\section{Cadre théorique}
+\label{sec:1-3}
+
+Trois éléments théoriques soutiennent la conception du dispositif d'interrogation et son évaluation.
+
+\subsection{Mesure de similarité et seuil de pertinence}
+
+La similarité cosinus mesure l'angle formé par deux vecteurs, indépendamment de leur norme. Cette propriété la rend adaptée à la comparaison de documents de longueurs inégales, situation courante lorsque les fiches indexées portent des descriptions de tailles variables.
+
+Sa valeur, comprise entre 0 et 1 pour des vecteurs à composantes positives, permet de fixer un seuil en deçà duquel un document est écarté. Ce seuil constitue le paramètre principal du dispositif : trop bas, il produit des rapprochements arbitraires ; trop haut, il conduit à ne rien restituer. Le chapitre~4 montre qu'un espace vectoriel mal adapté au corpus rend ce réglage sans objet, l'ordre des similarités étant lui-même erroné.
+
+\subsection{Architecture de génération augmentée par la recherche}
+
+Une telle architecture comporte quatre étapes : la constitution et le découpage d'un corpus, sa vectorisation et son indexation, la recherche des segments les plus proches d'une requête, et la formulation d'une réponse à partir des segments retenus.
+
+Sa performance se mesure en deux points distincts : la capacité de la recherche à ramener les segments pertinents, mesurée par le rappel, et la fidélité de la réponse aux segments fournis, c'est-à-dire l'absence d'ajouts non fondés.
+
+\subsection{Le refus comme indicateur de performance}
+
+Le protocole retenu ajoute à ces deux mesures un troisième indicateur, moins courant et pourtant décisif dans un contexte de gestion : le \textbf{taux de refus correct}, qui évalue la capacité du système à ne rien répondre lorsque rien de pertinent n'a été trouvé.
+
+Un moteur de recherche rend toujours quelque chose. Ce qui distingue un système utilisable d'un système dangereux, lorsque ses réponses portent sur l'activité d'une structure publique, n'est pas seulement sa capacité à trouver : c'est sa capacité à reconnaître qu'il n'a pas trouvé. Cet indicateur est celui qui, au chapitre~4, tranche entre les moteurs éprouvés.
+
+\section{Place de l'intelligence artificielle et du Big Data dans l'artisanat}
+\label{sec:1-4}
+
+\subsection{Apports}
+
+Trois apports sont attendus. L'\textbf{accès à l'information} est facilité par l'interrogation en langage naturel, qui dispense l'utilisateur de connaître la structure des données --- apport déterminant dans une structure où le personnel n'est pas spécialisé en informatique. La \textbf{valorisation des produits} est soutenue par les mécanismes de recommandation, qui rapprochent des articles qu'une navigation par catégories ne relierait pas. L'\textbf{aide à la décision} est renforcée par la production automatique d'indicateurs jusque-là indisponibles.
+
+\subsection{Limites}
+
+Quatre limites encadrent ces apports, et leur énoncé conditionne la crédibilité du travail.
+
+La \textbf{volumétrie} demeure réduite : le corpus transcrit compte 603~lignes de registre, dont 195 seulement portent sur l'exercice retenu. Cette échelle ne relève pas du critère de volume habituellement associé au Big Data ; les dimensions effectivement mobilisées sont ici la \emph{variété} des sources --- manuscrites, tabulaires, applicatives --- et la \emph{véracité} des données, dont l'établissement constitue une part substantielle du travail.
+
+L'\textbf{absence d'historique comportemental} interdit le filtrage collaboratif, le Village ne disposant ni de comptes clients ni d'historique de navigation : la recommandation doit se fonder sur le seul contenu des produits. La \textbf{contrainte de connectivité} affecte toute fonctionnalité reposant sur un service externe de vectorisation ou de génération, et impose que leur indisponibilité ne bloque aucune fonction de gestion. Le \textbf{coût récurrent} de ces services constitue enfin un facteur de risque, au regard du précédent d'un projet abandonné pour un motif de même nature.
+
+\vspace{1em}
+\noindent\textbf{Conclusion partielle.} Ce chapitre a présenté la structure d'accueil, son organisation et ses missions, ainsi que le déroulement du stage. Il a établi un point déterminant pour la suite : l'unité de location n'est pas la boutique mais l'espace locatif, une boutique pouvant abriter jusqu'à sept occupants. Il a défini les concepts mobilisés et situé l'étude au regard de trois familles de solutions, parmi lesquelles les logiciels de dépôt-vente se révèlent les plus proches du fonctionnement du village sans en couvrir la dimension locative. Il a rapporté les antécédents numériques de la structure, dont l'un n'a jamais été déployé faute de budget, et posé les trois éléments théoriques qui soutiennent l'évaluation du chapitre~4 --- au premier rang desquels le taux de refus correct. Le chapitre suivant expose la méthodologie retenue et caractérise le jeu de données constitué.

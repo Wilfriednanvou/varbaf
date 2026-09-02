@@ -1,0 +1,137 @@
+% ---------------------------------------------------------------
+% Préambule — mise en forme conforme au Guide de rédaction KEYCE v3
+% Marges 3 cm à gauche, 2,5 cm ailleurs ; Times 12 ; interligne 1,5
+% ---------------------------------------------------------------
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{mathptmx}          % Times New Roman
+\usepackage[scaled=0.92]{helvet}
+\usepackage{courier}
+
+\usepackage[a4paper,left=3cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[format=plain,labelsep=period,font=small,labelfont=bf]{caption}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.geometric,arrows.meta,fit,backgrounds,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage[hidelinks]{hyperref}
+
+% --- Espacement entre paragraphes (une ligne vide, guide § 2.1.2) ---
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
+\setlength{\parindent}{1.25em}
+
+% --- Numérotation des pages : en bas à droite ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}\fancyfoot[R]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}}
+
+% --- Titres (guide § 2.3.1) ---
+% Chapitre  : MAJUSCULES, gras, 13 pt
+% Section   : gras, minuscule, 13 pt
+% Sous-sect.: italique, gras, minuscule, 12 pt
+% Paragraphe: italique, minuscule, 12 pt
+\titleformat{\chapter}[hang]
+  {\normalfont\bfseries\fontsize{13}{16}\selectfont\filcenter}
+  {\MakeUppercase{\chaptername}~\thechapter~:}{0.4em}{\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{13}{16}\selectfont}
+  {\thesection.}{0.6em}{}
+\titlespacing*{\section}{0pt}{18pt}{6pt}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\itshape\fontsize{12}{15}\selectfont}
+  {\thesubsection.}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{14pt}{4pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\itshape\fontsize{12}{15}\selectfont}
+  {\thesubsubsection.}{0.6em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{4pt}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+% --- Numérotation tableaux et figures : chapitre.ordre ---
+\renewcommand{\thetable}{\thechapter.\arabic{table}}
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+\addto\captionsfrench{%
+  \renewcommand{\tablename}{Tableau}%
+  \renewcommand{\figurename}{Figure}%
+  \renewcommand{\listtablename}{Index des tableaux}%
+  \renewcommand{\listfigurename}{Index des figures}}
+
+% --- Source sous un tableau ou une figure ---
+\newcommand{\source}[1]{%
+  \par\vspace{0.5em}%
+  {\centering\footnotesize\itshape Source : #1\par}}
+
+% --- Citation longue : plus de 40 mots, retrait 1,4 cm, interligne simple ---
+\newenvironment{citationlongue}
+  {\begin{quote}\setlength{\rightskip}{1.4cm}\setlength{\leftskip}{1.4cm}\singlespacing\small}
+  {\end{quote}}
+
+% --- Encadré signalant une capture d'écran à insérer ---
+\newcommand{\capture}[2]{%
+  \begin{figure}[H]\centering
+  \setlength{\fboxsep}{10pt}%
+  \fcolorbox{black!45}{black!4}{%
+    \begin{minipage}{0.86\textwidth}\centering\singlespacing
+    \textbf{\small [CAPTURE D'ÉCRAN À INSÉRER]}\par\vspace{0.3em}
+    {\small #2}\par\vspace{0.5em}
+    {\footnotesize\itshape Remplacer ce cadre par le fichier image correspondant.}
+    \end{minipage}}
+  \caption{#1}
+  \end{figure}}
+
+% --- Style du tableau : en-tête gris, texte compact ---
+\newcommand{\entete}[1]{\textbf{\small #1}}
+\renewcommand{\arraystretch}{1.25}
+
+% --- Bibliographie APA : retrait pendant ---
+\newenvironment{bibliographieapa}
+  {\begin{list}{}{%
+     \setlength{\leftmargin}{1.25cm}%
+     \setlength{\itemindent}{-1.25cm}%
+     \setlength{\itemsep}{0.25em}%
+     \setlength{\parsep}{0pt}}\singlespacing}
+  {\end{list}}
+\newcommand{\refbib}[1]{\item #1}
+
+% --- Titres non numérotés apparaissant dans la table des matières ---
+\newcommand{\chapitresansnum}[1]{%
+  \chapter*{#1}\addcontentsline{toc}{chapter}{#1}}
+
+% --- Les tables (matieres, tableaux, figures) sans espacement de paragraphe ---
+\newcommand{\sansespacement}{\setlength{\parskip}{0pt}\singlespacing}
+
+\frenchsetup{StandardLists=true,SmallCapsFigTabCaptions=false,FrenchFootnotes=false}
+% --- Eviter les lignes et titres isoles en bord de page (guide 2.3.1) ---
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\brokenpenalty=10000
+
+\sloppy

@@ -1,0 +1,249 @@
+% ================= COUVERTURE =================
+\thispagestyle{empty}
+\begin{center}
+\singlespacing
+{\small
+\begin{tabularx}{\textwidth}{@{}>{\centering\arraybackslash}X@{\hspace{1em}}>{\centering\arraybackslash}X@{}}
+\textbf{RÉPUBLIQUE DU CAMEROUN} & \textbf{REPUBLIC OF CAMEROON}\\
+Paix -- Travail -- Patrie & Peace -- Work -- Fatherland\\[0.6em]
+\textbf{MINISTÈRE DE L'ENSEIGNEMENT SUPÉRIEUR} & \textbf{MINISTRY OF HIGHER EDUCATION}\\[0.6em]
+\textbf{INSTITUT UNIVERSITAIRE DES GRANDES ÉCOLES EUROPÉENNES (IUGEE)} & \textbf{UNIVERSITY INSTITUTE OF THE GREAT EUROPEAN SCHOOLS}\\[0.6em]
+\textbf{INSTITUT SUPÉRIEUR KEYCE INFORMATIQUE \& INTELLIGENCE ARTIFICIELLE} & \textbf{HIGHER INSTITUTE KEYCE OF COMPUTER SCIENCE \& ARTIFICIAL INTELLIGENCE}\\
+\end{tabularx}}
+
+\vspace{1.4cm}
+\rule{\textwidth}{0.8pt}
+\vspace{0.5cm}
+
+{\bfseries\fontsize{15}{19}\selectfont
+SYSTÈME D'INFORMATION INTELLIGENT AU SERVICE DE LA VALORISATION DE L'ARTISANAT :\\ CAS DU VILLAGE ARTISANAL RÉGIONAL DE BAFOUSSAM (VARBAF)\par}
+
+\vspace{0.5cm}
+\rule{\textwidth}{0.8pt}
+\vspace{1.2cm}
+
+{\large\bfseries RAPPORT DE FIN D'ÉTUDES\par}
+\vspace{0.4cm}
+présenté et soutenu par :
+
+\vspace{0.3cm}
+{\large\bfseries NANVOU DONJIO ANGE WILFRIED\par}
+
+\vspace{0.6cm}
+En vue de l'obtention du\\[0.3em]
+\textbf{Diplôme de Licence en Intelligence Artificielle et Big Data}
+
+\vspace{0.9cm}
+Sous l'encadrement de :\\[0.3em]
+{\bfseries M. FOTIE JURICE FABRICE}\\
+\emph{Enseignant associé à Keyce Informatique et Intelligence Artificielle}
+
+\vspace{0.9cm}
+Devant le jury composé de :
+
+\vspace{0.3em}
+\begin{tabular}{@{}ll@{}}
+Président : & \makebox[6cm]{\dotfill}\\[0.4em]
+Rapporteur : & \makebox[6cm]{\dotfill}\\[0.4em]
+Membres : & \makebox[6cm]{\dotfill}\\
+\end{tabular}
+
+\vfill
+Année académique : \textbf{2025 -- 2026}\\[0.4em]
+Date de la soutenance : \makebox[4cm]{\dotfill}
+\end{center}
+\clearpage
+
+% ================= PAGE DE GARDE =================
+\thispagestyle{empty}
+\begin{center}
+\singlespacing
+\vspace*{0.5cm}
+{\footnotesize [LOGO IUGEE] \hfill [LOGO KEYCE INFORMATIQUE] \hfill [LOGO VARBAF]}
+
+\vspace{2.5cm}
+{\bfseries\fontsize{15}{19}\selectfont
+SYSTÈME D'INFORMATION INTELLIGENT AU SERVICE DE LA VALORISATION DE L'ARTISANAT :\\ CAS DU VILLAGE ARTISANAL RÉGIONAL DE BAFOUSSAM (VARBAF)\par}
+
+\vspace{2cm}
+Rapport en vue de l'obtention du diplôme de :\\[0.4em]
+{\large\bfseries Licence en Intelligence Artificielle et Big Data\par}
+\vspace{0.4em}
+Option : Intelligence Artificielle et Big Data
+
+\vspace{1.6cm}
+Présenté par :\\[0.4em]
+{\large\bfseries NANVOU DONJIO ANGE WILFRIED\par}
+
+\vfill
+BAFOUSSAM, CAMEROUN\\[0.3em]
+ANNÉE ACADÉMIQUE 2025 -- 2026
+\end{center}
+\clearpage
+
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+% ================= DÉDICACE =================
+\chapter*{DÉDICACE}
+\addcontentsline{toc}{chapter}{Dédicace}
+\vspace{3cm}
+\begin{center}
+\emph{À ma sœur}
+
+\vspace{0.8cm}
+{\Large\bfseries NANVOU FEUDJIO NATHALIE\par}
+\end{center}
+\clearpage
+
+% ================= REMERCIEMENTS =================
+\chapter*{REMERCIEMENTS}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+Au terme de ce stage académique, nous tenons à exprimer notre gratitude à l'ensemble des personnes qui ont rendu ce travail possible. Leur disponibilité, leurs conseils et leur confiance ont accompagné chaque étape de ce projet. Nous adressons nos remerciements :
+
+\begin{itemize}[leftmargin=1.2em,itemsep=0.5em]
+\item \textbf{Aux membres du jury}, pour l'évaluation de ce travail et pour les remarques constructives qu'ils voudront bien y apporter.
+
+\item \textbf{À M. FOTIE JURICE FABRICE}, notre encadreur académique, pour la rigueur méthodologique et les orientations qui ont structuré ce travail.
+
+\item \textbf{À M. NGOUPAYOU CHOUAIBOU}, notre encadreur professionnel, pour son accompagnement quotidien sur le terrain et pour l'accès qu'il nous a ménagé aux réalités de la structure.
+
+\item \textbf{À M. NANA EDDY MERLIN}, Coordonnateur du Village Artisanal Régional de Bafoussam, pour son accueil et pour la confiance accordée à ce projet.
+
+\item \textbf{À la direction et au corps enseignant de Keyce Informatique Bafoussam}, pour la qualité de l'accompagnement administratif et pédagogique, et pour la formation reçue en Intelligence Artificielle et Big Data tout au long de ce parcours.
+
+\item \textbf{À l'ensemble du personnel du Village Artisanal Régional de Bafoussam}, dont l'accueil a facilité notre intégration et enrichi notre compréhension du terrain.
+
+\item \textbf{À notre famille}, pour son soutien constant tout au long de ce parcours.
+
+\item \textbf{À nos camarades de promotion}, pour les échanges et l'entraide qui ont accompagné cette année académique.
+\end{itemize}
+\clearpage
+
+% ================= RÉSUMÉ =================
+\chapter*{RÉSUMÉ}
+\addcontentsline{toc}{chapter}{Résumé}
+
+Le Village Artisanal Régional de Bafoussam assure l'encadrement des artisans, la formation, l'exposition et la commercialisation des produits artisanaux, ainsi que la gestion d'espaces locatifs. La gestion de ces activités repose cependant sur des supports manuels et des données dispersées, ce qui limite la traçabilité des opérations et la production d'indicateurs fiables pour la décision. Ce travail porte sur la conception et la réalisation d'un système d'information centralisé intégrant des fonctionnalités d'intelligence artificielle, afin d'améliorer la gestion et la valorisation des activités du Village.
+
+La méthodologie relève de la recherche-action et associe une approche descriptive, exploratoire, qualitative et quantitative. Elle s'appuie sur l'observation directe des processus, l'analyse documentaire, ainsi que sur la transcription, la normalisation et l'exploitation des supports existants. Le registre transcrit compte 603~lignes, mais l'analyse porte sur le seul exercice~2026, seule période pour laquelle les trois sources sont simultanément disponibles : elle retient 195~lignes de vente couvrant janvier à juin~2026, 36~espaces locatifs et 21~artisans identifiés.
+
+L'analyse établit quatre résultats sur cette période. Le rattachement d'une vente au parc locatif est impossible sur 41~lignes, soit 21,0~\% des ventes et 159~700~francs~CFA, c'est-à-dire 20,2~\% d'un chiffre d'affaires de 791~400~francs~CFA ; un même artisan apparaît par ailleurs sous 33~écritures distinctes pour 21~identités réelles. La dette du village envers ses artisans s'élève à 226~850~francs~CFA, soit 28,7~\% du chiffre d'affaires. Le taux de recouvrement des redevances s'établit à 14,73~\%, laissant 1~959~000~francs~CFA à recouvrer sur une imputation annuelle de 2~478~000~francs~CFA. La situation de caisse fait enfin apparaître une différence de 162~525~francs~CFA entre les avoirs dus et les sommes détenues, que l'absence de journal chronologique rend indécidable en l'état des supports.
+
+La solution réalisée est une application modulaire de 37~500 lignes, organisée en six modules à dépendance descendante, qui couvre les artisans, les espaces locatifs, les produits, les ventes, la trésorerie, le pilotage et un portail public de consultation. L'intelligence artificielle y prend la forme d'un assistant d'interrogation en langage naturel dont l'architecture sépare strictement les questions d'agrégation, résolues par calcul déterministe, des questions descriptives, traitées par recherche documentaire. Évalué sur 48~questions, l'assistant classe correctement 100~\% des questions et atteint un rappel@5 de 70~\% avec un taux de refus correct de 100~\%. La branche vectorielle dense, construite et mesurée, a été écartée : elle perd dix points de rappel et annule le refus. Ce résultat négatif infirme l'hypothèse de départ et constitue l'un des apports du travail.
+
+\vspace{0.6em}
+\noindent\textbf{Mots clés :} système d'information, artisanat, intelligence artificielle, qualité des données, recherche d'information.
+\clearpage
+
+% ================= ABSTRACT =================
+\chapter*{ABSTRACT}
+\addcontentsline{toc}{chapter}{Abstract}
+\begin{otherlanguage}{english}
+
+The Regional Craft Village of Bafoussam supports artisans, provides training, and exhibits and markets handicraft products, while also managing rental spaces. The management of these activities nevertheless relies on manual records and scattered data, which limits the traceability of operations and the production of reliable indicators for decision-making. This work covers the design and implementation of a centralised information system incorporating artificial intelligence features, in order to improve the management and promotion of the Village's activities.
+
+The methodology follows an action-research approach and combines descriptive, exploratory, qualitative and quantitative perspectives. It relies on direct observation of processes, documentary analysis, and the transcription, normalisation and exploitation of existing records. The transcribed register holds 603 entries, but the analysis covers the 2026 financial year alone, the only period for which all three sources are simultaneously available: it retains 195 sales entries from January to June 2026, 36 rental spaces and 21 identified artisans.
+
+The analysis establishes four findings for that period. Linking a sale to the rental estate proves impossible on 41 entries, that is 21.0\% of sales and 159,700 CFA francs, or 20.2\% of a turnover of 791,400 CFA francs; a single artisan further appears under 33 distinct written forms for 21 actual identities. Amounts owed by the Village to its artisans total 226,850 CFA francs, that is 28.7\% of turnover. The rental fee collection rate stands at 14.73\%, leaving 1,959,000 CFA francs outstanding on an annual assessment of 2,478,000 CFA francs. Finally, the cash position shows a 162,525 CFA franc difference between amounts owed and cash held, which the absence of a chronological ledger makes undecidable given the current records.
+
+The delivered solution is a modular application of 37,500 lines, organised into six modules with strictly descending dependencies, covering artisans, rental spaces, products, sales, treasury, monitoring, and a public consultation portal. Artificial intelligence takes the form of a natural-language querying assistant whose architecture strictly separates aggregation questions, resolved by deterministic computation, from descriptive questions, handled by document retrieval. Evaluated on 48 questions, the assistant classifies 100\% of questions correctly and reaches a recall@5 of 70\% with a correct-refusal rate of 100\%. The dense vector branch, although built and measured, was discarded: it loses ten points of recall and cancels refusal altogether. This negative result disproves the initial hypothesis and constitutes one of the contributions of this work.
+
+\vspace{0.6em}
+\noindent\textbf{Keywords:} information system, handicrafts, artificial intelligence, data quality, information retrieval.
+\end{otherlanguage}
+\clearpage
+
+% ================= SIGLES =================
+\chapter*{LISTE DES SIGLES ET ABRÉVIATIONS}
+\addcontentsline{toc}{chapter}{Liste des sigles et abréviations}
+\singlespacing
+\begin{longtable}{@{}p{3.2cm}p{\dimexpr\textwidth-3.7cm\relax}@{}}
+\toprule
+\entete{Abréviation} & \entete{Définition}\\
+\midrule
+\endhead
+APA & \emph{American Psychological Association}\\
+API & \emph{Application Programming Interface} --- interface de programmation applicative\\
+CNI & Carte Nationale d'Identité\\
+CNTC & Confédération Nationale des Travailleurs du Cameroun\\
+CRISP-DM & \emph{Cross Industry Standard Process for Data Mining}\\
+CRUD & \emph{Create, Read, Update, Delete}\\
+ERP & \emph{Enterprise Resource Planning} --- progiciel de gestion intégré\\
+FCFA & Franc de la Communauté Financière Africaine\\
+GIC & Groupe d'Initiative Commune\\
+IA & Intelligence Artificielle\\
+IABD & Intelligence Artificielle et Big Data\\
+IDF & \emph{Inverse Document Frequency}\\
+MINPMEESA & Ministère des Petites et Moyennes Entreprises, de l'Économie Sociale et de l'Artisanat\\
+MoSCoW & \emph{Must, Should, Could, Won't have}\\
+MVC & \emph{Model--View--Controller}\\
+RAG & \emph{Retrieval-Augmented Generation} --- génération augmentée par la recherche\\
+RG & Règle de Gestion\\
+SGBD & Système de Gestion de Base de Données\\
+SI & Système d'Information\\
+SQL & \emph{Structured Query Language}\\
+TF-IDF & \emph{Term Frequency -- Inverse Document Frequency}\\
+UML & \emph{Unified Modeling Language}\\
+VARBAF & Village Artisanal Régional de Bafoussam\\
+\bottomrule
+\end{longtable}
+\onehalfspacing
+\clearpage
+
+% ================= INDEX DES TABLEAUX ET FIGURES =================
+\chapter*{INDEX DES TABLEAUX}
+\addcontentsline{toc}{chapter}{Index des tableaux}
+\sansespacement
+\makeatletter\@starttoc{lot}\makeatother
+\onehalfspacing
+\clearpage
+
+\chapter*{INDEX DES FIGURES}
+\addcontentsline{toc}{chapter}{Index des figures}
+\sansespacement
+\makeatletter\@starttoc{lof}\makeatother
+\onehalfspacing
+\clearpage
+
+% ================= SOMMAIRE =================
+\chapter*{SOMMAIRE}
+\addcontentsline{toc}{chapter}{Sommaire}
+\sansespacement
+\begin{longtable}{@{}p{\dimexpr\textwidth-1.6cm\relax}@{}r@{}}
+Dédicace & i\\
+Remerciements & ii\\
+Résumé & iii\\
+Abstract & iv\\
+Liste des sigles et abréviations & v\\
+Index des tableaux & vi\\
+Index des figures & vii\\
+Sommaire & viii\\[0.5em]
+\textbf{Introduction générale} & \pageref{sec:intro}\\[0.5em]
+\textbf{Chapitre 1 : Contexte de l'entreprise et cadres d'étude} & \pageref{chap:un}\\
+\hspace{1em}1.1. Présentation de l'entreprise & \pageref{sec:1-1}\\
+\hspace{1em}1.2. Cadre conceptuel et état de l'art & \pageref{sec:1-2}\\
+\hspace{1em}1.3. Cadre théorique & \pageref{sec:1-3}\\
+\hspace{1em}1.4. Place de l'intelligence artificielle et du Big Data dans l'artisanat & \pageref{sec:1-4}\\[0.5em]
+\textbf{Chapitre 2 : Méthodologie d'étude et besoins du projet} & \pageref{chap:deux}\\
+\hspace{1em}2.1. Méthodologie d'étude & \pageref{sec:2-1}\\
+\hspace{1em}2.2. Variables, indicateurs et données de l'étude & \pageref{sec:2-2}\\
+\hspace{1em}2.3. Besoins du projet & \pageref{sec:2-3}\\[0.5em]
+\textbf{Chapitre 3 : Conception et réalisation de la solution} & \pageref{chap:trois}\\
+\hspace{1em}3.1. Méthodologie de gestion de projet et planification & \pageref{sec:3-1}\\
+
+\hspace{1em}3.2. Architecture, pipeline de données et modélisation & \pageref{sec:3-3}\\
+\hspace{1em}3.3. Outils, validation et déploiement & \pageref{sec:3-4}\\[0.5em]
+\textbf{Chapitre 4 : Analyse et synthèse du projet} & \pageref{chap:quatre}\\
+\hspace{1em}4.1. Discussion des hypothèses & \pageref{sec:4-1}\\
+\hspace{1em}4.2. Présentation des résultats & \pageref{sec:4-2}\\
+\hspace{1em}4.3. Coût estimatif du projet & \pageref{sec:4-3}\\
+\hspace{1em}4.4. Rétrospective du projet & \pageref{sec:4-4}\\[0.5em]
+\textbf{Conclusion générale} & \pageref{sec:conclusion}\\
+\textbf{Références bibliographiques} & \pageref{sec:biblio}\\
+\textbf{Annexes} & \pageref{sec:annexes}\\
+\textbf{Table des matières} & \pageref{sec:tdm}\\
+\end{longtable}
+\onehalfspacing
+\clearpage

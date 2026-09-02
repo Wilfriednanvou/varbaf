@@ -1,0 +1,149 @@
+\chapter*{ANNEXES}
+\addcontentsline{toc}{chapter}{Annexes}
+\label{sec:annexes}
+
+\renewcommand{\thetable}{A.\arabic{table}}
+\renewcommand{\thefigure}{A.\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+
+\section*{Annexe A --- Extrait du registre transcrit}
+
+Le tableau~\ref{tab:annexeregistre} reproduit la structure du registre telle qu'elle se présente à la transcription, avec quelques lignes représentatives de l'exercice~2026. Les numéros de téléphone des artisans, présents dans le relevé des occupants, ont été écartés de la transcription et ne figurent nulle part dans le jeu de données.
+
+\begin{table}[H]
+\centering
+\caption{Structure et extrait du registre des ventes, exercice 2026}
+\label{tab:annexeregistre}
+\singlespacing\footnotesize
+\begin{tabularx}{\textwidth}{@{}p{1.5cm}Xp{1.3cm}p{2.2cm}p{2.6cm}p{1.3cm}@{}}
+\toprule
+\entete{Mois} & \entete{Désignation} & \entete{Montant} & \entete{Nom artisan} & \entete{Observation} & \entete{Reste à payer}\\
+\midrule
+03/06/2026 & Sac dame en pochette & 12 000 & Chinda sokoudjou & --- & 12 000\\
+03/06/2026 & Grand tableau déco & 12 000 & Mme Justina & --- & 12 000\\
+19/02/2026 & \ldots & \ldots & \ldots & Payé le 19/02/2026 à Mme Guessong & 0\\
+\ldots & \ldots & \ldots & Chic décor & 20/06/2025 RNF & 0\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{état des ventes du VARBAF, feuille \emph{Ventes}. La colonne \emph{Observation} porte la trace de la décharge, non l'identité du vendeur ; la colonne \emph{Reste à payer} porte la part artisan non encore reversée.}
+\end{table}
+
+Trois propriétés de ce support conditionnent l'ensemble du traitement décrit au chapitre~3. Le registre ne porte \textbf{ni quantité ni prix unitaire} : seul le montant est inscrit, et les deux autres valeurs se déduisent. Il ne porte \textbf{aucun code d'espace locatif} : le rattachement au parc s'opère par le seul nom de l'artisan, écrit tel qu'il est prononcé. Il mêle enfin, dans la même colonne de première position, des \textbf{dates de vente et des libellés de sous-total} tels que \guillemotleft~TOTAL AOÛT 24~\guillemotright, ce qui impose de distinguer les lignes de données des lignes de synthèse avant tout calcul.
+
+\section*{Annexe B --- Structure de l'état des ventes}
+
+L'état des ventes du VARBAF, arrêté au 25~février~2026 et prolongé jusqu'en juin, comporte quatre feuilles dont l'articulation constitue le circuit financier du village.
+
+\begin{table}[H]
+\centering
+\caption{Les quatre feuilles de l'état des ventes et leur apport}
+\label{tab:annexefeuilles}
+\singlespacing
+\begin{tabularx}{\textwidth}{@{}p{2.7cm}p{2.1cm}X@{}}
+\toprule
+\entete{Feuille} & \entete{Volume} & \entete{Ce qu'elle établit}\\
+\midrule
+Ventes & 603 lignes & Le registre lui-même : désignation, montant, artisan, observation de décharge, reste à payer\\
+Commissions sur ventes & 95 décharges & L'historique des reversements : 1 651 000 F de ventes reversées, 135 275 F de commission retenue\\
+Caisse & 1 comptage & La situation de trésorerie : 140 500 F détenus contre 303 025 F d'avoirs, différence de 162 525 F\\
+Récapitulatif des montants & 19 bénéficiaires & Une campagne de reversement préparée et non exécutée : 219 850 F, 21 985 F de commission, 197 865 F nets\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{état des ventes du VARBAF au 25 février 2026.}
+\end{table}
+
+\section*{Annexe C --- Synthèse du rapport d'import}
+
+Le rapport d'import est produit automatiquement par le système à chaque reprise du registre. Il récapitule, ligne par ligne et en synthèse, ce qui a été lu, ce qui a été déduit et ce qui a été rejeté. Le tableau~\ref{tab:annexeimport} en donne la synthèse pour la reprise du 26~août~2026, portant sur l'intégralité du corpus transcrit.
+
+\begin{table}[H]
+\centering
+\caption{Synthèse du rapport d'import du 26 août 2026}
+\label{tab:annexeimport}
+\singlespacing
+\begin{tabularx}{\textwidth}{@{}p{3.2cm}Xrr@{}}
+\toprule
+\entete{Rubrique} & \entete{Indicateur} & \entete{Valeur} & \entete{Part}\\
+\midrule
+Lignes & Lignes traitées & 603 & 100,0 \%\\
+Lignes & Lignes importées & 602 & 99,8 \%\\
+Lignes & Lignes non importées & 1 & 0,2 \%\\
+Transcription & Valeur déduite des deux autres & 602 & 99,8 \%\\
+Transcription & Date reprise ou déduite & 100 & 16,6 \%\\
+Artisans & Écritures distinctes au registre & 55 & ---\\
+Artisans & Écritures regroupées automatiquement & 10 & 18,2 \%\\
+Artisans & Rapprochements écartés sous le seuil & 0 & ---\\
+Créations & Artisans créés & 40 & ---\\
+Créations & Attributions créées & 24 & ---\\
+Créations & Produits créés & 285 & ---\\
+Créations & Dépôts créés & 602 & ---\\
+Créations & Ventes créées & 602 & ---\\
+Anomalies & Code de boutique absent & 144 & 23,9 \%\\
+Anomalies & Aucun espace rattaché à l'artisan & 144 & 23,9 \%\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{rapport d'import produit par le système, versionné au dépôt du projet.}
+\end{table}
+
+\section*{Annexe D --- Jeu de questions d'évaluation}
+
+L'évaluation du dispositif d'intelligence artificielle repose sur 48~questions réparties en trois catégories. Le tableau~\ref{tab:annexequestions} en donne la structure et quelques exemples représentatifs ; le jeu complet est versionné au dépôt du projet.
+
+\begin{table}[H]
+\centering
+\caption{Structure du jeu d'évaluation de l'assistant}
+\label{tab:annexequestions}
+\singlespacing
+\begin{tabularx}{\textwidth}{@{}p{3cm}p{1.5cm}X@{}}
+\toprule
+\entete{Catégorie} & \entete{Effectif} & \entete{Exemples}\\
+\midrule
+Agrégation & 30 & \guillemotleft~Quel est le chiffre d'affaires ?~\guillemotright{} ; \guillemotleft~Quelles sont les recettes de commission en mars ?~\guillemotright{} ; \guillemotleft~Combien de ventes cette année ?~\guillemotright\\
+Descriptive & 10 & \guillemotleft~Quels produits en vannerie sont exposés ?~\guillemotright{} ; \guillemotleft~Quels artisans travaillent le bronze ?~\guillemotright\\
+Sans réponse attendue & 8 & Questions portant sur des sujets absents du corpus, pour lesquelles un refus explicite constitue la bonne réponse\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{jeu d'évaluation du module Pilotage.}
+\end{table}
+
+\section*{Annexe E --- Questions adressées à la coordination}
+
+Neuf points que les données ne permettent pas de trancher ont été adressés par écrit à la coordination du Village. Chacun est assorti de l'hypothèse retenue à défaut de réponse, afin qu'aucune zone d'incertitude ne soit comblée par une invention silencieuse. Un dixième point, issu de l'analyse de la feuille des commissions, s'y est ajouté après l'envoi et figure ici pour mémoire.
+
+\begin{table}[H]
+\centering
+\caption{Points en attente et hypothèse retenue à défaut de réponse}
+\label{tab:annexequestionscoord}
+\singlespacing\small
+\begin{tabularx}{\textwidth}{@{}p{0.6cm}p{4.2cm}X@{}}
+\toprule
+\entete{N\textsuperscript{o}} & \entete{Point} & \entete{Hypothèse retenue}\\
+\midrule
+1 & Artisan vendeur sans espace attribué & Vente enregistrée, artisan sans espace locatif, signalé comme tel\\
+2 & Acte fixant le taux de commission à 10 \% & Taux appliqué, source citée comme communiquée par la coordination\\
+3 & Boutiques absentes du relevé de recouvrement & Locaux existants sans espace renseigné, ce qui diffère de locaux inexistants\\
+4 & Artisans déposants sans contrat de location & Déposants non installés ; l'attribution n'est pas obligatoire pour vendre\\
+5 & Activité hors des quatorze secteurs officiels & Produits rattachés à l'artisan sans corps de métier déclaré\\
+6 & Séparation des tâches en caisse & Cumul saisie et clôture maintenu et consigné comme dette technique\\
+7 & Plan du bâtiment et superficies & Colonnes laissées vides plutôt que renseignées au jugé\\
+8 & Plaques de département sur les boutiques & Rien inscrit : les plaques se contredisent entre elles\\
+9 & Autorisations pour le portail public & Photographies de personnes non publiées ; textes rédigés et signalés comme tels\\
+10 & Exonérations de commission portant la mention \guillemotleft~RNF~\guillemotright{} & Taux en vigueur appliqué sans exception ; l'exonération n'est pas représentée faute de règle écrite\\
+\bottomrule
+\end{tabularx}
+\onehalfspacing
+\source{correspondance adressée à la coordination du VARBAF.}
+\end{table}
+
+\section*{Annexe F --- Extraits de code}
+
+\capture{Extrait du contrôle des chiffres sans source}{Code de la classe qui relit le texte produit par le modèle de langage et refuse toute suite de chiffres absente des extraits retrouvés. À insérer depuis le dépôt du projet.}
+
+\capture{Extrait du catalogue d'intentions d'agrégation}{Code déclarant les intentions reconnues par le routeur et l'indicateur calculé par chacune. À insérer depuis le dépôt du projet.}
+
+\capture{Extrait du schéma de base de données}{Diagramme des tables du module Commerce et de leurs relations, généré depuis les migrations. À insérer depuis le dépôt du projet.}

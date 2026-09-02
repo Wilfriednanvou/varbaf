@@ -1,0 +1,135 @@
+\chapter*{INTRODUCTION GÉNÉRALE}
+\addcontentsline{toc}{chapter}{Introduction générale}
+\label{sec:intro}
+
+\section*{1. Contexte général de l'étude}
+\addcontentsline{toc}{section}{1. Contexte général de l'étude}
+
+L'artisanat occupe au Cameroun une place importante sur les plans économique et culturel. Il constitue une source de revenus pour de nombreuses populations et contribue à la préservation ainsi qu'à la transmission des savoir-faire locaux. Afin de structurer ce secteur, les pouvoirs publics ont mis en place des structures spécialisées, notamment les villages artisanaux, chargés de promouvoir, d'encadrer et de valoriser les activités artisanales. C'est dans ce cadre que s'inscrit le Village Artisanal Régional de Bafoussam, inauguré en 2021, qui accueille et accompagne les artisans, met à leur disposition des espaces d'exposition et de vente, organise des formations et participe à la commercialisation des produits artisanaux.
+
+Le fonctionnement d'une telle structure produit un flux continu d'informations. Chaque produit confié par un artisan, chaque vente réalisée, chaque attribution d'espace et chaque redevance perçue constituent une donnée qui doit être enregistrée, conservée et exploitée. La qualité de cette information conditionne trois capacités essentielles : suivre l'activité, rendre compte aux artisans des sommes qui leur reviennent, et produire les indicateurs nécessaires à la décision.
+
+Parallèlement, les techniques d'intelligence artificielle et les méthodes de traitement de données connaissent une diffusion rapide dans les organisations. Les modèles de langage, la recherche vectorielle et les méthodes de recommandation ouvrent des possibilités nouvelles d'accès à l'information. Leur transposition à une structure artisanale de taille modeste soulève toutefois des questions spécifiques, tenant à la volumétrie des données disponibles, à leur qualité et aux contraintes matérielles du terrain.
+
+C'est à l'intersection de ces enjeux --- entre la nécessité de disposer d'une information fiable pour améliorer la gestion du Village et les possibilités offertes par l'intelligence artificielle --- que s'inscrit la présente étude, dont le thème est : \guillemotleft~Système d'information intelligent au service de la valorisation de l'artisanat : cas du Village Artisanal Régional de Bafoussam (VARBAF)~\guillemotright.
+
+\section*{2. Problématique de l'étude}
+\addcontentsline{toc}{section}{2. Problématique de l'étude}
+
+\subsection*{2.1. Présentation du problème}
+
+L'observation conduite au Village Artisanal Régional de Bafoussam entre juin et août 2026 met en évidence une organisation de l'information reposant principalement sur des supports manuels et non reliés entre eux.
+
+Les dépôts de produits et les ventes sont consignés dans un registre manuscrit unique. La vente n'y fait pas l'objet d'un enregistrement propre : elle est signalée par une annotation portée en regard de la ligne de dépôt, sous la forme d'une mention telle que \guillemotleft~vendu~\guillemotright, \guillemotleft~payé~\guillemotright{} ou \guillemotleft~versé~\guillemotright. Le suivi des occupants des espaces locatifs, avec leurs redevances et l'état de leur recouvrement, fait l'objet d'un classeur distinct. L'inventaire des produits, avec leurs caractéristiques et leurs prix, en constitue un troisième.
+
+Cette organisation produit quatre effets observables.
+
+Le premier concerne la fiabilité des enregistrements. Le total d'une ligne étant calculé mentalement puis inscrit à la main, la quantité, le prix unitaire et le montant ne sont pas toujours tous trois renseignés, et rien ne garantit leur cohérence. Aucun dispositif de contrôle ne permet de détecter un écart, et rien n'indique qu'il soit corrigé.
+
+Le deuxième concerne la traçabilité. Le registre porte le nom de l'artisan tel qu'il est prononcé au comptoir, non l'espace locatif qui lui est attribué. Or une boutique abrite plusieurs artisans, et le même artisan apparaît sous plusieurs écritures selon la personne qui tient le registre. Le rattachement d'une vente à son bénéficiaire repose alors sur la mémoire du personnel, ressource par nature non transmissible.
+
+Le troisième concerne le suivi de l'argent. La part revenant à l'artisan est reversée contre décharge, et la trace de ce reversement est portée en observation sur la ligne de vente, en clair et sans format. Une somme non reversée se lit dans une colonne de reste à payer alimentée à la main. Aucun journal ne relie ces reversements aux espèces effectivement détenues, de sorte qu'un écart entre les deux ne se constate qu'au moment d'un comptage, sans que rien ne permette de l'expliquer.
+
+Le quatrième concerne l'exploitation. Les données étant réparties sur des supports sans lien, la production d'un indicateur consolidé suppose un travail manuel de rapprochement. Le taux de recouvrement des redevances, qui mesure pourtant une mission explicitement assignée aux villages artisanaux, n'est ainsi établi qu'à l'occasion d'un relevé ponctuel.
+
+\subsection*{2.2. Formulation du problème}
+
+\noindent\textbf{Question générale de l'étude}
+
+Dans quelle mesure un système d'information enrichi de fonctionnalités d'intelligence artificielle peut-il contribuer à la valorisation des activités du Village Artisanal Régional de Bafoussam ?
+
+\noindent\textbf{Questions spécifiques de l'étude}
+
+\begin{enumerate}[label=\alph*),leftmargin=1.6em,itemsep=0.3em]
+\item Quelles défaillances la gestion actuelle de l'information produit-elle sur le suivi des dépôts, des ventes et des redevances ?
+\item Quelles exigences un système d'information centralisé doit-il satisfaire dans le contexte particulier de cette structure ?
+\item Quelles techniques d'intelligence artificielle sont applicables aux données réellement disponibles, et selon quel protocole d'évaluation ?
+\end{enumerate}
+
+\section*{3. Hypothèses de l'étude}
+\addcontentsline{toc}{section}{3. Hypothèses de l'étude}
+
+\noindent\textbf{Hypothèse générale}
+
+La mise en œuvre d'un système d'information centralisé, enrichi de fonctionnalités d'intelligence artificielle, améliore le suivi des activités du Village Artisanal Régional de Bafoussam et renforce la valorisation de ses produits, de ses données et du travail de ses artisans.
+
+\noindent\textbf{Hypothèses spécifiques}
+
+\begin{itemize}[leftmargin=1.6em,itemsep=0.3em]
+\item \textbf{H1.} La tenue manuelle des registres produit un taux mesurable de pertes d'information sur l'identité des artisans concernés et sur les valeurs élémentaires des lignes de vente.
+\item \textbf{H2.} La centralisation des données permet de produire automatiquement des indicateurs de suivi qui ne sont aujourd'hui disponibles qu'au prix d'un rapprochement manuel.
+\item \textbf{H3.} Une recherche fondée sur la représentation vectorielle dense des informations du village restitue des résultats plus pertinents qu'une recherche fondée sur la pondération des termes, sur des questions formulées en langage naturel.
+\end{itemize}
+
+\section*{4. Objectifs de l'étude}
+\addcontentsline{toc}{section}{4. Objectifs de l'étude}
+
+\noindent\textbf{Objectif général}
+
+Concevoir et mettre en œuvre un système d'information centralisé, enrichi de fonctionnalités d'intelligence artificielle, au service de la valorisation des activités du Village Artisanal Régional de Bafoussam.
+
+\noindent\textbf{Objectifs spécifiques}
+
+\begin{enumerate}[label=\alph*),leftmargin=1.6em,itemsep=0.3em]
+\item Analyser les processus actuels de gestion de l'information relatifs aux dépôts, aux ventes et aux redevances, afin d'identifier et de mesurer leurs principales défaillances.
+\item Concevoir et mettre en œuvre un système d'information centralisé permettant de structurer les données et d'automatiser le suivi des artisans, des espaces locatifs, des produits, des ventes, des redevances et de la trésorerie.
+\item Concevoir et évaluer des fonctionnalités d'intelligence artificielle adaptées aux données disponibles, notamment une interrogation en langage naturel des informations du village, et en mesurer la performance selon un protocole explicite.
+\end{enumerate}
+
+\section*{5. Justification de l'étude}
+\addcontentsline{toc}{section}{5. Justification de l'étude}
+
+\subsection*{5.1. Au plan pratique}
+
+Ce travail répond à un besoin exprimé et documenté, que deux constats chiffrés établissent.
+
+Le premier porte sur les recettes locatives. Le relevé de recouvrement de l'exercice 2026 fait apparaître un reste à recouvrer de 1~959~000~francs~CFA sur une imputation annuelle de 2~478~000~francs~CFA. Le montant effectivement acquitté s'élève ainsi à 365~000~francs~CFA, soit un taux de recouvrement de 14,73~\%. Or la mobilisation des recettes non fiscales figure parmi les apports attendus des villages artisanaux.
+
+Le second porte sur la caisse. La situation de caisse établie par la structure fait état de 140~500~francs~CFA détenus --- 40~500~francs comptés en coupures et 100~000~francs au titre du compte de commission --- pour 303~025~francs~CFA d'avoirs dus, soit une différence de 162~525~francs~CFA. Quatre sorties postérieures au comptage, totalisant 120~000~francs~CFA, figurent sur le même document sans qu'aucun journal daté ne permette d'établir dans quelle mesure elles expliquent cette différence. Ce constat n'est pas celui d'une irrégularité : c'est celui de l'absence d'un dispositif capable de trancher la question.
+
+Le dispositif proposé vise en conséquence à fournir à la structure les instruments qui lui manquent : un journal de caisse chronologique et immuable, un arrêté journalier rapprochant le montant compté du solde théorique, et un suivi des redevances et des reversements adossé aux mêmes données.
+
+\subsection*{5.2. Au plan scientifique}
+
+L'étude constitue une application des méthodes d'intelligence artificielle et de traitement de données à un terrain caractérisé par une volumétrie réduite et des sources hétérogènes. Cette configuration, fréquente dans les organisations de taille modeste, pose des questions méthodologiques distinctes de celles des environnements à fort volume : la difficulté n'est pas le traitement de masses de données, mais la constitution même d'un gisement exploitable à partir de supports manuscrits. Elle conduit en outre à éprouver, plutôt qu'à présumer, la supériorité des méthodes vectorielles denses sur un corpus court et francophone --- question sur laquelle le présent travail apporte un résultat mesuré.
+
+\subsection*{5.3. Au plan de la continuité}
+
+Deux projets numériques ont déjà été conduits au sein de la structure. L'un d'eux, une application d'archivage documentaire, a été achevé sur le plan technique sans être déployé, faute de budget d'hébergement et de maintenance. Ce précédent oriente les choix du présent travail vers une solution dont le cœur est déployable localement, sans coût récurrent.
+
+\section*{6. Délimitation de l'étude}
+\addcontentsline{toc}{section}{6. Délimitation de l'étude}
+
+\subsection*{6.1. Délimitation géographique}
+
+L'étude porte sur le seul Village Artisanal Régional de Bafoussam. Les autres villages artisanaux du territoire national ne sont pas inclus dans le périmètre de l'analyse, bien que la transposabilité de la solution soit examinée en perspective.
+
+\subsection*{6.2. Délimitation temporelle}
+
+\textbf{L'analyse porte sur le seul exercice 2026.} Ce choix n'est pas de commodité : il est imposé par les données elles-mêmes.
+
+Le registre transcrit remonte à mai~2024, mais les exercices antérieurs ne sont pas exploitables au même titre, et cela pour trois raisons cumulatives. Le relevé de recouvrement des redevances n'existe que pour 2026, de sorte qu'aucun indicateur de recouvrement n'est calculable pour 2024 ni pour 2025. Les cent lignes dont la date a dû être reprise de la ligne précédente appartiennent toutes aux exercices antérieurs, tandis qu'aucune ligne de 2026 ne présente ce défaut. La classification par type d'artisanat, enfin, est renseignée sur la totalité des lignes de 2026 et pratiquement absente des exercices précédents.
+
+Retenir 2026 fait perdre du volume --- 195~lignes sur 603 --- mais garantit que les trois sources décrivent la même période et que les indicateurs produits sont mutuellement cohérents. Un indicateur calculé sur une période dont une source est absente n'est pas un indicateur partiel : c'est un indicateur faux dont rien ne signale la fausseté.
+
+Les données des exercices antérieurs demeurent chargées dans le système, où elles constituent l'historique de l'activité. Elles ne fondent aucun chiffre présenté dans ce rapport.
+
+L'observation de terrain a été conduite du 23~juin au 23~août~2026.
+
+\subsection*{6.3. Délimitation thématique}
+
+Le périmètre fonctionnel couvre l'ensemble du parc locatif, c'est-à-dire les boutiques et leurs espaces, mais également les espaces situés au sous-sol et sur l'espace vert, qui font l'objet de contrats de location et dont l'un porte la redevance la plus élevée du parc. Ces derniers ne sont pas des locaux de vente, distinction que le modèle de données conserve afin que le taux d'occupation présenté à la tutelle demeure calculable sur les seules boutiques.
+
+Les fonctionnalités de gestion des formations, de réservation d'espaces et d'organisation d'événements sont écartées de la présente réalisation et renvoyées à une version ultérieure. La vente et l'encaissement en ligne sont exclus, le portail public étant conçu comme un canal de consultation.
+
+\section*{7. Plan de rédaction}
+\addcontentsline{toc}{section}{7. Plan de rédaction}
+
+Ce rapport comprend quatre chapitres.
+
+\begin{itemize}[leftmargin=1.6em,itemsep=0.2em]
+\item Le premier présente la structure d'accueil et établit les cadres conceptuel et théorique de l'étude.
+\item Le deuxième expose la méthodologie retenue, décrit le jeu de données constitué et formalise les besoins du projet.
+\item Le troisième traite de la conception et de la réalisation de la solution.
+\item Le quatrième présente et discute les résultats obtenus.
+\end{itemize}
