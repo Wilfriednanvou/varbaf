@@ -5,6 +5,7 @@ namespace Modules\Socle\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Socle\Enums\StatutExercice;
 use Modules\Socle\Exceptions\ExerciceNonCloturableException;
 use Modules\Socle\Services\VerrousDeCloture;
 
@@ -19,12 +20,20 @@ use Modules\Socle\Services\VerrousDeCloture;
  * Le crochet garantit le confort d'usage, l'index garantit
  * l'intégrité même si une écriture contourne l'ORM.
  *
+ * **`statut` se déduit, il ne se choisit pas.** `en_cours` et `cloture`
+ * restent la source écrite par le formulaire et par
+ * `activer()`/`cloturer()` ; le même crochet en dérive `statut` à
+ * chaque écriture, pour que les deux ne puissent jamais diverger.
+ * Absent de `$fillable` pour cette raison — la seule sortie de la
+ * dérivation automatique est `archiver()`, qui l'écrit directement.
+ *
  * @property int $id
  * @property string $libelle
  * @property \Illuminate\Support\Carbon $date_debut
  * @property \Illuminate\Support\Carbon $date_fin
  * @property bool $en_cours
  * @property bool $cloture
+ * @property StatutExercice $statut
  * @property int $village_id
  */
 class Exercice extends Model
@@ -47,6 +56,7 @@ class Exercice extends Model
             'date_fin' => 'date',
             'en_cours' => 'boolean',
             'cloture' => 'boolean',
+            'statut' => StatutExercice::class,
         ];
     }
 
@@ -56,6 +66,19 @@ class Exercice extends Model
             // Un exercice clôturé ne peut plus être l'exercice en cours.
             if ($exercice->cloture) {
                 $exercice->en_cours = false;
+            }
+
+            // ARCHIVE n'a pas d'équivalent dans les deux booléens :
+            // `archiver()` l'écrit directement, et cette dérivation ne
+            // doit pas l'écraser au passage suivant dans ce crochet —
+            // sans quoi archiver() serait défait par la première
+            // sauvegarde anodine qui suit.
+            if ($exercice->statut !== StatutExercice::ARCHIVE) {
+                $exercice->statut = match (true) {
+                    $exercice->cloture => StatutExercice::CLOTURE,
+                    $exercice->en_cours => StatutExercice::ACTIF,
+                    default => StatutExercice::EN_PREPARATION,
+                };
             }
 
             if (! $exercice->en_cours) {
@@ -148,5 +171,25 @@ class Exercice extends Model
     public function estModifiable(): bool
     {
         return ! $this->cloture;
+    }
+
+    /**
+     * Range un exercice déjà clôturé parmi les archives.
+     *
+     * **Purement cosmétique.** ARCHIVE ne change aucun droit par
+     * rapport à CLOTURE — `estModifiable()` répond déjà `false` pour
+     * les deux, puisque l'archivage exige `cloture = true`. Son seul
+     * effet est de sortir l'exercice de la liste par défaut d'un
+     * sélecteur, pour un village dont l'historique s'allonge.
+     */
+    public function archiver(): bool
+    {
+        if (! $this->cloture) {
+            return false;
+        }
+
+        $this->statut = StatutExercice::ARCHIVE;
+
+        return $this->save();
     }
 }
