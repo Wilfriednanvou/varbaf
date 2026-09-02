@@ -6,6 +6,7 @@ use Filament\Pages\Page;
 use Livewire\Attributes\Computed;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\Exercice;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Pilotage\Data\FiltreRapport;
 
 /**
@@ -53,9 +54,12 @@ class TableauDeBord extends Page
     {
         abort_unless(auth()->user()->can('consulter_tableau_bord'), 403);
 
-        // `Exercice::courant()` est le point d'entrée du Socle : le
-        // Pilotage ne requête pas sa table directement.
-        $this->exerciceId = Exercice::courant()?->getKey();
+        // Le sélecteur global de la barre supérieure pose l'exercice
+        // consulté : le tableau de bord s'ouvre dessus par défaut,
+        // plutôt que de retomber systématiquement sur l'actif. Rien
+        // n'empêche ensuite de changer la sélection dans la liste
+        // déroulante ci-dessous, propre à cette page.
+        $this->exerciceId = app(ContexteExercice::class)->exerciceConsulte()?->getKey();
     }
 
     public function getTitle(): string
