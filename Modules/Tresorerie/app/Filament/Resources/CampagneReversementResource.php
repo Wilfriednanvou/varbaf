@@ -12,8 +12,10 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Tresorerie\Enums\StatutCampagneReversement;
 use Modules\Tresorerie\Filament\Resources\CampagneReversementResource\Pages;
 use Modules\Tresorerie\Models\CampagneReversement;
@@ -47,6 +49,19 @@ class CampagneReversementResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()->can('lister_campagnes_reversement');
+    }
+
+    /**
+     * Même portée que les autres ressources déjà bornées à l'étape 3
+     * du plan multi-exercice — voir DepotResource.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->when(
+                app(ContexteExercice::class)->exerciceConsulte()?->getKey(),
+                fn (Builder $requete, int $exerciceId) => $requete->where('exercice_id', $exerciceId),
+            );
     }
 
     public static function form(Schema $form): Schema
@@ -129,7 +144,8 @@ class CampagneReversementResource extends Resource
                     ->tooltip('Recalculer les parts dues')
                     ->color('primary')
                     ->visible(fn (CampagneReversement $record) => $record->estEnPreparation()
-                        && auth()->user()->can('preparer_campagne_reversement'))
+                        && auth()->user()->can('preparer_campagne_reversement')
+                        && app(ContexteExercice::class)->estModifiable())
                     ->requiresConfirmation()
                     ->modalHeading('Préparer la campagne')
                     ->modalDescription('Le calcul précédent sera entièrement refait depuis les ventes. Aucune écriture en caisse à ce stade.')
@@ -176,7 +192,8 @@ class CampagneReversementResource extends Resource
                     ->tooltip('Rattacher les ventes et décaisser')
                     ->color('danger')
                     ->visible(fn (CampagneReversement $record) => $record->estEnPreparation()
-                        && auth()->user()->can('valider_campagne_reversement'))
+                        && auth()->user()->can('valider_campagne_reversement')
+                        && app(ContexteExercice::class)->estModifiable())
                     ->requiresConfirmation()
                     ->modalHeading('Valider la campagne')
                     ->modalDescription(fn (CampagneReversement $record) => "Les ventes retenues seront rattachées définitivement et "
@@ -278,7 +295,8 @@ class CampagneReversementResource extends Resource
                     ->iconButton()
                     ->tooltip('Abandonner cette préparation')
                     ->visible(fn (CampagneReversement $record) => $record->estEnPreparation()
-                        && auth()->user()->can('supprimer_campagne_reversement'))
+                        && auth()->user()->can('supprimer_campagne_reversement')
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Abandonner la campagne')
                     ->modalDescription('La préparation et ses calculs seront effacés. Aucune vente n\'a encore été rattachée.')
                     ->modalSubmitActionLabel('Enregistrer')

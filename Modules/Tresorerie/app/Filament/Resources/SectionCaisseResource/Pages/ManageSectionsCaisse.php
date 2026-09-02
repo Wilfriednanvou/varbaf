@@ -9,6 +9,7 @@ use Filament\Support\Enums\Alignment;
 use Modules\Socle\Filament\Concerns\TitreLisible;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Tresorerie\Filament\Resources\SectionCaisseResource;
 use Modules\Tresorerie\Models\Caisse;
 use Modules\Tresorerie\Models\SectionCaisse;
@@ -35,7 +36,8 @@ class ManageSectionsCaisse extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->label('Ouvrir une section')
-                ->visible(fn () => auth()->user()->can('ouvrir_section_caisse'))
+                ->visible(fn () => auth()->user()->can('ouvrir_section_caisse')
+                    && app(ContexteExercice::class)->estModifiable())
                 ->modalHeading('Ouvrir une section de caisse')
                 ->modalWidth('3xl')
                 ->createAnother(false)

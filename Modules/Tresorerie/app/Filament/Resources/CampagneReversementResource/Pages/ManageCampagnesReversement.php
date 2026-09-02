@@ -9,6 +9,7 @@ use Filament\Support\Enums\Alignment;
 use Modules\Socle\Filament\Concerns\TitreLisible;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Tresorerie\Filament\Resources\CampagneReversementResource;
 
 class ManageCampagnesReversement extends ManageRecords
@@ -33,7 +34,8 @@ class ManageCampagnesReversement extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->label('Ouvrir une campagne')
-                ->visible(fn () => auth()->user()->can('preparer_campagne_reversement'))
+                ->visible(fn () => auth()->user()->can('preparer_campagne_reversement')
+                    && app(ContexteExercice::class)->estModifiable())
                 ->modalHeading('Ouvrir une campagne de reversement')
                 ->modalWidth('3xl')
                 ->createAnother(false)

@@ -10,6 +10,7 @@ use Modules\Artisanat\Filament\Widgets\StatistiquesAttributions;
 use Modules\Artisanat\Models\AttributionEspace;
 use Modules\Socle\Filament\Concerns\TitreLisible;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 class ManageAttributionsEspaces extends ManageRecords
 {
@@ -45,7 +46,8 @@ class ManageAttributionsEspaces extends ManageRecords
     {
         return [
             Actions\CreateAction::make()
-                ->visible(fn () => auth()->user()->can('ajouter_attribution'))
+                ->visible(fn () => auth()->user()->can('ajouter_attribution')
+                    && app(ContexteExercice::class)->estModifiable())
                 ->modalHeading('Nouvelle attribution d\'espace')
                 ->modalWidth('3xl')
                 ->createAnother(false)

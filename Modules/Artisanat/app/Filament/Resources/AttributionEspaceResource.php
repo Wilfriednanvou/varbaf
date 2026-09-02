@@ -23,6 +23,7 @@ use Modules\Artisanat\Models\EspaceLocatif;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 /**
  * Attribution d'un espace locatif à un artisan.
@@ -59,6 +60,19 @@ class AttributionEspaceResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()->can('lister_attributions');
+    }
+
+    /**
+     * Même portée que les autres ressources déjà bornées à l'étape 3
+     * du plan multi-exercice — voir DepotResource.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->when(
+                app(ContexteExercice::class)->exerciceConsulte()?->getKey(),
+                fn (Builder $requete, int $exerciceId) => $requete->where('exercice_id', $exerciceId),
+            );
     }
 
     /**
@@ -372,9 +386,6 @@ class AttributionEspaceResource extends Resource
                     ->relationship('espaceLocatif', 'code')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('exercice_id')
-                    ->label('Exercice')
-                    ->relationship('exercice', 'libelle'),
             ])
             ->defaultSort('date_debut', 'desc')
             ->recordActions([
@@ -385,7 +396,8 @@ class AttributionEspaceResource extends Resource
                     ->iconButton()
                     ->tooltip('Résilier avant terme')
                     ->visible(fn (AttributionEspace $record) => auth()->user()->can('resilier_attribution')
-                        && $record->statut === StatutAttribution::ACTIVE)
+                        && $record->statut === StatutAttribution::ACTIVE
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Résilier l\'attribution')
                     ->modalDescription('L\'espace sera libéré à la date du jour et pourra être réattribué.')
                     ->modalWidth('lg')
@@ -419,7 +431,8 @@ class AttributionEspaceResource extends Resource
                     ->tooltip('Clore à l\'échéance')
                     ->requiresConfirmation()
                     ->visible(fn (AttributionEspace $record) => auth()->user()->can('terminer_attribution')
-                        && $record->statut === StatutAttribution::ACTIVE)
+                        && $record->statut === StatutAttribution::ACTIVE
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Terminer l\'attribution')
                     ->modalDescription('À utiliser lorsque le contrat arrive normalement à son terme, sans rupture.')
                     ->modalWidth('lg')
@@ -438,7 +451,8 @@ class AttributionEspaceResource extends Resource
                     ->iconButton()
                     ->tooltip('Modifier')
                     ->visible(fn (AttributionEspace $record) => auth()->user()->can('modifier_attribution')
-                        && $record->statut === StatutAttribution::ACTIVE)
+                        && $record->statut === StatutAttribution::ACTIVE
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Modifier l\'attribution')
                     ->modalWidth('3xl')
                     ->modalSubmitActionLabel('Enregistrer')
@@ -460,7 +474,8 @@ class AttributionEspaceResource extends Resource
                 Actions\DeleteAction::make()
                     ->iconButton()
                     ->tooltip('Supprimer')
-                    ->visible(fn () => auth()->user()->can('supprimer_attribution'))
+                    ->visible(fn () => auth()->user()->can('supprimer_attribution')
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Supprimer l\'attribution')
                     ->modalDescription('Une attribution rompue se résilie, elle ne se supprime pas : la suppression efface l\'historique d\'occupation.')
                     ->modalWidth('lg')

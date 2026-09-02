@@ -23,6 +23,7 @@ use Modules\Commerce\Models\Produit;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\Exercice;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 /**
  * Dépôts d'articles.
@@ -54,6 +55,22 @@ class DepotResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()->can('lister_depots');
+    }
+
+    /**
+     * Un dépôt d'un autre exercice que celui consulté n'apparaît nulle
+     * part sur cet écran — ni dans la table, ni comme cible d'une
+     * action de ligne, ni comme relation résolue ailleurs. C'est le
+     * seul point de portée à tenir : `Resource::getEloquentQuery()` est
+     * le chemin que Filament emprunte pour tout le reste.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->when(
+                app(ContexteExercice::class)->exerciceConsulte()?->getKey(),
+                fn (Builder $requete, int $exerciceId) => $requete->where('exercice_id', $exerciceId),
+            );
     }
 
     public static function form(Schema $form): Schema
@@ -207,9 +224,6 @@ class DepotResource extends Resource
                     ->relationship('artisan', 'nom')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('exercice_id')
-                    ->label('Exercice')
-                    ->relationship('exercice', 'libelle'),
             ])
             ->defaultSort('numero', 'desc')
             ->recordActions([
@@ -220,7 +234,9 @@ class DepotResource extends Resource
                     ->iconButton()
                     ->tooltip('Valider et entrer en stock')
                     ->requiresConfirmation()
-                    ->visible(fn (Depot $record) => auth()->user()->can('valider_depot') && $record->estModifiable())
+                    ->visible(fn (Depot $record) => auth()->user()->can('valider_depot')
+                        && $record->estModifiable()
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Valider le dépôt')
                     ->modalDescription('Les articles entrent en stock, les lignes sont figées et la décharge devient imprimable. La validation est irréversible.')
                     ->modalWidth('lg')
@@ -267,7 +283,9 @@ class DepotResource extends Resource
                 Actions\EditAction::make()
                     ->iconButton()
                     ->tooltip('Modifier')
-                    ->visible(fn (Depot $record) => auth()->user()->can('modifier_depot') && $record->estModifiable())
+                    ->visible(fn (Depot $record) => auth()->user()->can('modifier_depot')
+                        && $record->estModifiable()
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Modifier le dépôt')
                     ->modalWidth('3xl')
                     ->modalSubmitActionLabel('Enregistrer')
@@ -285,7 +303,9 @@ class DepotResource extends Resource
                 Actions\DeleteAction::make()
                     ->iconButton()
                     ->tooltip('Supprimer')
-                    ->visible(fn (Depot $record) => auth()->user()->can('supprimer_depot') && $record->estModifiable())
+                    ->visible(fn (Depot $record) => auth()->user()->can('supprimer_depot')
+                        && $record->estModifiable()
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Supprimer le dépôt')
                     ->modalDescription('Seul un brouillon se supprime : un dépôt validé est la pièce qui justifie la détention des biens.')
                     ->modalWidth('lg')

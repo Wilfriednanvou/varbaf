@@ -9,6 +9,7 @@ use Modules\Commerce\Filament\Resources\DepotResource;
 use Modules\Commerce\Models\Depot;
 use Modules\Socle\Filament\Concerns\TitreLisible;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 class ManageDepots extends ManageRecords
 {
@@ -32,7 +33,8 @@ class ManageDepots extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->label('Nouveau dépôt')
-                ->visible(fn () => auth()->user()->can('ajouter_depot'))
+                ->visible(fn () => auth()->user()->can('ajouter_depot')
+                    && app(ContexteExercice::class)->estModifiable())
                 ->modalHeading('Nouveau dépôt d\'articles')
                 ->modalDescription('Le dépôt est créé en brouillon : rien n\'entre en stock tant qu\'il n\'est pas validé.')
                 ->modalWidth('3xl')

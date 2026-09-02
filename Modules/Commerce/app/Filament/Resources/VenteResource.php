@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Commerce\Enums\EtatVente;
 use Modules\Commerce\Filament\Resources\VenteResource\Pages;
@@ -16,6 +17,7 @@ use Modules\Commerce\Models\Vente;
 use Modules\Commerce\Services\ServiceVente;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 
 /**
  * Écran de consultation des ventes.
@@ -71,6 +73,18 @@ class VenteResource extends Resource
     public static function canDeleteAny(): bool
     {
         return false;
+    }
+
+    /**
+     * Même portée que DepotResource — voir son commentaire.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->when(
+                app(ContexteExercice::class)->exerciceConsulte()?->getKey(),
+                fn (Builder $requete, int $exerciceId) => $requete->where('exercice_id', $exerciceId),
+            );
     }
 
     public static function table(Table $table): Table
@@ -139,9 +153,6 @@ class VenteResource extends Resource
                     ->relationship('artisan', 'nom')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('exercice_id')
-                    ->label('Exercice')
-                    ->relationship('exercice', 'libelle'),
             ])
             ->defaultSort('date_vente', 'desc')
             ->recordActions([
@@ -174,7 +185,9 @@ class VenteResource extends Resource
                     ->color('danger')
                     ->iconButton()
                     ->tooltip('Annuler la vente')
-                    ->visible(fn (Vente $record) => auth()->user()->can('annuler_vente') && $record->estValidee())
+                    ->visible(fn (Vente $record) => auth()->user()->can('annuler_vente')
+                        && $record->estValidee()
+                        && app(ContexteExercice::class)->estModifiable())
                     ->modalHeading('Annuler la vente')
                     ->modalDescription('Les articles reviennent en stock et l\'encaissement est contre-passé en caisse. La vente reste au registre, avec son motif d\'annulation.')
                     ->modalWidth('lg')

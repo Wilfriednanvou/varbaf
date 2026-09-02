@@ -11,8 +11,10 @@ use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Socle\Enums\NavigationGroup;
 use Modules\Socle\Models\JournalAudit;
+use Modules\Socle\Services\ContexteExercice;
 use Modules\Tresorerie\Filament\Resources\SectionCaisseResource\Pages;
 use Modules\Tresorerie\Models\Caisse;
 use Modules\Tresorerie\Models\SectionCaisse;
@@ -31,6 +33,19 @@ class SectionCaisseResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()->can('lister_sections_caisse');
+    }
+
+    /**
+     * Même portée que DepotResource et VenteResource — voir leur
+     * commentaire.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->when(
+                app(ContexteExercice::class)->exerciceConsulte()?->getKey(),
+                fn (Builder $requete, int $exerciceId) => $requete->where('exercice_id', $exerciceId),
+            );
     }
 
     public static function form(Schema $form): Schema
@@ -133,7 +148,9 @@ class SectionCaisseResource extends Resource
                     ->tooltip('Clôturer cette section')
                     ->color('danger')
                     ->visible(fn (SectionCaisse $record) =>
-                        $record->estOuverte() && auth()->user()->can('cloturer_section_caisse')
+                        $record->estOuverte()
+                        && auth()->user()->can('cloturer_section_caisse')
+                        && app(ContexteExercice::class)->estModifiable()
                     )
                     ->requiresConfirmation()
                     ->modalHeading('Clôturer la section')
