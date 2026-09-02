@@ -4,7 +4,12 @@ namespace Modules\Tresorerie\Filament\Resources;
 
 use Filament\Actions;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Modules\Artisanat\Enums\StatutAttribution;
+use Modules\Artisanat\Models\AttributionEspace;
+use Modules\Tresorerie\Services\ServiceLocations;
 use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables;
@@ -49,7 +54,11 @@ class MouvementCaisseResource extends Resource
                     Forms\Components\Select::make('nature')
                         ->label('Nature')
                         ->options(NatureMouvementCaisse::options())
-                        ->required(),
+                        ->required()
+                        // Réactive : le champ d'attribution n'apparaît
+                        // que sur une redevance, et ne peut le faire que
+                        // si la nature se propage au reste du formulaire.
+                        ->live(),
                 ]),
                 Grid::make(2)->schema([
                     Forms\Components\Select::make('sens')
@@ -63,6 +72,51 @@ class MouvementCaisseResource extends Resource
                         ->required()
                         ->minValue(1),
                 ]),
+                /*
+                 * Le rattachement d'une redevance à son attribution.
+                 *
+                 * **Sans lui, l'écran des locations ne peut rien dire.**
+                 * Un encaissement qui ne nomme pas ce qu'il paie ne
+                 * s'impute à personne : le parc afficherait tout le monde
+                 * en retard, y compris les artisans à jour. Les colonnes
+                 * `origine_type` et `origine_id` existent depuis la
+                 * création de la table (A-07) et n'attendaient qu'un
+                 * champ pour être remplies.
+                 *
+                 * Visible sur la seule nature « redevance » : sur une
+                 * vente, l'origine est posée par le service qui
+                 * l'enregistre, et l'ouvrir à la saisie permettrait de
+                 * la contredire.
+                 */
+                Forms\Components\Select::make('origine_id')
+                    ->label('Attribution réglée')
+                    ->options(fn (): array => AttributionEspace::query()
+                        ->with(['espaceLocatif', 'artisan'])
+                        ->where('statut', StatutAttribution::ACTIVE->value)
+                        ->get()
+                        ->mapWithKeys(fn (AttributionEspace $a): array => [
+                            $a->getKey() => trim(
+                                ($a->espaceLocatif?->code ?? '—')
+                                .' — '.($a->artisan?->identite ?? 'occupant inconnu')
+                                .' ('.number_format((int) $a->redevance_convenue, 0, ',', ' ').' F/mois)'
+                            ),
+                        ])
+                        ->all())
+                    ->searchable()
+                    ->visible(fn (Get $get): bool => $get('nature') === NatureMouvementCaisse::REDEVANCE->value)
+                    ->required(fn (Get $get): bool => $get('nature') === NatureMouvementCaisse::REDEVANCE->value)
+                    // Le type accompagne l'identifiant, sans quoi une
+                    // ligne porterait un identifiant que rien ne
+                    // qualifie. Constaté, jamais choisi : il n'y a qu'une
+                    // classe possible pour une redevance.
+                    ->afterStateUpdated(fn (?string $state, Set $set) => $set(
+                        'origine_type',
+                        filled($state) ? ServiceLocations::ORIGINE : null,
+                    ))
+                    ->dehydrated(),
+
+                Forms\Components\Hidden::make('origine_type'),
+
                 Forms\Components\TextInput::make('libelle')
                     ->label('Libellé')
                     ->placeholder('Description du mouvement')
