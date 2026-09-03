@@ -71,9 +71,16 @@ class LecteurRegistre
      * médicinales » — aucun ne recoupe sans force l'un des quatorze
      * secteurs.
      *
+     * Rendue publique : `CompleterAttributionsCommand` (qui lit
+     * `parc-locatif.csv` directement, pour les occupants que le
+     * registre ne révèle pas) doit résoudre exactement le même métier
+     * de la même façon — deux tables qui divergeraient produiraient un
+     * secteur différent selon qu'un occupant a vendu ou non, ce qui
+     * n'aurait aucun sens.
+     *
      * @var array<string, string>
      */
-    protected const CORPS_METIER = [
+    public const CORPS_METIER = [
         'production des vins' => 'AGR',
         'apiculteur' => 'AGR',
         'production des produits a base de la farine locale' => 'AGR',
