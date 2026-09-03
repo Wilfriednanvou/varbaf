@@ -431,6 +431,28 @@ class AssistantInterrogationTest extends TestCase
         $this->assertStringContainsString('exercice', $parametres->libellePeriode);
     }
 
+    public function test_sans_periode_nommee_l_exercice_consulte_prime_sur_l_actif(): void
+    {
+        // Un exercice clôturé, distinct de l'actif — celui que le
+        // sélecteur global désigne le temps de ce test.
+        $historique = Exercice::create([
+            'libelle' => '2025',
+            'date_debut' => '2025-01-01',
+            'date_fin' => '2025-12-31',
+            'village_id' => $this->village->id,
+        ]);
+
+        app(\Modules\Socle\Services\ContexteExercice::class)->definir($historique);
+
+        $parametres = app(ExtracteurDeParametres::class)->extraire("Quel est le chiffre d'affaires ?");
+
+        // Sans ce garde-fou, une question posée en consultant un
+        // exercice clôturé répondrait en silence sur l'exercice actif —
+        // un chiffre juste pour une question différente de celle
+        // posée.
+        $this->assertSame($historique->id, $parametres->filtre->exerciceId);
+    }
+
     public function test_un_artisan_nomme_est_reconnu_contre_la_base(): void
     {
         $parametres = app(ExtracteurDeParametres::class)->extraire('Quelle est la situation de Kamdem ?');

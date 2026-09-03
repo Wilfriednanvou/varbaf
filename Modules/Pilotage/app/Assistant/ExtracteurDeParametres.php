@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Pilotage\Data\FiltreRapport;
 use Modules\Pilotage\Indexation\Normalisateur;
-use Modules\Socle\Models\Exercice;
+use Modules\Socle\Services\ContexteExercice;
 
 /**
  * Lit dans la question ce qui doit borner le calcul.
@@ -68,7 +68,11 @@ class ExtracteurDeParametres
      */
     protected function periode(string $question, array $termes, string $brut): array
     {
-        $exerciceId = Exercice::courant()?->getKey();
+        // L'exercice consulté au sélecteur global, pas nécessairement
+        // l'actif : une question posée sans année pendant qu'on regarde
+        // un exercice clôturé doit rester sur ce qu'on a sous les yeux,
+        // pas retomber en silence sur l'exercice en cours.
+        $exerciceId = app(ContexteExercice::class)->exerciceConsulte()?->getKey();
         $maintenant = Carbon::now();
 
         // Une année à quatre chiffres : « en 2024 ». Le tokeniser écarte
