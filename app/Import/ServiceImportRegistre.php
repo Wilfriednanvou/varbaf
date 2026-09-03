@@ -162,6 +162,17 @@ class ServiceImportRegistre
     ) {}
 
     /**
+     * Le lecteur employé par ce service — pour lire, après coup, ce
+     * qu'il a écarté (`dernieresExclusions`). Le rapport ne porte que
+     * des lignes importables ; les écritures « A ARBITRER » et « NON
+     * ARTISAN » n'en font jamais partie et se lisent donc à part.
+     */
+    public function lecteur(): LecteurRegistre
+    {
+        return $this->lecteur;
+    }
+
+    /**
      * @param  callable(int, int): void|null  $progression
      */
     public function importer(

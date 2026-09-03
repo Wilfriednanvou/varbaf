@@ -6,103 +6,100 @@ use Illuminate\Support\Carbon;
 use RuntimeException;
 
 /**
- * Lecture du registre transcrit : du fichier vers des lignes
- * exploitables.
+ * Lecture du registre de ventes reconstruit (pipeline du 2 septembre 2026).
  *
- * Le lecteur ne touche pas à la base. Il fait une seule chose, mais il
- * la fait sur la totalité du fichier avant que quoi que ce soit ne
- * s'écrive : il transforme mille cent quarante-neuf lignes de registre
- * manuscrit en objets, en disant pour chacune ce qu'il a dû supposer.
+ * **Ce que cette classe faisait avant, et pourquoi ça ne suffit plus.**
+ * Elle lisait directement le cahier manuscrit transcrit : dates en trois
+ * écritures, quantité/prix/montant à recouper, noms d'artisans à
+ * rapprocher par similarité. Le pipeline `docs/donnees/*.py` fait
+ * désormais tout ce travail en amont, une fois pour toutes, et le
+ * documente dans `docs/donnees/README.md` — dates déjà résolues,
+ * artisans déjà rapprochés dans `rattachements.csv`. Relire le registre
+ * comme un cahier brut referait un travail déjà fait, avec le risque de
+ * le refaire autrement.
  *
- * **Pourquoi la lecture précède l'écriture.** Trois décisions de
- * l'import ne peuvent pas se prendre ligne à ligne : le prix d'un
- * produit est celui de sa **première** occurrence, la date de début
- * d'une occupation est celle de la **plus ancienne** vente de
- * l'artisan dans le local, et le rapprochement des noms d'artisans
- * suppose de les connaître tous. Écrire au fil de la lecture obligerait
- * à revenir corriger des enregistrements déjà posés — et un produit
- * dont le prix a été réécrit après coup n'est plus un prix figé.
+ * **Ce que cette classe fait maintenant : joindre, pas deviner.** Trois
+ * fichiers, une seule vérité chacun :
+ * - `registre.csv` — la vente : date, désignation, montant, écriture
+ *   d'artisan telle que transcrite.
+ * - `rattachements.csv` — la décision humaine-assistée sur cette
+ *   écriture : rattachée à un occupant du parc, sans correspondance
+ *   (déposant non installé), à arbitrer, ou pas un artisan du tout.
+ * - `parc-locatif.csv` — pour l'espace résolu, la redevance convenue et
+ *   le métier déclaré.
  *
- * **Ce que le lecteur s'autorise.** Reprendre la valeur de la ligne
- * précédente quand la cellule porte un guillemet de répétition ;
- * compléter une année absente d'une date en `14/07` ; déduire la
- * troisième valeur quand deux des trois — quantité, prix, montant —
- * sont présentes. Chacune de ces trois libertés laisse une anomalie
- * attachée à la ligne.
+ * **Deux décisions ne produisent aucune ligne importable**, et c'est
+ * délibéré : `A ARBITRER` est une ambiguïté que le script de
+ * rapprochement a explicitement refusé de trancher — l'importer quand
+ * même reviendrait à trancher à sa place. `NON ARTISAN` désigne un
+ * espace du village ou un agent, jamais un artisan — il n'y a personne
+ * à qui rattacher la vente. Les deux sont comptées et signalées,
+ * jamais tues.
  *
- * **La date est le seul cas où une cellule vide se reporte**, et c'est
- * une lecture du document, pas une facilité : un cahier de ventes ne
- * réécrit la date qu'au changement de jour, si bien qu'une cellule
- * laissée blanche y **signifie** « même jour ». Une désignation ou un
- * nom d'artisan laissés blancs ne signifient rien de tel : ils
- * signalent que le scribe n'a pas noté, et les compléter d'après la
- * ligne du dessus attribuerait une vente à quelqu'un au hasard. Un
- * guillemet de répétition, lui, se reporte partout, parce qu'il est une
- * écriture explicite de la source.
- *
- * **Ce qu'il refuse.** Deviner un nom d'artisan, deviner une
- * désignation, réparer un montant en retouchant le prix ou la quantité.
+ * **Une ligne, un article.** Le nouveau registre ne porte plus de
+ * quantité ni de prix unitaire séparés — un seul montant par ligne. La
+ * ligne est donc traitée comme la vente d'un article unique à ce
+ * montant : c'est la meilleure lecture d'une ligne qui ne dit rien de
+ * plus, et le montant retenu par le système reste rigoureusement celui
+ * du registre (quantité 1 × prix = montant, sans arrondi ni écart).
  */
 class LecteurRegistre
 {
     /**
-     * Colonnes attendues, dans n'importe quel ordre.
-     *
-     * Vérifiées à l'ouverture plutôt que découvertes à la trente-septième
-     * ligne : un fichier au mauvais format doit échouer avant la première
-     * écriture, pas au milieu.
+     * Décisions de `rattachements.csv` qui ne produisent aucune ligne :
+     * une ambiguïté réelle, ou une écriture qui ne désigne pas un
+     * artisan.
      *
      * @var array<int, string>
      */
-    public const COLONNES = [
-        'date',
-        'code_boutique_source',
-        'code_boutique_normalise',
-        'nom_artisan_source',
-        'designation',
-        'conditionnement',
-        'quantite',
-        'prix_unitaire',
-        'montant',
-        'coherence',
-        'vendeur_reference',
+    protected const DECISIONS_EXCLUES = ['A ARBITRER', 'NON ARTISAN'];
+
+    /**
+     * Métier déclaré au relevé de recouvrement → code du corps de
+     * métier officiel (`CorpsMetierSeeder`), en forme comparable
+     * (`Normalisation::comparable()`).
+     *
+     * **Absent de cette table, un métier reste sans secteur — jamais
+     * deviné.** Voir la migration
+     * `rendre_facultatives_les_donnees_absentes_du_registre` : inventer
+     * un rattachement approximatif polluerait un référentiel qui fait
+     * autorité. Plusieurs métiers du relevé restent donc volontairement
+     * hors de cette table : « bijoux en perles » (question 5 de
+     * `docs/questions-coordination.md`, toujours sans réponse),
+     * « objets en bambou », « plusieurs objets artisanaux », « objet
+     * traditionnel », « naturopathie… », « entretien des plantes
+     * médicinales » — aucun ne recoupe sans force l'un des quatorze
+     * secteurs.
+     *
+     * @var array<string, string>
+     */
+    protected const CORPS_METIER = [
+        'production des vins' => 'AGR',
+        'apiculteur' => 'AGR',
+        'production des produits a base de la farine locale' => 'AGR',
+        'production de la pharmacopee traditionnelle' => 'MED',
+        'produits de sante' => 'MED',
+        'cosmetique' => 'COS',
+        'production des cosmetiques' => 'COS',
+        'production des objets sculptes' => 'SCU',
+        'production des objets sculptes transformation du bois' => 'SCU',
+        'fabrication des chaussures' => 'CUI',
+        'vannerie' => 'VAN',
+        'objets artisanaux et recuperateur' => 'REC',
+        'dessinateur' => 'ARP',
+        'cooperative des artisans menuisiers' => 'MEN',
     ];
 
     /**
-     * Colonnes lues si elles sont là, ignorées sinon.
+     * Ce que la dernière lecture a écarté — une entrée par ligne
+     * exclue, pour le rapport complémentaire.
      *
-     * Elles ne viennent pas du cahier mais du travail de rattachement
-     * de la coordination : l'espace locatif de l'artisan, son nom
-     * officiel au parc, la redevance convenue pour cet espace et son
-     * corps de métier. Les exiger ferait échouer la lecture d'un
-     * registre transcrit avant que ce rattachement n'existe — or
-     * l'ordre des travaux est bien celui-là : on transcrit, puis on
-     * rattache.
+     * Remise à zéro à chaque appel de `lire()` : la propriété ne porte
+     * que le dernier fichier lu.
      *
-     * @var array<int, string>
+     * @var array<int, array{ligne_source: string, artisan: string, decision: string, montant: string}>
      */
-    public const COLONNES_FACULTATIVES = [
-        'espace_locatif',
-        'nom_artisan_officiel',
-        'redevance_convenue',
-        'corps_metier',
-    ];
-
-    /**
-     * Valeurs qui ne désignent rien : le registre les emploie là où le
-     * scribe n'a pas su.
-     *
-     * @var array<int, string>
-     */
-    protected const NON_RENSEIGNE = ['?', '-', '--', 'N/A', 'NA', 'NEANT', 'NÉANT'];
-
-    /**
-     * Fenêtre de vraisemblance des dates, en années autour de l'année
-     * courante. Voir `estVraisemblable()` pour le raisonnement.
-     */
-    protected const ANNEES_EN_ARRIERE = 20;
-
-    protected const ANNEES_EN_AVANT = 1;
+    public array $dernieresExclusions = [];
 
     /**
      * @return array<int, LigneRegistre>
@@ -113,489 +110,205 @@ class LecteurRegistre
             throw new RuntimeException("Registre introuvable ou illisible : {$chemin}");
         }
 
+        $repertoire = dirname($chemin);
+        $rattachements = $this->lireRattachements($repertoire.DIRECTORY_SEPARATOR.'rattachements.csv');
+        $parc = $this->lireParc($repertoire.DIRECTORY_SEPARATOR.'parc-locatif.csv');
+
+        $this->dernieresExclusions = [];
         $fichier = basename($chemin);
-        $flux = fopen($chemin, 'r');
+        $lignes = [];
 
-        if ($flux === false) {
-            throw new RuntimeException("Ouverture impossible du registre : {$chemin}");
-        }
+        foreach ($this->lireCsv($chemin) as $brut) {
+            $artisanSource = trim($brut['artisan'] ?? '');
+            $rattachement = $rattachements[$artisanSource] ?? null;
 
-        try {
-            $entete = $this->lireEntete($flux, $chemin);
-
-            $lignes = [];
-            $numero = 0;
-
-            // Report des cellules répétées. Le registre est tenu à la
-            // main : une colonne laissée vide veut dire « comme
-            // au-dessus », et c'est ainsi qu'il se lit sur papier.
-            $dateCourante = null;
-            $codeBoutiqueCourant = '';
-            $nomArtisanCourant = null;
-            $designationCourante = '';
-            $conditionnementCourant = '';
-
-            while (($cellules = fgetcsv($flux, 0, ',', '"', '')) !== false) {
-                // Ligne entièrement vide : le fichier en porte parfois
-                // en fin de parcours. Elle n'est pas une ligne du
-                // registre et ne doit donc rien peser au rapport.
-                if ($cellules === [null] || $this->estVide($cellules)) {
-                    continue;
-                }
-
-                $numero++;
-                $brut = $this->associer($entete, $cellules);
-
-                $ligne = $this->composer(
-                    $fichier,
-                    $numero,
-                    $brut,
-                    $dateCourante,
-                    $codeBoutiqueCourant,
-                    $nomArtisanCourant,
-                    $designationCourante,
-                    $conditionnementCourant,
+            if ($rattachement === null) {
+                // Ne peut arriver que si rattachements.csv n'a pas été
+                // régénéré depuis le dernier registre : les deux
+                // fichiers sont produits par le même pipeline et
+                // portent les mêmes écritures. Signalé en échec dur
+                // plutôt qu'en anomalie silencieuse — une ligne sans
+                // décision ne doit pas se glisser dans un import.
+                throw new RuntimeException(
+                    "Aucune décision dans rattachements.csv pour l'écriture « {$artisanSource} » "
+                    ."(ligne {$brut['ligne_source']}). Régénérer rattacher-artisans.py avant de réimporter."
                 );
-
-                $lignes[] = $ligne;
-
-                // Le report retient la valeur **effective** de la ligne
-                // qui vient d'être lue, y compris quand elle est vide.
-                // Un guillemet de répétition renvoie à la ligne du
-                // dessus et à aucune autre : remonter jusqu'à la
-                // dernière cellule renseignée ferait dire au registre
-                // l'inverse de ce qu'il écrit — un conditionnement
-                // laissé blanc trois lignes plus haut reviendrait
-                // s'appliquer à un article qui n'en a pas.
-                //
-                // La date fait exception, et seulement au début du
-                // fichier : tant qu'aucune date n'a pu être établie, il
-                // n'y a rien à reporter.
-                $dateCourante = $ligne->date ?? $dateCourante;
-                $codeBoutiqueCourant = $ligne->codeBoutique;
-                $nomArtisanCourant = $ligne->nomArtisan;
-                $designationCourante = $ligne->designation;
-                $conditionnementCourant = $ligne->conditionnement;
             }
 
-            return $lignes;
-        } finally {
-            fclose($flux);
-        }
-    }
+            if (in_array($rattachement['decision'], self::DECISIONS_EXCLUES, strict: true)) {
+                $this->dernieresExclusions[] = [
+                    'ligne_source' => $brut['ligne_source'] ?? '',
+                    'artisan' => $artisanSource,
+                    'decision' => $rattachement['decision'],
+                    'montant' => $brut['montant'] ?? '',
+                ];
 
-    /**
-     * @param  resource  $flux
-     * @return array<int, string>
-     */
-    protected function lireEntete($flux, string $chemin): array
-    {
-        $entete = fgetcsv($flux, 0, ',', '"', '');
-
-        if ($entete === false || $entete === [null]) {
-            throw new RuntimeException("Registre vide : {$chemin}");
-        }
-
-        // Marque d'ordre des octets déposée par les tableurs.
-        $entete[0] = preg_replace('/^\x{FEFF}/u', '', (string) $entete[0]) ?? '';
-        $entete = array_map(fn ($colonne) => trim((string) $colonne), $entete);
-
-        $manquantes = array_diff(self::COLONNES, $entete);
-
-        if ($manquantes !== []) {
-            throw new RuntimeException(
-                'Colonnes absentes du registre : '.implode(', ', $manquantes)
-                .'. Attendues : '.implode(', ', self::COLONNES).'.'
-            );
-        }
-
-        return $entete;
-    }
-
-    /**
-     * @param  array<int, string|null>  $cellules
-     */
-    protected function estVide(array $cellules): bool
-    {
-        foreach ($cellules as $cellule) {
-            if (trim((string) $cellule) !== '') {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param  array<int, string>  $entete
-     * @param  array<int, string|null>  $cellules
-     * @return array<string, string>
-     */
-    protected function associer(array $entete, array $cellules): array
-    {
-        $brut = [];
-
-        foreach ($entete as $rang => $colonne) {
-            $brut[$colonne] = trim((string) ($cellules[$rang] ?? ''));
-        }
-
-        return $brut;
-    }
-
-    /**
-     * @param  array<string, string>  $brut
-     */
-    protected function composer(
-        string $fichier,
-        int $numero,
-        array $brut,
-        ?Carbon $dateCourante,
-        string $codeBoutiqueCourant,
-        ?string $nomArtisanCourant,
-        string $designationCourante,
-        string $conditionnementCourant,
-    ): LigneRegistre {
-        $anomalies = [];
-
-        [$date, $anomalieDate] = $this->resoudreDate($brut['date'], $dateCourante);
-        $this->ajouter($anomalies, $anomalieDate);
-
-        [$codeBoutique, $anomalieBoutique] = $this->resoudreCodeBoutique(
-            $brut['code_boutique_normalise'],
-            $brut['code_boutique_source'],
-            $codeBoutiqueCourant,
-        );
-        $this->ajouter($anomalies, $anomalieBoutique);
-
-        [$nomArtisan, $anomalieArtisan] = $this->resoudreNomArtisan($brut['nom_artisan_source'], $nomArtisanCourant);
-        $this->ajouter($anomalies, $anomalieArtisan);
-
-        [$designation, $anomalieDesignation] = $this->resoudreRepetition($brut['designation'], $designationCourante);
-        $this->ajouter($anomalies, $anomalieDesignation === null ? null : LigneRegistre::DESIGNATION_REPRISE);
-
-        if ($designation === '') {
-            $this->ajouter($anomalies, LigneRegistre::DESIGNATION_ABSENTE);
-        }
-
-        [$conditionnement] = $this->resoudreRepetition($brut['conditionnement'], $conditionnementCourant);
-
-        [$quantite, $prix, $montant, $anomaliesMontants] = $this->resoudreMontants(
-            $brut['quantite'],
-            $brut['prix_unitaire'],
-            $brut['montant'],
-        );
-
-        foreach ($anomaliesMontants as $anomalie) {
-            $this->ajouter($anomalies, $anomalie);
-        }
-
-        $ecartSource = strtoupper(trim($brut['coherence'])) === 'ECART';
-
-        if ($ecartSource) {
-            $this->ajouter($anomalies, LigneRegistre::ECART_SIGNALE_A_LA_SOURCE);
-        }
-
-        $ligne = new LigneRegistre(
-            numero: $numero,
-            empreinte: $this->empreinte($fichier, $numero, $brut),
-            brut: $brut,
-            date: $date,
-            codeBoutiqueSource: Normalisation::lisible($brut['code_boutique_source']),
-            codeBoutique: $codeBoutique,
-            nomArtisan: $nomArtisan,
-            designation: $designation,
-            conditionnement: $conditionnement,
-            quantite: $quantite,
-            prixUnitaire: $prix,
-            montantTranscrit: $montant,
-            ecartSignaleALaSource: $ecartSource,
-            anomalies: $anomalies,
-            espaceLocatif: Normalisation::codeBoutique($brut['espace_locatif'] ?? ''),
-            nomArtisanOfficiel: Normalisation::lisible($brut['nom_artisan_officiel'] ?? ''),
-            redevanceConvenue: Normalisation::entier($brut['redevance_convenue'] ?? ''),
-            corpsMetier: Normalisation::codeBoutique($brut['corps_metier'] ?? ''),
-        );
-
-        // L'écart de calcul est constaté sur les valeurs retenues, et non
-        // recopié de la colonne « coherence » du fichier. Le registre
-        // signale cinquante lignes ; le contrôle, lui, les recompte
-        // toutes — c'est ce qui permet de dire au rapport si la
-        // transcription a manqué des écarts, plutôt que de la croire.
-        if ($ligne->enEcartDeCalcul()) {
-            $ligne->signaler(LigneRegistre::ECART_DE_CALCUL);
-        }
-
-        return $ligne;
-    }
-
-    /**
-     * @param  array<int, string>  $anomalies
-     */
-    protected function ajouter(array &$anomalies, ?string $anomalie): void
-    {
-        if ($anomalie !== null && ! in_array($anomalie, $anomalies, strict: true)) {
-            $anomalies[] = $anomalie;
-        }
-    }
-
-    /**
-     * @param  array<string, string>  $brut
-     */
-    protected function empreinte(string $fichier, int $numero, array $brut): string
-    {
-        // Le rang entre dans l'empreinte : deux lignes rigoureusement
-        // identiques — le même miel, le même jour, au même prix — sont
-        // deux ventes distinctes, et non un doublon à écarter.
-        return hash('sha256', $fichier."\x1f".$numero."\x1f".implode("\x1f", $brut));
-    }
-
-    /**
-     * Date de la ligne, et ce qu'il a fallu supposer pour l'obtenir.
-     *
-     * Quatre écritures cohabitent dans le registre : la date complète en
-     * ISO, la date française à deux ou quatre chiffres d'année, le jour
-     * et le mois seuls — le scribe ne réécrivait pas l'année à chaque
-     * page — et la cellule vide ou répétée.
-     *
-     * @return array{0: ?Carbon, 1: ?string}
-     */
-    protected function resoudreDate(string $brut, ?Carbon $precedente): array
-    {
-        $valeur = trim($brut);
-
-        if ($valeur === '' || Normalisation::estRepetition($valeur) || $this->estNonRenseigne($valeur)) {
-            return $precedente
-                ? [$precedente->copy(), LigneRegistre::DATE_REPRISE]
-                : [null, LigneRegistre::DATE_INDETERMINABLE];
-        }
-
-        // Le format est reconnu par la forme de l'écriture avant d'être
-        // analysé. Laisser `createFromFormat` deviner mènerait au pire
-        // des résultats : `31/12/25` lu au format `d/m/Y` donne l'an 25
-        // de notre ère, sans le moindre avertissement.
-        $normalise = str_replace('-', '/', $valeur);
-
-        $formats = [
-            '#^\d{4}/\d{1,2}/\d{1,2}$#' => ['Y/m/d', $normalise],
-            '#^\d{1,2}/\d{1,2}/\d{4}$#' => ['d/m/Y', $normalise],
-            '#^\d{1,2}/\d{1,2}/\d{2}$#' => ['d/m/y', $normalise],
-        ];
-
-        foreach ($formats as $forme => [$format, $sujet]) {
-            if (preg_match($forme, $sujet) !== 1) {
                 continue;
             }
 
-            $date = $this->parserStrict($sujet, $format);
+            $espaceLocatif = $rattachement['espace_locatif'];
+            $infosParc = $espaceLocatif !== '' ? ($parc[$espaceLocatif] ?? null) : null;
 
-            if ($date === null) {
-                return $this->reporterDateInvalide($precedente, LigneRegistre::DATE_INVALIDE);
-            }
+            // RATTACHE : le nom officiel du parc fait autorité — une
+            // personne a lu les deux écritures et tranché. SANS
+            // CORRESPONDANCE : aucun occupant ne répond, l'écriture du
+            // registre devient elle-même le nom retenu (déposant non
+            // installé, règle 4 — identité permanente sans espace).
+            $nomOfficiel = $rattachement['decision'] === 'RATTACHE'
+                ? $rattachement['occupant_parc']
+                : Normalisation::lisible($artisanSource);
 
-            if (! $this->estVraisemblable($date)) {
-                return $this->reporterDateInvalide($precedente, LigneRegistre::DATE_INVRAISEMBLABLE);
-            }
+            $montant = Normalisation::entier($brut['montant'] ?? '');
+            $date = $this->parserDate($brut['date'] ?? '');
 
-            return [$date, null];
-        }
-
-        // Jour et mois seuls : l'année vient de la ligne précédente. Le
-        // scribe ne réécrivait pas l'année à chaque page.
-        if (preg_match('#^(\d{1,2})/(\d{1,2})$#', $normalise, $trouve) === 1 && $precedente) {
-            $date = $this->parserStrict(
-                sprintf('%04d/%02d/%02d', $precedente->year, (int) $trouve[2], (int) $trouve[1]),
-                'Y/m/d',
+            $ligne = new LigneRegistre(
+                numero: (int) ($brut['ligne_source'] ?? 0),
+                empreinte: $this->empreinte($fichier, $brut),
+                brut: $brut,
+                date: $date,
+                codeBoutiqueSource: $espaceLocatif !== '' ? $espaceLocatif : 'SANS CODE',
+                // Le contenant vient de parc-locatif.csv, jamais dérivé
+                // du code de l'espace : SS01 abrite G0201, un code qui
+                // ne suit pas la règle B{numero} (voir
+                // EspaceLocatif::genererCode()).
+                codeBoutique: $infosParc['contenant'] ?? '',
+                nomArtisan: Normalisation::lisible($artisanSource),
+                designation: Normalisation::lisible($brut['designation'] ?? ''),
+                conditionnement: '',
+                quantite: $montant !== null ? 1 : null,
+                prixUnitaire: $montant,
+                montantTranscrit: $montant,
+                ecartSignaleALaSource: false,
+                espaceLocatif: $espaceLocatif,
+                nomArtisanOfficiel: $nomOfficiel,
+                redevanceConvenue: $infosParc['redevance'] ?? null,
+                corpsMetier: $infosParc['corps_metier'] ?? '',
             );
 
-            if ($date !== null) {
-                return [$date, LigneRegistre::DATE_ANNEE_DEDUITE];
-            }
-        }
-
-        return $this->reporterDateInvalide($precedente, LigneRegistre::DATE_INVALIDE);
-    }
-
-    /**
-     * Le registre porte un 30 février et un 4 août 1026. On ne les
-     * corrige ni au 29, ni à 2026 : rien ne dit que le scribe visait le
-     * dernier jour du mois plutôt que le premier du suivant, et choisir
-     * pour lui reviendrait à inventer une donnée que personne ne
-     * saurait plus distinguer d'une donnée relevée. La ligne précédente
-     * fait foi, l'anomalie le dit, et la coordination tranche sur pièce.
-     *
-     * @return array{0: ?Carbon, 1: string}
-     */
-    protected function reporterDateInvalide(?Carbon $precedente, string $anomalie): array
-    {
-        return $precedente
-            ? [$precedente->copy(), $anomalie]
-            : [null, $anomalie];
-    }
-
-    /**
-     * La date tombe-t-elle dans la période où un registre du village
-     * peut avoir été tenu ?
-     *
-     * Le contrôle n'est pas une coquetterie. Le registre porte un
-     * « 04/08/1026 », faute de frappe évidente sur 2026 — et sans
-     * garde-fou, cette seule ligne devient la plus ancienne pièce du
-     * fichier, l'import cherche alors un taux de commission en vigueur
-     * au onzième siècle, n'en trouve aucun, et refuse de démarrer. Une
-     * coquille de transcription bloquerait la reprise entière.
-     *
-     * Vingt ans en arrière et un an en avant : assez large pour ne
-     * jamais écarter une pièce réelle — le village n'existait pas il y
-     * a vingt ans — assez étroit pour attraper une erreur de siècle ou
-     * une date saisie au clavier numérique.
-     */
-    protected function estVraisemblable(Carbon $date): bool
-    {
-        $annee = (int) $date->format('Y');
-        $courante = (int) Carbon::now()->format('Y');
-
-        return $annee >= $courante - self::ANNEES_EN_ARRIERE
-            && $annee <= $courante + self::ANNEES_EN_AVANT;
-    }
-
-    /**
-     * Analyse une date en refusant les débordements.
-     *
-     * `Carbon::createFromFormat` accepte volontiers le 30 février et le
-     * reporte au 1er mars. Sur un registre transcrit à la main, ce
-     * report transformerait une faute de copie en donnée plausible :
-     * on préfère la refuser et la signaler.
-     */
-    protected function parserStrict(string $valeur, string $format): ?Carbon
-    {
-        $date = \DateTime::createFromFormat('!'.$format, $valeur);
-        $erreurs = \DateTime::getLastErrors();
-
-        if ($date === false) {
-            return null;
-        }
-
-        if (is_array($erreurs) && (($erreurs['warning_count'] ?? 0) > 0 || ($erreurs['error_count'] ?? 0) > 0)) {
-            return null;
-        }
-
-        return Carbon::instance($date)->startOfDay();
-    }
-
-    /**
-     * @return array{0: string, 1: ?string}
-     */
-    protected function resoudreCodeBoutique(string $normalise, string $source, string $precedent): array
-    {
-        $valeur = Normalisation::codeBoutique($normalise);
-
-        if ($valeur === '' || $this->estNonRenseigne($valeur)) {
-            $valeur = Normalisation::codeBoutique($source);
-        }
-
-        if (Normalisation::estRepetition($valeur)) {
-            return $precedent !== ''
-                ? [$precedent, LigneRegistre::BOUTIQUE_REPRISE]
-                : ['', LigneRegistre::BOUTIQUE_ABSENTE];
-        }
-
-        if ($valeur === '' || $this->estNonRenseigne($valeur)) {
-            return ['', LigneRegistre::BOUTIQUE_ABSENTE];
-        }
-
-        return [$valeur, null];
-    }
-
-    /**
-     * Nom d'artisan, ou rien.
-     *
-     * La règle de l'énoncé est stricte : jamais de nom supposé. Une
-     * cellule vide donne donc `null`, que l'import fera basculer sur
-     * l'artisan « Non identifié ». Un guillemet de répétition, lui,
-     * n'est pas une absence : c'est le registre qui désigne la ligne
-     * du dessus.
-     *
-     * @return array{0: ?string, 1: ?string}
-     */
-    protected function resoudreNomArtisan(string $brut, ?string $precedent): array
-    {
-        $valeur = Normalisation::lisible($brut);
-
-        if (Normalisation::estRepetition($brut)) {
-            return $precedent !== null
-                ? [$precedent, LigneRegistre::ARTISAN_REPRIS]
-                : [null, LigneRegistre::ARTISAN_ABSENT];
-        }
-
-        if ($valeur === '' || $this->estNonRenseigne($valeur)) {
-            return [null, LigneRegistre::ARTISAN_ABSENT];
-        }
-
-        return [$valeur, null];
-    }
-
-    /**
-     * @return array{0: string, 1: ?string}
-     */
-    protected function resoudreRepetition(string $brut, string $precedent): array
-    {
-        if (Normalisation::estRepetition($brut)) {
-            return $precedent !== '' ? [$precedent, 'reprise'] : ['', null];
-        }
-
-        $valeur = Normalisation::lisible($brut);
-
-        return [$this->estNonRenseigne($valeur) ? '' : $valeur, null];
-    }
-
-    /**
-     * Quantité, prix et montant : deux valeurs suffisent à établir la
-     * troisième.
-     *
-     * L'ordre des tentatives n'est pas indifférent. La quantité et le
-     * prix sont les données que le scribe notait en premier et
-     * relisait ; le montant est le résultat de son calcul mental,
-     * c'est-à-dire l'endroit où l'erreur se loge. Quand les trois sont
-     * là, on garde les trois — l'écart éventuel est un fait à
-     * consigner, pas une contradiction à trancher. Quand il en manque
-     * une, on la déduit des deux autres, et on le dit.
-     *
-     * @return array{0: ?int, 1: ?int, 2: ?int, 3: array<int, string>}
-     */
-    protected function resoudreMontants(string $quantiteBrute, string $prixBrut, string $montantBrut): array
-    {
-        $quantite = Normalisation::entier($quantiteBrute);
-        $prix = Normalisation::entier($prixBrut);
-        $montant = Normalisation::entier($montantBrut);
-
-        $anomalies = [];
-
-        if ($quantite !== null && $prix !== null) {
             if ($montant === null) {
-                $anomalies[] = LigneRegistre::MONTANT_DEDUIT;
+                $ligne->signaler(LigneRegistre::VALEURS_INSUFFISANTES);
             }
 
-            return [$quantite, $prix, $montant, $anomalies];
+            $lignes[] = $ligne;
         }
 
-        if ($quantite !== null && $montant !== null && $quantite > 0) {
-            $anomalies[] = LigneRegistre::PRIX_DEDUIT;
-
-            return [$quantite, (int) round($montant / $quantite), $montant, $anomalies];
-        }
-
-        if ($prix !== null && $montant !== null && $prix > 0) {
-            $anomalies[] = LigneRegistre::QUANTITE_DEDUITE;
-
-            return [max(1, (int) round($montant / $prix)), $prix, $montant, $anomalies];
-        }
-
-        $anomalies[] = LigneRegistre::VALEURS_INSUFFISANTES;
-
-        return [$quantite, $prix, $montant, $anomalies];
+        return $lignes;
     }
 
-    protected function estNonRenseigne(string $valeur): bool
+    /**
+     * Empreinte d'idempotence : le rang du registre source suffit à
+     * distinguer deux lignes par ailleurs identiques (le même article,
+     * au même prix, le même jour).
+     *
+     * @param  array<string, string>  $brut
+     */
+    protected function empreinte(string $fichier, array $brut): string
     {
-        return in_array(mb_strtoupper($valeur), self::NON_RENSEIGNE, strict: true);
+        return hash('sha256', $fichier."\x1f".($brut['ligne_source'] ?? ''));
+    }
+
+    protected function parserDate(string $brut): ?Carbon
+    {
+        $valeur = trim($brut);
+
+        if ($valeur === '') {
+            return null;
+        }
+
+        // Déjà résolue en ISO par extraire-registre.py : aucun format
+        // à deviner ici.
+        try {
+            return Carbon::createFromFormat('Y-m-d', $valeur)?->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @return array<string, array{decision: string, espace_locatif: string, occupant_parc: string}>
+     */
+    protected function lireRattachements(string $chemin): array
+    {
+        $index = [];
+
+        foreach ($this->lireCsv($chemin) as $ligne) {
+            $index[trim($ligne['ecriture_registre'] ?? '')] = [
+                'decision' => trim($ligne['decision'] ?? ''),
+                'espace_locatif' => trim($ligne['espace_locatif'] ?? ''),
+                'occupant_parc' => Normalisation::lisible($ligne['occupant_parc'] ?? ''),
+            ];
+        }
+
+        return $index;
+    }
+
+    /**
+     * @return array<string, array{contenant: string, redevance: ?int, corps_metier: string}>
+     */
+    protected function lireParc(string $chemin): array
+    {
+        $index = [];
+
+        foreach ($this->lireCsv($chemin) as $ligne) {
+            $espace = trim($ligne['espace'] ?? '');
+
+            if ($espace === '') {
+                continue;
+            }
+
+            $index[$espace] = [
+                'contenant' => trim($ligne['contenant'] ?? ''),
+                'redevance' => Normalisation::entier($ligne['redevance'] ?? ''),
+                'corps_metier' => self::CORPS_METIER[Normalisation::comparable($ligne['metier'] ?? '')] ?? '',
+            ];
+        }
+
+        return $index;
+    }
+
+    /**
+     * Lecteur CSV générique : point-virgule, tel que produisent les
+     * trois scripts Python de `docs/donnees/`.
+     *
+     * @return iterable<int, array<string, string>>
+     */
+    protected function lireCsv(string $chemin): iterable
+    {
+        if (! is_file($chemin) || ! is_readable($chemin)) {
+            throw new RuntimeException("Fichier introuvable ou illisible : {$chemin}");
+        }
+
+        $flux = fopen($chemin, 'r');
+
+        if ($flux === false) {
+            throw new RuntimeException("Ouverture impossible : {$chemin}");
+        }
+
+        try {
+            $entete = fgetcsv($flux, 0, ';', '"', '');
+
+            if ($entete === false || $entete === [null]) {
+                return;
+            }
+
+            $entete[0] = preg_replace('/^\x{FEFF}/u', '', (string) $entete[0]) ?? '';
+            $entete = array_map(fn ($colonne) => trim((string) $colonne), $entete);
+
+            while (($cellules = fgetcsv($flux, 0, ';', '"', '')) !== false) {
+                if ($cellules === [null]) {
+                    continue;
+                }
+
+                $ligne = [];
+
+                foreach ($entete as $rang => $colonne) {
+                    $ligne[$colonne] = trim((string) ($cellules[$rang] ?? ''));
+                }
+
+                yield $ligne;
+            }
+        } finally {
+            fclose($flux);
+        }
     }
 }

@@ -91,10 +91,51 @@ class ImporterRegistreCommand extends Command
         }
 
         $this->afficher($rapport);
+        $this->afficherExclusions($import);
         $this->exporter($rapport);
         $this->auditer($rapport, $chemin);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Écritures que `rattachements.csv` a explicitement écartées —
+     * ambiguïté réelle (« A ARBITRER ») ou pas un artisan (« NON
+     * ARTISAN »). Elles ne figurent nulle part dans le rapport
+     * d'import : le dire ici évite qu'un chiffre d'affaires reconstitué
+     * ne se lise comme complet alors qu'il ne l'est délibérément pas.
+     */
+    protected function afficherExclusions(ServiceImportRegistre $import): void
+    {
+        $exclusions = $import->lecteur()->dernieresExclusions;
+
+        if ($exclusions === []) {
+            return;
+        }
+
+        $parDecision = [];
+
+        foreach ($exclusions as $exclusion) {
+            $decision = $exclusion['decision'];
+            $parDecision[$decision] ??= ['lignes' => 0, 'montant' => 0];
+            $parDecision[$decision]['lignes']++;
+            $parDecision[$decision]['montant'] += (int) ($exclusion['montant'] ?: 0);
+        }
+
+        $this->newLine();
+        $this->components->warn(
+            'Écritures écartées par rattachements.csv, hors du rapport ci-dessus : '
+            .'ambiguïté réelle ou écriture qui ne désigne pas un artisan.'
+        );
+
+        $this->table(
+            ['Décision', 'Lignes', 'Montant'],
+            array_map(
+                fn (string $decision, array $c) => [$decision, (string) $c['lignes'], number_format($c['montant'], 0, ',', ' ').' F'],
+                array_keys($parDecision),
+                $parDecision,
+            ),
+        );
     }
 
     /**

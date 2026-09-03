@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Import\LigneRegistre;
 use App\Import\RapportImport;
 use App\Import\ServiceImportRegistre;
 use App\Import\TraceLigneImportee;
@@ -30,15 +29,22 @@ use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 /**
- * Reprise du registre de ventes transcrit.
+ * Reprise du registre de ventes reconstruit (pipeline du 2 septembre
+ * 2026) — `registre.csv` + `rattachements.csv` + `parc-locatif.csv`.
  *
- * Le registre réel du village n'est pas rejoué ici : mille cent
- * quarante-neuf lignes mettraient plusieurs minutes et ne prouveraient
- * rien de plus. Le fichier ci-dessous est un extrait taillé pour porter
- * une fois chacune des difficultés qu'on y rencontre — un nom
- * orthographié de deux façons, un artisan absent, un code hors parc, un
- * guillemet de répétition, une date sans année, un total qui ne tombe
- * pas juste, une ligne trop lacunaire pour devenir une vente.
+ * **Ce fichier a changé de forme, pas d'intention.** Il protégeait un
+ * lecteur qui parsait un cahier manuscrit brut — guillemets de
+ * répétition, dates à trois écritures, quantité/prix/montant à
+ * recouper. Ce travail vit maintenant dans `docs/donnees/*.py`, avant
+ * que PHP ne voie quoi que ce soit, et les tests qui le protégeaient
+ * n'ont plus d'objet : ils ont disparu avec lui plutôt que d'être
+ * maquillés en tests du nouveau format.
+ *
+ * Ce qui reste, parce que ça n'a pas bougé : la façon dont
+ * `ServiceImportRegistre` écrit — un artisan par occupant résolu,
+ * jamais d'espace ni de secteur inventé, le prix d'un produit figé sur
+ * sa première occurrence, une occupation refusée qui n'emporte jamais
+ * la vente, la relançabilité sans doublon.
  */
 class ImportRegistreTest extends TestCase
 {
@@ -51,6 +57,8 @@ class ImportRegistreTest extends TestCase
     protected Utilisateur $compte;
 
     protected string $registre;
+
+    protected string $repertoire;
 
     protected string $repertoireRapports;
 
@@ -81,11 +89,8 @@ class ImportRegistreTest extends TestCase
             'village_id' => $this->village->id,
         ]);
 
-        // Le référentiel des corps de métier appartient au seeder du
-        // module Artisanat, qui ne tourne pas ici : ce test construit
-        // ses fixtures à la main. Les deux secteurs que le jeu d'essai
-        // désigne sont donc posés explicitement, avec les codes du
-        // seeder — c'est par le code que la reprise les retrouve.
+        // Référentiel des corps de métier : le seeder du module ne
+        // tourne pas ici, ce test pose les deux codes qu'il désigne.
         CorpsMetier::create([
             'code' => 'AGR',
             'libelle' => 'Agroalimentaire',
@@ -98,18 +103,17 @@ class ImportRegistreTest extends TestCase
             'description' => 'Préparations de la pharmacopée traditionnelle',
         ]);
 
-        // Deux locaux du parc, et rien de plus : tout le reste de ce que
-        // le registre nomme devra se ranger hors parc.
-        //
-        // Leurs espaces sont posés ici parce que l'import ne les crée
-        // plus : depuis le 26/08, le parc est semé d'après l'état de
-        // recouvrement des redevances et la reprise s'y rattache.
+        // Le parc, seedé indépendamment du fichier de reprise — c'est
+        // toujours BoutiqueSeeder/EspaceLocatifSeeder qui en font
+        // autorité, jamais l'import. B0299 n'existe délibérément pas :
+        // c'est l'espace que la table de correspondance nommera sans
+        // que le parc le porte.
         $b01 = Boutique::create(['numero' => 'B01', 'village_id' => $this->village->id]);
         $b02 = Boutique::create(['numero' => 'B02', 'village_id' => $this->village->id]);
 
-        EspaceLocatif::create(['boutique_id' => $b01->id]);   // B0101
-        EspaceLocatif::create(['boutique_id' => $b02->id]);   // B0201
-        EspaceLocatif::create(['boutique_id' => $b02->id]);   // B0202
+        EspaceLocatif::create(['boutique_id' => $b01->id]); // B0101
+        EspaceLocatif::create(['boutique_id' => $b02->id]); // B0201
+        EspaceLocatif::create(['boutique_id' => $b02->id]); // B0202
 
         $agent = Agent::create([
             'nom' => 'Ngassa',
@@ -127,12 +131,6 @@ class ImportRegistreTest extends TestCase
             'agent_id' => $agent->id,
         ]);
 
-        // Le Gate::before du Socle ouvre toutes les permissions au
-        // super-utilisateur. La reprise n'en a besoin que d'une —
-        // `valider_produit`, vérifiée par `ServiceValidationProduit` —
-        // mais passer par le rôle plutôt que par la permission nominale
-        // vérifie au passage que la commande emprunte bien le chemin
-        // d'habilitation ordinaire, et non une porte dérobée.
         Role::findOrCreate(Utilisateur::ROLE_SUPER_UTILISATEUR, 'web');
         $this->compte->syncRoles([Utilisateur::ROLE_SUPER_UTILISATEUR]);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -155,51 +153,67 @@ class ImportRegistreTest extends TestCase
             'exercice_id' => $this->exercice->id,
         ]);
 
+        $this->repertoire = storage_path('framework/testing/registre-'.uniqid());
         $this->repertoireRapports = storage_path('framework/testing/imports-'.uniqid());
-        $this->registre = $this->ecrireLeRegistre();
+        $this->registre = $this->ecrireLesFichiers();
 
         $this->actingAs($this->compte);
     }
 
     protected function tearDown(): void
     {
-        File::delete($this->registre);
+        File::deleteDirectory($this->repertoire);
         File::deleteDirectory($this->repertoireRapports);
 
         parent::tearDown();
     }
 
-    protected function ecrireLeRegistre(): string
+    /**
+     * Sept lignes, chacune posée pour porter une difficulté précise :
+     * deux écritures pour le même occupant (Bassi/BASSIE), un montant
+     * absent (Beurre), un déposant sans espace connu (Curcuma), deux
+     * occupants distincts que la table envoie sur le même espace
+     * (Crousti/Ngassam — l'occupation refusée), un espace nommé mais
+     * hors du parc (Introuvable → B0299), et un même produit vendu deux
+     * fois à des prix différents (Miel : 5000 puis 3000).
+     */
+    protected function ecrireLesFichiers(): string
     {
-        // Les quatre dernières colonnes ne viennent pas du cahier mais
-        // du travail de rattachement de la coordination : l'espace, le
-        // loyer convenu, le corps de métier. Le cahier de ventes, lui,
-        // ne note ni emplacement, ni redevance, ni secteur. Elles sont
-        // facultatives, et les lignes hors parc les laissent vides.
-        $lignes = <<<'CSV'
-        date,code_boutique_source,code_boutique_normalise,nom_artisan_source,designation,conditionnement,quantite,prix_unitaire,montant,coherence,vendeur_reference,espace_locatif,redevance_convenue,corps_metier
-        2026-02-03,No 1,B01,Bassi,Miel,Bouteille,2,2500,5000,OK,Marie,B0101,3000,AGR
-        2026-02-04,B-01,B01,BASSIE,Miel,Bouteille,1,2500,2500,OK,Marie,B0101,3000,AGR
-        2026-02-05,B 2,B02,,Curcuma,Sachet,1,1000,1000,OK,,,,
-        2026-02-06,Hall,HALL,Gabrielle,Vin d'Avocat,Bouteille,3,3000,9000,OK,Payé,,,
-        2026-02-07,B19,B19,Doriane,Chapeau,,1,5000,5000,OK,,,,
-        2026-02-08,b 01,B01,Bassi,Miel,Bouteille,2,3000,6000,OK,Marie,B0101,3000,AGR
-        2026-02-09,B 2,B02,Crousti delice,Croquette,Sachet,3,500,1500,OK,,B0201,2500,MED
-        2026-02-10,B 2,B02,Crousti Delice NGASSAM,Croquette,Sachet,1,500,500,OK,,B0201,2500,MED
-        2026-02-11,B-01,B01,Bassi,Savon,,1,7500,1500,ECART,,B0101,3000,AGR
-        12/02,B 2,B02,Bassi,Fève,,1,1000,1000,OK,,B0202,2500,MED
-        "-""-","-""-","-""-","-""-","-""-","-""-",2,1000,2000,OK,,B0202,2500,MED
-        2026-02-13,B-01,B01,Bassi,,,1,1000,1000,OK,,B0101,3000,AGR
-        2026-02-14,B-01,B01,Bassi,Beurre,,,,,,,B0101,3000,AGR
-        2026-02-15,B-01,B01,Bassi,Chocolat,Boite,,1000,3000,OK,,B0299,,
+        File::ensureDirectoryExists($this->repertoire);
+
+        $registre = <<<'CSV'
+        ligne_source;date;date_lue;designation;montant;artisan;type_artisanat;observation;reste_a_payer
+        1;2026-02-03;oui;Miel;5000;Bassi;;;0
+        2;2026-02-04;oui;Miel;3000;BASSIE;;;0
+        3;2026-02-05;oui;Curcuma;1000;Non installée;;;0
+        4;2026-02-06;oui;Beurre;;Bassi;;;0
+        5;2026-02-09;oui;Croquette;1500;Crousti delice;;;0
+        6;2026-02-10;oui;Croquette;500;Crousti NGASSAM;;;0
+        7;2026-02-15;oui;Boîte;1000;Introuvable;;;0
         CSV;
 
-        $chemin = storage_path('framework/testing/registre-'.uniqid().'.csv');
+        $rattachements = <<<'CSV'
+        ecriture_registre;nb_ventes;total_fcfa;decision;espace_locatif;occupant_parc;similarite;motif
+        Bassi;2;8000;RATTACHE;B0101;Bassi;1.0;Identité établie
+        BASSIE;1;3000;RATTACHE;B0101;Bassi;0.9;Variante orthographique
+        Non installée;1;1000;SANS CORRESPONDANCE;;;0.0;Aucun occupant ne partage de mot distinctif
+        Crousti delice;1;1500;RATTACHE;B0201;Crousti;1.0;Identité établie
+        Crousti NGASSAM;1;500;RATTACHE;B0201;Ngassam;0.8;Identité établie
+        Introuvable;1;1000;RATTACHE;B0299;Fantôme;1.0;Identité établie
+        CSV;
 
-        File::ensureDirectoryExists(dirname($chemin));
-        File::put($chemin, $lignes."\n");
+        $parc = <<<'CSV'
+        ligne_source;contenant;nature;espace;occupant;metier;redevance;du_2026;paye_2026;paye_mensuel_2026;ecart_paye;reste_2026
+        1;B01;BOUTIQUE;B0101;Bassi;Production des vins;3000;0;0;0;0;0
+        2;B02;BOUTIQUE;B0201;Crousti;Production de la pharmacopée traditionnelle;2500;0;0;0;0;0
+        3;B02;BOUTIQUE;B0202;Ngassam;Produits de santé;2500;0;0;0;0;0
+        CSV;
 
-        return $chemin;
+        File::put($this->repertoire.'/registre.csv', $registre."\n");
+        File::put($this->repertoire.'/rattachements.csv', $rattachements."\n");
+        File::put($this->repertoire.'/parc-locatif.csv', $parc."\n");
+
+        return $this->repertoire.'/registre.csv';
     }
 
     protected function importer(): RapportImport
@@ -213,122 +227,57 @@ class ImportRegistreTest extends TestCase
     {
         $rapport = $this->importer();
 
-        $this->assertSame(14, $rapport->valeur(RapportImport::LIGNES_TRAITEES));
+        $this->assertSame(7, $rapport->valeur(RapportImport::LIGNES_TRAITEES));
 
-        // Deux lignes ne peuvent pas devenir des ventes : celle dont la
-        // désignation manque, et celle qui n'a ni quantité, ni prix, ni
-        // montant. Elles sont signalées et tracées, jamais écartées en
-        // silence.
-        $this->assertSame(2, $rapport->valeur(RapportImport::LIGNES_NON_IMPORTEES));
-        $this->assertSame(12, $rapport->valeur(RapportImport::LIGNES_IMPORTEES));
-        $this->assertSame(12, Vente::count());
+        // Une seule ligne ne peut pas devenir une vente : Beurre, sans
+        // montant. Elle est tracée, jamais écartée en silence.
+        $this->assertSame(1, $rapport->valeur(RapportImport::LIGNES_NON_IMPORTEES));
+        $this->assertSame(6, $rapport->valeur(RapportImport::LIGNES_IMPORTEES));
+        $this->assertSame(6, Vente::count());
 
         $this->assertGreaterThan(0, $rapport->valeur(RapportImport::LIGNES_SIGNALEES));
-        $this->assertSame(14, TraceLigneImportee::count());
-        $this->assertSame(2, TraceLigneImportee::where('statut', TraceLigneImportee::STATUT_NON_IMPORTEE)->count());
+        $this->assertSame(7, TraceLigneImportee::count());
+        $this->assertSame(1, TraceLigneImportee::where('statut', TraceLigneImportee::STATUT_NON_IMPORTEE)->count());
     }
 
-    public function test_les_anomalies_sont_denombrees_par_nature(): void
-    {
-        $rapport = $this->importer();
-
-        $natures = $rapport->anomaliesParNature();
-
-        // Chaque nature est comptée séparément : c'est ce qui distingue
-        // une propriété de la source d'un incident isolé. Sur le
-        // registre réel, la quantité est déduite à chaque ligne — 99,8 %
-        // — quand la date n'est héritée que sur 16 % : sans ce détail,
-        // les deux se confondent derrière « 100 % de lignes signalées ».
-        $this->assertArrayHasKey(LigneRegistre::QUANTITE_DEDUITE, $natures);
-        $this->assertArrayHasKey(LigneRegistre::VALEURS_INSUFFISANTES, $natures);
-
-        // Une seule ligne du jeu d'essai n'a ni quantité, ni prix, ni
-        // montant.
-        $this->assertSame(1, $natures[LigneRegistre::VALEURS_INSUFFISANTES]);
-
-        // Le classement va du plus fréquent au plus rare : c'est ce qui
-        // rend le tableau lisible d'un coup d'œil.
-        $comptes = array_values($natures);
-        $trie = $comptes;
-        rsort($trie);
-
-        $this->assertSame($trie, $comptes);
-    }
-
-    public function test_une_ligne_sans_quantite_est_signalee_et_non_rejetee(): void
-    {
-        $rapport = $this->importer();
-
-        // Quantité absente, prix et montant présents : la quantité se
-        // déduit des deux autres et la ligne devient une vente.
-        $chocolat = Produit::where('designation', 'Chocolat')->firstOrFail();
-        $ligne = $chocolat->lignesDepot()->firstOrFail();
-
-        $this->assertSame(3, $ligne->quantite);
-        $this->assertGreaterThanOrEqual(1, $rapport->valeur(RapportImport::LIGNES_VALEURS_DEDUITES));
-
-        // Les trois valeurs absentes : la ligne reste tracée, avec ses
-        // anomalies, et sans vente.
-        $beurre = TraceLigneImportee::where('numero_ligne', 13)->firstOrFail();
-        $this->assertSame(TraceLigneImportee::STATUT_NON_IMPORTEE, $beurre->statut);
-        $this->assertNull($beurre->vente_id);
-        $this->assertNotEmpty($beurre->anomalies);
-    }
-
-    public function test_il_rapproche_les_ecritures_proches_et_signale_celles_qui_restent_sous_le_seuil(): void
-    {
-        $rapport = $this->importer();
-
-        // « Bassi » et « BASSIE » se ressemblent au-delà du seuil : une
-        // seule fiche, sous la forme la plus fréquente.
-        $this->assertSame(1, Artisan::where('nom', 'Bassi')->count());
-        $this->assertSame(0, Artisan::where('nom', 'BASSIE')->count());
-        $this->assertSame(1, $rapport->valeur(RapportImport::ARTISANS_REGROUPES));
-
-        // « Crousti delice » et « Crousti Delice NGASSAM » restent deux
-        // fiches, mais le rapport dit que le rapprochement a été écarté.
-        $this->assertSame(1, Artisan::where('nom', 'Crousti delice')->count());
-        $this->assertSame(1, Artisan::where('nom', 'Crousti Delice NGASSAM')->count());
-
-        $doutes = collect($rapport->doutes())->pluck('nom')->all();
-        $this->assertContains('Crousti Delice NGASSAM', $doutes);
-    }
-
-    public function test_une_ligne_sans_artisan_va_sur_non_identifie_sans_nom_suppose(): void
-    {
-        $rapport = $this->importer();
-
-        $anonyme = Artisan::where('nom', ServiceImportRegistre::ARTISAN_NON_IDENTIFIE)->firstOrFail();
-
-        $curcuma = Produit::where('designation', 'Curcuma')->firstOrFail();
-        $this->assertSame($anonyme->id, $curcuma->artisan_id);
-
-        $this->assertSame(1, $rapport->valeur(RapportImport::LIGNES_SANS_ARTISAN));
-
-        // Le registre ne porte pas le secteur d'activité : la colonne
-        // reste vide plutôt que de recevoir un secteur inventé.
-        $this->assertNull($anonyme->corps_metier_id);
-    }
-
-    public function test_les_codes_hors_boutiques_vont_sur_une_boutique_technique(): void
+    public function test_une_ligne_sans_montant_est_tracee_et_non_reprise(): void
     {
         $this->importer();
 
+        $beurre = TraceLigneImportee::where('numero_ligne', 4)->firstOrFail();
+
+        $this->assertSame(TraceLigneImportee::STATUT_NON_IMPORTEE, $beurre->statut);
+        $this->assertNull($beurre->vente_id);
+        $this->assertSame(0, Produit::where('designation', 'Beurre')->count());
+    }
+
+    public function test_deux_ecritures_rattachees_au_meme_occupant_produisent_un_seul_artisan(): void
+    {
+        $this->importer();
+
+        // « Bassi » et « BASSIE » sont deux écritures du registre pour
+        // le même occupant du parc : rattachements.csv les envoie
+        // toutes deux sur « Bassi », et resoudreArtisan() ne crée
+        // qu'une seule fiche.
+        $this->assertSame(1, Artisan::where('nom', 'Bassi')->count());
+        $this->assertSame(0, Artisan::where('nom', 'BASSIE')->count());
+
+        $bassi = Artisan::where('nom', 'Bassi')->firstOrFail();
+        $this->assertSame(2, Vente::where('artisan_id', $bassi->id)->count());
+    }
+
+    public function test_un_deposant_sans_espace_connu_va_sur_la_boutique_technique(): void
+    {
+        $rapport = $this->importer();
+
         $technique = Boutique::where('numero', ServiceImportRegistre::BOUTIQUE_TECHNIQUE)->firstOrFail();
+        $curcuma = Produit::where('designation', 'Curcuma')->firstOrFail();
 
-        // Les ventes de HALL et de B19 existent, rattachées au contenant
-        // technique : les écarter perdrait des recettes encaissées.
-        $this->assertSame(2, Vente::where('boutique_id', $technique->id)->count());
+        $this->assertSame($technique->id, $curcuma->boutique_id);
 
-        // B19 a la forme d'un code de boutique mais ne correspond à
-        // aucun local du parc : le créer gonflerait le parc et fausserait
-        // tout taux d'occupation.
-        $this->assertSame(0, Boutique::where('numero', 'B19')->count());
-
-        // Et la boutique technique ne reçoit aucun espace locatif. C'est
-        // le changement du 26/08 : une vente dont on ignore
-        // l'emplacement est une lacune du cahier, pas une occupation.
-        $this->assertSame(0, EspaceLocatif::where('boutique_id', $technique->id)->count());
+        $nonInstallee = Artisan::where('nom', 'Non installée')->firstOrFail();
+        $this->assertSame(0, AttributionEspace::where('artisan_id', $nonInstallee->id)->count());
+        $this->assertGreaterThanOrEqual(1, $rapport->valeur(RapportImport::LIGNES_SIGNALEES));
     }
 
     public function test_l_import_ne_cree_aucun_espace_locatif(): void
@@ -345,139 +294,81 @@ class ImportRegistreTest extends TestCase
     {
         $rapport = $this->importer();
 
-        // La dernière ligne renvoie à B0299, que le parc ne porte pas.
+        // B0299 figure dans rattachements.csv mais dans aucune des deux
+        // tables qui font autorité sur le parc — ni les espaces réels,
+        // ni parc-locatif.csv. La vente n'est pas perdue pour autant :
+        // elle s'enregistre sur la boutique technique, faute de
+        // contenant connu pour la porter.
         $this->assertSame(1, $rapport->valeur(RapportImport::ESPACES_HORS_PARC));
         $this->assertCount(1, $rapport->horsParc());
 
-        // La vente est enregistrée quand même, sur la boutique : une
-        // table de correspondance mal remplie ne doit pas faire perdre
-        // une recette.
-        $b01 = Boutique::where('numero', 'B01')->firstOrFail();
-        $chocolat = Produit::where('designation', 'Chocolat')->firstOrFail();
+        $technique = Boutique::where('numero', ServiceImportRegistre::BOUTIQUE_TECHNIQUE)->firstOrFail();
+        $boite = Produit::where('designation', 'Boîte')->firstOrFail();
 
-        $this->assertSame($b01->id, $chocolat->boutique_id);
-    }
-
-    public function test_il_regroupe_les_ecritures_de_boutiques(): void
-    {
-        $rapport = $this->importer();
-
-        // « No 1 », « B-01 » et « b 01 » désignent le même local.
-        $this->assertGreaterThanOrEqual(1, $rapport->valeur(RapportImport::BOUTIQUES_REGROUPEES));
-        $this->assertSame(4, $rapport->valeur(RapportImport::BOUTIQUES_RETENUES));
+        $this->assertSame($technique->id, $boite->boutique_id);
     }
 
     public function test_une_occupation_refusee_ne_fait_pas_tomber_la_vente(): void
     {
         $rapport = $this->importer();
 
-        // « Crousti delice » et « Crousti Delice NGASSAM » désignent la
-        // même personne — Crousti Delice est le nom commercial, NGASSAM
-        // le nom de l'artisan — mais le rapprochement automatique les
-        // laisse sous le seuil, et l'import les enregistre donc comme
-        // deux artisans. La table de correspondance les envoie tous deux
-        // sur B0201 : le second contrat chevauche le premier et le
-        // modèle le refuse, à juste titre.
-        //
-        // C'est le cas que ce test existe pour figer. Le refus est
-        // correct au regard du parc ; ce qui ne le serait pas, c'est
-        // qu'il emporte la vente. La croquette a été vendue, l'argent
-        // est entré en caisse, et aucune imperfection du rapprochement
-        // des noms ne doit effacer cela.
+        // Crousti et Ngassam sont deux occupants distincts que la table
+        // de correspondance envoie tous deux sur B0201. Le second
+        // contrat chevauche le premier et le modèle le refuse, à juste
+        // titre — mais la croquette a bien été vendue, et l'argent est
+        // entré en caisse : le refus ne doit pas l'effacer.
         $this->assertSame(1, $rapport->valeur(RapportImport::OCCUPATIONS_REFUSEES));
 
         $b0201 = EspaceLocatif::where('code', 'B0201')->firstOrFail();
         $this->assertSame(1, AttributionEspace::where('espace_locatif_id', $b0201->id)->count());
 
-        // Et le compte des ventes est intact : le refus d'un contrat
-        // d'occupation n'a coûté aucune recette.
-        $this->assertSame(12, Vente::count());
+        $this->assertSame(6, Vente::count());
     }
 
     public function test_le_corps_de_metier_vient_du_releve_et_non_du_cahier(): void
     {
-        $rapport = $this->importer();
+        $this->importer();
 
         $bassi = Artisan::where('nom', 'Bassi')->firstOrFail();
         $agro = CorpsMetier::where('code', 'AGR')->firstOrFail();
 
-        // Le cahier de ventes ne dit jamais de quel métier relève un
-        // artisan ; c'est la colonne « métier » du relevé des redevances
-        // qui le porte, rangée sous les quatorze secteurs du seeder.
+        // Le registre ne porte jamais de métier ; c'est la colonne
+        // « metier » de parc-locatif.csv, rangée sous les secteurs
+        // officiels, qui le fournit.
         $this->assertSame($agro->id, $bassi->corps_metier_id);
 
-        // Un artisan sans rattachement reste sans secteur : le
-        // référentiel appartient au seeder, une reprise n'y ajoute rien.
-        $anonyme = Artisan::where('nom', ServiceImportRegistre::ARTISAN_NON_IDENTIFIE)->firstOrFail();
-        $this->assertNull($anonyme->corps_metier_id);
-
-        $this->assertLessThan(
-            $rapport->valeur(RapportImport::ARTISANS_CREES),
-            $rapport->valeur(RapportImport::ARTISANS_SANS_SECTEUR),
-            'Le relevé doit renseigner le secteur d\'au moins un artisan.',
-        );
+        // Un déposant sans ligne dans parc-locatif.csv reste sans
+        // secteur, plutôt que d'en recevoir un inventé.
+        $nonInstallee = Artisan::where('nom', 'Non installée')->firstOrFail();
+        $this->assertNull($nonInstallee->corps_metier_id);
     }
 
     public function test_la_redevance_relevee_est_figee_sur_l_attribution(): void
     {
-        $rapport = $this->importer();
+        $this->importer();
 
         $bassi = Artisan::where('nom', 'Bassi')->firstOrFail();
+        $attribution = AttributionEspace::where('artisan_id', $bassi->id)->firstOrFail();
 
-        $parEspace = AttributionEspace::where('artisan_id', $bassi->id)
-            ->get()
-            ->mapWithKeys(fn (AttributionEspace $a) => [
-                $a->espaceLocatif->code => $a->redevance_convenue === null
-                    ? null
-                    : (int) $a->redevance_convenue,
-            ])
-            ->all();
-
-        // Le forfait est celui du relevé de recouvrement, espace par
-        // espace, et il ne se déduit d'aucune surface (A-01).
-        $this->assertSame(3000, $parEspace['B0101']);
-        $this->assertSame(2500, $parEspace['B0202']);
-
-        // Toutes les attributions de cet import en portent une : plus
-        // aucun contrat gratuit implicite.
-        $this->assertSame(0, $rapport->valeur(RapportImport::ATTRIBUTIONS_SANS_REDEVANCE));
+        // Le forfait vient de parc-locatif.csv, jamais d'une surface
+        // (A-01).
+        $this->assertSame(3000, (int) $attribution->redevance_convenue);
     }
 
-    public function test_l_artisan_est_rattache_a_l_espace_que_le_registre_nomme(): void
+    public function test_l_artisan_est_rattache_a_l_espace_que_la_table_designe(): void
     {
         $this->importer();
 
-        $b02 = Boutique::where('numero', 'B02')->firstOrFail();
-
-        // Le parc n'a pas bougé : deux espaces sur B02, ceux qui y
-        // étaient avant l'import.
-        $this->assertSame(2, EspaceLocatif::where('boutique_id', $b02->id)->count());
-
         $bassi = Artisan::where('nom', 'Bassi')->firstOrFail();
+        $attribution = AttributionEspace::where('artisan_id', $bassi->id)->firstOrFail();
 
-        $attributions = AttributionEspace::where('artisan_id', $bassi->id)->get();
+        $this->assertSame('B0101', $attribution->espaceLocatif->code);
+        $this->assertSame(StatutAttribution::ACTIVE, $attribution->statut);
+        $this->assertSame($this->exercice->id, $attribution->exercice_id);
 
-        // Bassi vend depuis B0101 et B0202 : deux attributions, chacune
-        // sur l'espace que la table de correspondance a désigné, et
-        // aucune sur B0299 qui n'existe pas.
-        $this->assertCount(2, $attributions);
-
-        $this->assertEqualsCanonicalizing(
-            ['B0101', 'B0202'],
-            $attributions->map(fn (AttributionEspace $a) => $a->espaceLocatif->code)->all(),
-        );
-
-        foreach ($attributions as $attribution) {
-            $this->assertSame(StatutAttribution::ACTIVE, $attribution->statut);
-            $this->assertSame($this->exercice->id, $attribution->exercice_id);
-        }
-
-        // L'occupation commence à la plus ancienne vente relevée, pas au
-        // jour de l'import.
-        $enB01 = $attributions->first(
-            fn (AttributionEspace $attribution) => $attribution->espaceLocatif->boutique_id !== $b02->id
-        );
-        $this->assertSame('2026-02-03', $enB01->date_debut->toDateString());
+        // L'occupation commence à la plus ancienne vente relevée pour
+        // cet occupant, pas au jour de l'import.
+        $this->assertSame('2026-02-03', $attribution->date_debut->toDateString());
     }
 
     public function test_le_prix_du_produit_est_celui_de_la_premiere_occurrence(): void
@@ -486,81 +377,28 @@ class ImportRegistreTest extends TestCase
 
         $miel = Produit::where('designation', 'Miel')->firstOrFail();
 
-        // Le miel a été vendu 2 500 puis 3 000 F : la fiche produit
-        // retient le premier prix rencontré.
-        $this->assertSame(2500, (int) round((float) $miel->prix_unitaire));
+        // Vendu 5 000 puis 3 000 F : la fiche retient le premier prix
+        // rencontré.
+        $this->assertSame(5000, (int) round((float) $miel->prix_unitaire));
 
-        // La vente du 8 février porte le prix réellement pratiqué ce
-        // jour-là : c'est le figement de RG-10, et non le prix du
-        // catalogue.
-        $venteDuHuit = Vente::whereDate('date_vente', '2026-02-08')->firstOrFail();
-        $this->assertSame(3000, (int) $venteDuHuit->lignes()->firstOrFail()->prix_unitaire);
-        $this->assertSame(6000, (int) $venteDuHuit->montant_total);
+        // La seconde vente porte bien le montant réellement encaissé ce
+        // jour-là, et non le prix du catalogue (RG-10).
+        $venteDuQuatre = Vente::whereDate('date_vente', '2026-02-04')->firstOrFail();
+        $this->assertSame(3000, (int) $venteDuQuatre->montant_total);
 
-        // La référence est produite par le modèle, jamais saisie.
         $this->assertNotEmpty($miel->reference);
         $this->assertStringStartsWith('BTQ', $miel->reference);
-
-        // Le registre ne porte pas la famille du produit.
         $this->assertNull($miel->categorie_id);
-    }
-
-    public function test_une_ligne_en_ecart_est_importee_telle_quelle_et_listee(): void
-    {
-        $rapport = $this->importer();
-
-        $savon = Produit::where('designation', 'Savon')->firstOrFail();
-        $vente = Vente::whereHas('lignes', fn ($requete) => $requete->where('produit_id', $savon->id))
-            ->firstOrFail();
-
-        // Ni le prix ni la quantité ne sont retouchés pour faire tomber
-        // le total transcrit : le montant de la vente est celui qu'impose
-        // l'invariant du système, et l'écart est consigné.
-        $this->assertSame(7500, (int) $vente->montant_total);
-
-        $this->assertSame(1, $rapport->valeur(RapportImport::ECARTS_A_LA_SOURCE));
-        $this->assertGreaterThanOrEqual(1, $rapport->valeur(RapportImport::ECARTS_DE_CALCUL));
-
-        $signalees = collect($rapport->signalements())->pluck('ligne')->all();
-        $this->assertContains('9', $signalees);
-    }
-
-    public function test_les_guillemets_de_repetition_reprennent_la_ligne_precedente(): void
-    {
-        $this->importer();
-
-        // La ligne 11 ne porte que des guillemets : elle reprend la date,
-        // le local, l'artisan et la désignation de la ligne 10.
-        $trace = TraceLigneImportee::where('numero_ligne', 11)->firstOrFail();
-        $this->assertSame(TraceLigneImportee::STATUT_IMPORTEE, $trace->statut);
-
-        $vente = Vente::findOrFail($trace->vente_id);
-        $this->assertSame('2026-02-12', $vente->date_vente->toDateString());
-        $this->assertSame('Fève', $vente->lignes()->firstOrFail()->designation);
-    }
-
-    public function test_une_date_sans_annee_reprend_celle_de_la_ligne_precedente(): void
-    {
-        $rapport = $this->importer();
-
-        $trace = TraceLigneImportee::where('numero_ligne', 10)->firstOrFail();
-        $vente = Vente::findOrFail($trace->vente_id);
-
-        $this->assertSame('2026-02-12', $vente->date_vente->toDateString());
-        $this->assertGreaterThanOrEqual(1, $rapport->valeur(RapportImport::LIGNES_SANS_DATE_PROPRE));
     }
 
     public function test_chaque_ligne_produit_un_depot_puis_une_vente_et_laisse_le_stock_a_zero(): void
     {
         $this->importer();
 
-        $this->assertSame(12, Depot::count());
-        $this->assertSame(12, Depot::valide()->count());
+        $this->assertSame(6, Depot::count());
+        $this->assertSame(6, Depot::valide()->count());
 
         $miel = Produit::where('designation', 'Miel')->firstOrFail();
-
-        // Cinq unités déposées, cinq vendues : le journal de stock est
-        // équilibré et n'est jamais passé par un solde négatif.
         $this->assertSame(0, $miel->getQuantiteEnStock());
     }
 
@@ -571,21 +409,50 @@ class ImportRegistreTest extends TestCase
         $ventes = Vente::count();
         $produits = Produit::count();
         $artisans = Artisan::count();
-        $espaces = EspaceLocatif::count();
         $attributions = AttributionEspace::count();
 
         $second = $this->importer();
 
-        $this->assertSame(14, $second->valeur(RapportImport::LIGNES_TRAITEES));
-        $this->assertSame(14, $second->valeur(RapportImport::LIGNES_DEJA_REPRISES));
+        $this->assertSame(7, $second->valeur(RapportImport::LIGNES_TRAITEES));
+        $this->assertSame(7, $second->valeur(RapportImport::LIGNES_DEJA_REPRISES));
         $this->assertSame(0, $second->valeur(RapportImport::LIGNES_IMPORTEES));
 
         $this->assertSame($ventes, Vente::count());
         $this->assertSame($produits, Produit::count());
         $this->assertSame($artisans, Artisan::count());
-        $this->assertSame($espaces, EspaceLocatif::count());
         $this->assertSame($attributions, AttributionEspace::count());
-        $this->assertSame(14, TraceLigneImportee::count());
+        $this->assertSame(7, TraceLigneImportee::count());
+    }
+
+    public function test_les_ecritures_ecartees_par_rattachements_csv_ne_produisent_rien(): void
+    {
+        // Ajoute une écriture « A ARBITRER » et une « NON ARTISAN » au
+        // jeu d'essai, pour vérifier qu'aucune des deux ne produit de
+        // vente ni d'artisan — le lecteur les exclut avant même que
+        // `estVendable()` ne soit interrogée.
+        File::put($this->repertoire.'/registre.csv', File::get($this->repertoire.'/registre.csv')
+            ."8;2026-02-16;oui;Sac;2000;À trancher;;;0\n"
+            ."9;2026-02-17;oui;Don;500;Espace du village;;;0\n");
+
+        File::put($this->repertoire.'/rattachements.csv', File::get($this->repertoire.'/rattachements.csv')
+            ."À trancher;1;2000;A ARBITRER;;;0.6;Ambiguïté réelle\n"
+            ."Espace du village;1;500;NON ARTISAN;;;0.0;Pas une personne\n");
+
+        $import = app(ServiceImportRegistre::class);
+        $rapport = $import->importer($this->registre, seuil: 85.0, marge: 10.0);
+
+        // Les deux écritures écartées ne deviennent jamais des
+        // LigneRegistre : elles n'atteignent pas la boucle qui compte
+        // les lignes traitées, et c'est délibéré — le rapport porte sur
+        // ce qu'il y avait à traiter, pas sur ce qu'un rattachement a
+        // refusé en amont.
+        $this->assertSame(7, $rapport->valeur(RapportImport::LIGNES_TRAITEES));
+        $this->assertSame(6, $rapport->valeur(RapportImport::LIGNES_IMPORTEES));
+        $this->assertSame(0, Artisan::where('nom', 'À trancher')->count());
+        $this->assertSame(0, Artisan::where('nom', 'Espace du village')->count());
+        $this->assertSame(0, Vente::whereHas('lignes', fn ($r) => $r->where('designation', 'Sac'))->count());
+
+        $this->assertCount(2, $import->lecteur()->dernieresExclusions);
     }
 
     public function test_la_commande_exporte_le_rapport_en_csv(): void
@@ -604,9 +471,7 @@ class ImportRegistreTest extends TestCase
         $contenu = File::get($synthese->getPathname());
 
         $this->assertStringContainsString('Lignes traitées', $contenu);
-        $this->assertStringContainsString('Lignes en écart de calcul', $contenu);
-        $this->assertStringContainsString('Lignes sans artisan identifiable', $contenu);
-        $this->assertStringContainsString('Écritures regroupées automatiquement', $contenu);
+        $this->assertStringContainsString('Attributions créées', $contenu);
     }
 
     public function test_la_commande_refuse_de_partir_sans_compte_reel(): void
